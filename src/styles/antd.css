@@ -1,0 +1,439 @@
+.ant-card-body{
+  padding: 15px !important;
+}
+
+.home-header-select.ant-select.ant-select-sm .ant-select-arrow{
+  display: none;
+}
+.home-header-select.ant-select.ant-select-sm .ant-select-selector .ant-select-selection-wrap .ant-select-selection-search{
+padding: 10px 5px !important;
+}
+.home-header-select.ant-select.ant-select-sm .ant-select-selector .ant-select-selection-item{
+  padding: 0px !important;
+}
+.ant-slider-track{
+  background: var(--secondary-color) !important;
+}
+.ant-slider-dot{
+  border-color: var(--secondary-color) !important;
+}
+.home-header-select {
+  background: transparent !important;
+}
+.home-header-select .ant-select-selector{
+  padding: 0px !important;
+  border: 0px solid transparent !important;
+  background-color: transparent !important;
+}
+
+/* Custom color for selected option */
+.ant-select-item-option-selected,
+.sorting-selection .ant-select-selector {
+  /* background-color: var(--secondary-color) !important;  
+  color: white !important;               */
+  outline: none !important;
+  border: none !important;
+  background-color: transparent !important;
+}
+/* .sorting-selection .ant-select-arrow, .sorting-selection .ant-select-selection-item{
+  color: white !important;  
+} */
+
+/* If you want to style the option when hovered */
+/* .sorting-selection .ant-select-item-option:hover {
+  background-color: var(--secondary-color);
+} */
+.ant-select-focused {
+  display:none;
+}
+
+/* Global styles for the Slider */
+.diamond-slider {
+  width: 100%;
+  /* margin-bottom: 15px; */
+}
+
+/* Rail styling */
+.diamond-slider .MuiSlider-rail {
+  background-color: #D2E0E6 !important;
+}
+
+/* Track styling */
+.diamond-slider .MuiSlider-track {
+  background-color: #d2e6dc8a !important;
+  border: none;
+  height: 5px;
+  width: 100%;
+  /* display:none !important; */
+}
+/* secondary */
+/* Mark styling */
+.diamond-slider .MuiSlider-mark {
+  height: 5px;
+  width: 1.5px;
+  background-color: var(--secondary-color);
+
+}
+
+/* Thumb styling */
+.MuiSlider-thumb {
+  /* background-color: transparent;
+  height: 0px;
+  width: 0px;
+  border: none; */
+  background-color: var(--secondary-color) !important;
+  box-shadow: none !important;
+}
+
+/* Active and Focused Thumb state */
+.diamond-slider .MuiSlider-thumb:focus,
+.diamond-slider .MuiSlider-thumb:hover,
+.diamond-slider .MuiSlider-thumb.Mui-active,
+.diamond-slider .MuiSlider-thumb.Mui-focusVisible {
+  box-shadow: none in !important;
+  /* background-color: transparent; */
+  border: none;
+}
+
+
+
+/* slider subtypes */
+
+.subtype-swiper {
+  width: 100%;
+  padding: 10px 0;
+}
+
+.mySwiper2 .swiper-button-next, .mySwiper2 .swiper-button-prev{
+  color: #17381d !important;
+  scale: 0.7;
+}
+.homepage-banner-swiper .swiper-button-next, .homepage-banner-swiper .swiper-button-prev{
+  color: #17381d !important;
+  background-color: #fff !important;
+  scale: 0.7;
+  padding: 25px !important;
+  border-radius: 70%;
+  background-color: 1px solid transparent !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.homepage-banner-swiper .swiper-button-prev:after, .homepage-banner-swiper .swiper-button-next:after{
+  font-size: 25px !important;
+}
+
+/* Base bullet style */
+.homepage-banner-swiper .swiper-pagination-bullet {
+  width: 40px;
+  height: 1.5px;
+  display: inline-block;
+  border-radius: 1px;
+  background: white;
+  opacity: 1;
+  transition: opacity 0.3s, background 0.3s;
+  margin: 0 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pagination container positioning */
+.homepage-banner-swiper .swiper-pagination {
+  bottom: 24px !important;
+}
+
+/* Active bullet with progress animation */
+.homepage-banner-swiper .swiper-pagination-bullet-active {
+  background: white;
+  opacity: 1;
+}
+
+/* Progress bar inside active bullet */
+.homepage-banner-swiper .swiper-pagination-bullet-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #17381d;
+  border-radius: 1px;
+  animation: progressAnimation 6s linear infinite;
+}
+
+/* Progress animation keyframes */
+@keyframes progressAnimation {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+
+.homepage-banner-swiper .swiper-slide{
+  height: 100%;
+}
+.subtype-swiper .swiper-button-next,
+.subtype-swiper .swiper-button-prev {
+  color: #17381d;
+  scale: 0.7;
+}
+
+
+.subtype-swiper .swiper-pagination {
+  display: none;
+}
+.next-try::before{
+  width: 0px;
+    height: 0px;
+    border-top: 36px solid transparent;
+    border-bottom: 36px solid transparent;
+    border-left: 15px solid #ffffff;
+    position: absolute;
+    clip-path: polygon(0 -2%, 50% 50%, 1% 100%);
+    content: "";
+    top: 0px;
+    left: 0;
+    transform: translate(-100%, 0);
+}
+.next-try::after{
+  width: 0;
+    height: 0;
+    border-top: 36px solid transparent;
+    border-bottom: 36px solid transparent;
+    border-left: 15px solid transparent;
+    position: absolute;
+    content: "";
+    top: 0px;
+    right: 0;
+    transform: translate(100%, 0);
+}
+.first-step::after{
+  width: 0;
+    height: 0;
+    border-top: 36px solid transparent;
+    border-bottom: 36px solid transparent;
+    border-left: 13px solid #e7eae1;
+    position: absolute;
+    content: "";
+    top: 0px;
+    right: 0;
+    z-index: 10;
+    transform: translate(100%, 0);
+}
+.last-step::before{
+  width: 0;
+    height: 0;
+    border-top: 36px solid #ffffff;
+    border-bottom: 36px solid #ffffff;
+    border-left: 15px solid transparent;
+    position: absolute;
+    content: "";
+    top: 0px;
+    right: 0;
+    transform: translate(100%, 0);
+}
+/*  mobile screen Styles */
+@media (max-width: 640px) {
+  .subtype-swiper .swiper-button-next,
+  .subtype-swiper .swiper-button-prev {
+    scale: 0.6;
+  }
+.ant-select-dropdown{
+  z-index: 51 !important;
+}
+  /* .ant-select-dropdown */
+  .sorting-selection .ant-select-selector{
+    border:none !important;
+  }
+  .rc-virtual-list-holder-inner div {
+    min-height: 14px !important; /* Set height of every div inside .rc-virtual-list-holder-inner */
+  }
+  .ant-select-item, .ant-select-item-option {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  .ant-select-item-option-content{
+  font-size: 12px !important;
+  height: 14px !important;
+  }
+  .ant-card-body{
+    padding: 5px 10px !important;
+  }
+
+.ant-modal-content{
+  padding: 20px 10px !important;
+}
+
+
+  .force-horizontal-steps {
+    .ant-steps-item-title {
+      max-width: 80px;
+    }
+    
+    .ant-steps-item-description {
+      max-width: 80px;
+    }
+    flex-direction: row !important;
+  }
+  .force-horizontal-steps .ant-steps-item-container , .order-details-progress .ant-steps-item-container{
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  }
+
+  .force-horizontal-steps .ant-steps-item-tail , .order-details-progress .ant-steps-item-tail{
+    display: none !important;
+  }
+  .force-horizontal-steps .ant-steps-item-title , .order-details-progress .ant-steps-item-title{
+    font-size: 12px !important;
+    line-height: 12px !important;
+    padding: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  .force-horizontal-steps .ant-steps-item-description, .order-details-progress .ant-steps-item-description{
+    font-size: 10px !important;
+    text-align: center !important;
+  }
+  .force-horizontal-steps .ant-steps-item-icon, .order-details-progress .ant-steps-item-icon{
+    /* width: 100% !important; */
+    margin: 5px 0 !important;
+    text-align: center !important;
+  }
+
+  .order-details-progress{
+    .ant-steps-item-title {
+      max-width: 80px;
+    }
+    
+    .ant-steps-item-description {
+      max-width: 80px;
+    }
+    flex-direction: row !important;
+  }
+  .currency-selection-modal .ant-modal-body{
+    font-size: 12px !important;
+    h2{
+      font-size: 12px !important; 
+    }
+  }
+
+  .next-try::before{
+    width: 0px;
+      height: 0px;
+      border-top: 27px solid transparent;
+      border-bottom: 27px solid transparent;
+      border-left: 12px solid #ffffff;
+      position: absolute;
+      content: "";
+      top: 0px;
+      left: 0;
+      transform: translate(-100%, 0);
+  }
+  .next-try::after{
+    width: 0;
+      height: 0;
+      border-top: 27px solid transparent;
+      border-bottom: 27px solid transparent;
+      border-left: 12px solid transparent;
+      position: absolute;
+      content: "";
+      top: 0px;
+      right: 0;
+      transform: translate(100%, 0);
+  }
+  .first-step::after{
+    width: 0;
+      height: 0;
+      border-top: 27px solid transparent;
+      border-bottom: 27px solid transparent;
+      border-left: 11px solid #e7eae1;
+      position: absolute;
+      content: "";
+      top: 0px;
+      right: 0;
+      /* z-index: 10; */
+      transform: translate(100%, 0);
+  }
+  .last-step::before{
+    width: 0;
+      height: 0;
+      border-top: 27px solid #ffffff;
+      border-bottom: 27px solid #ffffff;
+      border-left: 12px solid transparent;
+      position: absolute;
+      content: "";
+      top: 0px;
+      right: 0;
+      transform: translate(100%, 0);
+  }
+}
+
+.promotional-strip .swiper-wrapper{
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* laptop lg screen Styles */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .next-try::before{
+    width: 0px;
+      height: 0px;
+      border-top: 32px solid transparent;
+      border-bottom: 32px solid transparent;
+      border-left: 12px solid #ffffff;
+      position: absolute;
+      content: "";
+      top: 0px;
+      left: 0;
+      transform: translate(-100%, 0);
+  }
+  .next-try::after{
+    width: 0;
+      height: 0;
+      border-top: 32px solid transparent;
+      border-bottom: 32px solid transparent;
+      border-left: 12px solid #ffffff;
+      position: absolute;
+      content: "";
+      top: 0px;
+      right: 0;
+      z-index: 10;
+      transform: translate(100%, 0);
+  }
+  .first-step::after{
+    width: 0;
+      height: 0;
+      border-top: 29px solid transparent;
+      border-bottom: 27px solid transparent;
+      border-left: 12px solid #e7eae1;
+      position: absolute;
+      content: "";
+      top: 0px;
+      right: 0;
+      /* z-index: 10; */
+      transform: translate(100%, 0);
+  }
+  .last-step::before{
+    width: 0;
+      height: 0;
+      border-top: 32px solid #ffffff;
+      border-bottom: 32px solid #ffffff;
+      border-left: 12px solid transparent;
+      position: absolute;
+      content: "";
+      top: 0px;
+      right: 0;
+      transform: translate(100%, 0);
+  }
+}
+
+
+.modal-backdrop.yotpo-review-form-modal .yotpo-modal {
+
+  height: auto !important;
+  }

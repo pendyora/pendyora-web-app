@@ -33,7 +33,6 @@ const HeaderTopPart = ({
   const [scrolled, setScrolled] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
 
-  
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -42,16 +41,15 @@ const HeaderTopPart = ({
 
   return (
     <div
-    className={`relative w-full flex items-center justify-between pt-[10px] px-10 md:px-5 transition-[background-color,backdrop-filter,box-shadow,color] duration-300 ease-out pb-[10px] text-black ${
-      isMegaMenuOpen
-        ? 'bg-white shadow-[0_1px_0_rgba(45,23,14,0.06),0_16px_40px_-20px_rgba(45,23,14,0.18)]'
-        : scrolled
-          ? 'bg-white/70 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_rgba(45,23,14,0.06),0_16px_40px_-20px_rgba(45,23,14,0.18)]'
-          : 'bg-transparent'
-    }`}
-  >
+      className={`relative w-full flex items-center justify-between pt-[10px] px-10 md:px-5 transition-[background-color,backdrop-filter,box-shadow,color] duration-300 ease-out pb-[10px] text-black ${
+        isMegaMenuOpen
+          ? 'bg-white shadow-[0_1px_0_rgba(45,23,14,0.06),0_16px_40px_-20px_rgba(45,23,14,0.18)]'
+          : scrolled
+            ? 'bg-white/70 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_rgba(45,23,14,0.06),0_16px_40px_-20px_rgba(45,23,14,0.18)]'
+            : 'bg-transparent'
+      }`}
+    >
       <div className="w-[15%] flex justify-center items-center h-[57px]">
-
         <Link href="/" className="h-[30px] w-[100%] lg:h-[50px] lg:w-full flex justify-center items-center">
           <Image
             src="/images/logo.png"
@@ -62,10 +60,9 @@ const HeaderTopPart = ({
             className="object-cover lg:w-[60%]"
           />
         </Link>
-
       </div>
       <div className="w-[70%]">
-        <HeaderViewDynamic headerData={headerMetaData} onMenuOpenChange={setIsMegaMenuOpen}  />
+        <HeaderViewDynamic headerData={headerMetaData} onMenuOpenChange={setIsMegaMenuOpen} />
       </div>
       <div className="flex w-[15%]  justify-end gap-3 md:gap-2  items-center">
         <div className="flex items-center">

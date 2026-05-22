@@ -1,15 +1,9 @@
 'use client';
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useMotionValue,
-  useSpring,
-  useMotionValueEvent,
-} from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import Link from 'next/link';
+
 import { Image } from 'antd';
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useMotionValueEvent } from 'framer-motion';
+import Link from 'next/link';
 
 type Product = {
   productImage?: string;
@@ -40,10 +34,15 @@ function useBreakpoint() {
   useEffect(() => {
     const update = () => {
       const w = window.innerWidth;
-      if (w < 550) setState({ cardWidth: w - 48, visible: 1 });
-      else if (w < 769) setState({ cardWidth: 280, visible: 2 });
-      else if (w < 1024) setState({ cardWidth: 300, visible: 3 });
-      else setState({ cardWidth: 320, visible: 4 });
+      if (w < 550) {
+        setState({ cardWidth: w - 48, visible: 1 });
+      } else if (w < 769) {
+        setState({ cardWidth: 280, visible: 2 });
+      } else if (w < 1024) {
+        setState({ cardWidth: 300, visible: 3 });
+      } else {
+        setState({ cardWidth: 320, visible: 4 });
+      }
     };
     update();
     window.addEventListener('resize', update);
@@ -83,9 +82,7 @@ export default function BestSellersCarousel({ products }: { products: Product[] 
   });
 
   // Scroll-driven horizontal pan
-  const scrollX = useTransform([scrollYProgress, maxXMV], ([p, max]) =>
-    -(p as number) * (max as number)
-  );
+  const scrollX = useTransform([scrollYProgress, maxXMV], ([p, max]) => -(p as number) * (max as number));
 
   // Manual button offset with spring easing
   const rawManualX = useMotionValue(0);
@@ -108,7 +105,9 @@ export default function BestSellersCarousel({ products }: { products: Product[] 
   const prev = () => rawManualX.set(Math.min(0, rawManualX.get() + step));
   const next = () => rawManualX.set(Math.max(-maxXVal, rawManualX.get() - step));
 
-  useEffect(() => { rawManualX.set(0); }, [cardWidth]);
+  useEffect(() => {
+    rawManualX.set(0);
+  }, [cardWidth]);
 
   return (
     <section ref={sectionRef} className="relative bg-ivory" style={{ height: sectionHeight }}>
@@ -117,7 +116,6 @@ export default function BestSellersCarousel({ products }: { products: Product[] 
         className="sticky flex flex-col justify-start overflow-hidden pt-10 pb-14 lg:pt-8 lg:pb-12 sm:pt-6 sm:pb-8"
         style={{ top: 'var(--header-height)', height: 'calc(100vh - var(--header-height))' }}
       >
-
         {/* Header — z-10 keeps it above the will-change:transform track layer */}
         <div className="relative z-10 container-xs px-20 md:px-5 sm:px-3 pb-14 lg:pb-10 sm:pb-6">
           <motion.div
@@ -158,12 +156,7 @@ export default function BestSellersCarousel({ products }: { products: Product[] 
                 </button>
               </div> */}
 
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
                 <Link
                   href="/all"
                   className="font-libre text-sm tracking-[1.5px] uppercase text-primary hover:text-luxury transition-colors duration-300 flex items-center gap-2 sm:hidden"
@@ -186,12 +179,7 @@ export default function BestSellersCarousel({ products }: { products: Product[] 
               2xl:pl-[calc((100vw-1400px)/2+100px)] xl:pl-24 lg:pl-20 md:pl-5 sm:pl-3 pl-[calc((100vw-1400px)/2+100px)]"
           >
             {products.map((product, index) => (
-              <ProductCard
-                key={index}
-                product={product}
-                index={index}
-                cardWidth={cardWidth}
-              />
+              <ProductCard key={index} product={product} index={index} cardWidth={cardWidth} />
             ))}
             {/* trailing spacer so last card doesn't sit at the hard right edge */}
             <div className="shrink-0 w-[10vw]" />
@@ -210,7 +198,6 @@ export default function BestSellersCarousel({ products }: { products: Product[] 
             </button>
           </Link>
         </div>
-
       </div>
     </section>
   );
@@ -218,18 +205,9 @@ export default function BestSellersCarousel({ products }: { products: Product[] 
 
 // ─── Product Card (unchanged) ─────────────────────────────────────────────────
 
-function ProductCard({
-  product,
-  index,
-  cardWidth,
-}: {
-  product: Product;
-  index: number;
-  cardWidth: number;
-}) {
+function ProductCard({ product, index, cardWidth }: { product: Product; index: number; cardWidth: number }) {
   const [hovered, setHovered] = useState(false);
-  const hasDiscount =
-    product.discount_type && product.discounted_price && product.discounted_price !== 'null';
+  const hasDiscount = product.discount_type && product.discounted_price && product.discounted_price !== 'null';
   const specialTitle = product.specialProductTitles?.[0]?.title;
 
   return (
@@ -246,17 +224,9 @@ function ProductCard({
     >
       {/* Image */}
       <div className="relative overflow-hidden mb-4" style={{ aspectRatio: '1/1' }}>
-        <motion.div
-          transition={{ duration: 0.6 }}
-          animate={{ scale: hovered ? 1.05 : 1 }}
-          className="w-full h-full"
-        >
+        <motion.div transition={{ duration: 0.6 }} animate={{ scale: hovered ? 1.05 : 1 }} className="w-full h-full">
           <Image
-            src={
-              hovered && product.productHoverImage
-                ? product.productHoverImage
-                : (product.productImage ?? '/images/no_images.svg')
-            }
+            src={hovered && product.productHoverImage ? product.productHoverImage : (product.productImage ?? '/images/no_images.svg')}
             alt={typeof product.productName === 'string' ? product.productName : 'Product'}
             width="100%"
             height="100%"
@@ -273,9 +243,7 @@ function ProductCard({
 
         {hasDiscount && (
           <div className="absolute top-4 right-4 z-10 px-3 py-1.5 bg-primary text-text_w font-libre text-[10px] tracking-widest uppercase">
-            {product.discount_type === 'percentage'
-              ? `${product.discount_value}% OFF`
-              : `$${product.discount_value} OFF`}
+            {product.discount_type === 'percentage' ? `${product.discount_value}% OFF` : `$${product.discount_value} OFF`}
           </div>
         )}
 
@@ -306,17 +274,11 @@ function ProductCard({
         <div className="flex items-center gap-2">
           {hasDiscount ? (
             <>
-              <span className="font-libre text-sm text-luxury">
-                ${Math.ceil(Number(product.discounted_price))}
-              </span>
-              <span className="font-libre text-xs text-mocha/60 line-through">
-                ${Math.ceil(Number(product.productPrice))}
-              </span>
+              <span className="font-libre text-sm text-luxury">${Math.ceil(Number(product.discounted_price))}</span>
+              <span className="font-libre text-xs text-mocha/60 line-through">${Math.ceil(Number(product.productPrice))}</span>
             </>
           ) : (
-            <span className="font-libre text-sm text-primary">
-              ${Math.ceil(Number(product.productPrice))}
-            </span>
+            <span className="font-libre text-sm text-primary">${Math.ceil(Number(product.productPrice))}</span>
           )}
         </div>
       </div>

@@ -1,9 +1,9 @@
 'use client';
 import React, { Suspense, useEffect, useRef } from 'react';
-import { ReactLenis } from 'lenis/react';
 
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider } from 'antd';
+import { ReactLenis } from 'lenis/react';
 import { usePathname } from 'next/navigation';
 import { LuLoader } from 'react-icons/lu';
 import { Provider } from 'react-redux';
@@ -56,85 +56,86 @@ const AppProviderData = ({ children, initialHeaderMegaData, initialPromoData }: 
 
   return (
     <ReactLenis root options={{ lerp: 0.1, duration: 1.2 }}>
-    <Provider store={store}>
-      <AntdRegistry>
-        <ConfigProvider
-          theme={{
-            token: customTheme.token,
-            components: {
-              Button: {
-                controlHeight: 45,
-                // colorText: '#ffffff',
-                borderRadius: 0,
-                colorPrimary: secondary_color,
-                algorithm: true, // Enable algorithm
+      <Provider store={store}>
+        <AntdRegistry>
+          <ConfigProvider
+            theme={{
+              token: customTheme.token,
+              components: {
+                Button: {
+                  controlHeight: 45,
+                  // colorText: '#ffffff',
+                  borderRadius: 0,
+                  colorPrimary: secondary_color,
+                  algorithm: true, // Enable algorithm
+                },
+                Input: {
+                  controlHeight: 38,
+                  colorPrimary: prev_secondary_color,
+                  borderRadius: 0,
+                  algorithm: true, // Enable algorithm
+                },
+                DatePicker: {
+                  controlHeight: 38,
+                  colorPrimary: prev_secondary_color,
+                  borderRadius: 0,
+                  algorithm: true, // Enable algorithm
+                },
+                Radio: {
+                  controlHeight: 38,
+                  // colorPrimary: '#818d64',
+                  colorPrimary: secondary_color,
+                  borderRadius: 0,
+                  algorithm: true, // Enable algorithm
+                },
+                Select: {
+                  controlHeight: 38,
+                  colorPrimary: prev_secondary_color,
+                  borderRadius: 0,
+                  algorithm: true, // Enable algorithm
+                },
+                Slider: {
+                  // controlHeight: 38,
+                  // colorBgBase: '#818d64',
+                  // colorBgContainer: '#818d64',
+                  colorPrimary: secondary_color,
+                  // colorPrimary: '#17381d',
+                  borderRadius: 0,
+                  algorithm: true, // Enable algorithm
+                },
+                Checkbox: {
+                  // controlHeight: 38,
+                  colorPrimary: secondary_color,
+                  // borderRadius: 0,
+                  algorithm: true, // Enable algorithm
+                },
               },
-              Input: {
-                controlHeight: 38,
-                colorPrimary: prev_secondary_color,
-                borderRadius: 0,
-                algorithm: true, // Enable algorithm
-              },
-              DatePicker: {
-                controlHeight: 38,
-                colorPrimary: prev_secondary_color,
-                borderRadius: 0,
-                algorithm: true, // Enable algorithm
-              },
-              Radio: {
-                controlHeight: 38,
-                // colorPrimary: '#818d64',
-                colorPrimary: secondary_color,
-                borderRadius: 0,
-                algorithm: true, // Enable algorithm
-              },
-              Select: {
-                controlHeight: 38,
-                colorPrimary: prev_secondary_color,
-                borderRadius: 0,
-                algorithm: true, // Enable algorithm
-              },
-              Slider: {
-                // controlHeight: 38,
-                // colorBgBase: '#818d64',
-                // colorBgContainer: '#818d64',
-                colorPrimary: secondary_color,
-                // colorPrimary: '#17381d',
-                borderRadius: 0,
-                algorithm: true, // Enable algorithm
-              },
-              Checkbox: {
-                // controlHeight: 38,
-                colorPrimary: secondary_color,
-                // borderRadius: 0,
-                algorithm: true, // Enable algorithm
-              },
-            },
-          }}
-        >
-          <AppProvider>
-            <div className="relative">
-              <Header
-                className={isHomepage ? 'bg-transparent fixed top-0 left-0 right-0' : 'bg-transparent sticky top-0'}                headerMetaData={initialHeaderMegaData}
-                promoStripData={initialPromoData}
-              />
-              <Suspense
-                fallback={
-                  <div className="flex justify-center items-center h-[80vh] bg-ivory">
-                    <div className="w-full flex justify-center items-center">
-                      <LuLoader className="h-10 w-10 animate-spin text-primary" />
+            }}
+          >
+            <AppProvider>
+              <div className="relative">
+                <Header
+                  className={isHomepage ? 'bg-transparent fixed top-0 left-0 right-0' : 'bg-transparent sticky top-0'}
+                  headerMetaData={initialHeaderMegaData}
+                  promoStripData={initialPromoData}
+                />
+                <Suspense
+                  fallback={
+                    <div className="flex justify-center items-center h-[80vh] bg-ivory">
+                      <div className="w-full flex justify-center items-center">
+                        <LuLoader className="h-10 w-10 animate-spin text-primary" />
+                      </div>
                     </div>
-                  </div>
-                }
-              >
-                {children}
-              </Suspense>
-              <Footer className="overflow-x-hidden" />
-            </div>
-          </AppProvider>
-        </ConfigProvider>
-      </AntdRegistry>
-    </Provider>
+                  }
+                >
+                  {children}
+                </Suspense>
+                <Footer className="overflow-x-hidden" />
+              </div>
+            </AppProvider>
+          </ConfigProvider>
+        </AntdRegistry>
+      </Provider>
     </ReactLenis>
   );
 };

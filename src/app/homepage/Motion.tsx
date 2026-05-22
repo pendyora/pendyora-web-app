@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 const stages = [
-  { t: "Rough", d: "A stone is born.", img: "/images/img_ashclair_diam.png" },
-  { t: "Cut", d: "Geometry of light.", img: "/images/img_polished_diamond.png" },
-  { t: "Set", d: "Held by hand.", img: "/images/img_aliceconti_ring_430x430.png" },
-  { t: "Worn", d: "Becoming yours.", img: "/images/img_ashclair_ring.png" },
+  { t: 'Rough', d: 'A stone is born.', img: '/images/img_ashclair_diam.png' },
+  { t: 'Cut', d: 'Geometry of light.', img: '/images/img_polished_diamond.png' },
+  { t: 'Set', d: 'Held by hand.', img: '/images/img_aliceconti_ring_430x430.png' },
+  { t: 'Worn', d: 'Becoming yours.', img: '/images/img_ashclair_ring.png' },
 ];
 
 export default function Motion() {
@@ -16,7 +16,9 @@ export default function Motion() {
   useEffect(() => {
     const onS = () => {
       const el = ref.current;
-      if (!el) return;
+      if (!el) {
+        return;
+      }
       const r = el.getBoundingClientRect();
       const vh = window.innerHeight;
       const total = el.offsetHeight - vh;
@@ -24,8 +26,8 @@ export default function Motion() {
       setP(scrolled / Math.max(total, 1));
     };
     onS();
-    window.addEventListener("scroll", onS, { passive: true });
-    return () => window.removeEventListener("scroll", onS);
+    window.addEventListener('scroll', onS, { passive: true });
+    return () => window.removeEventListener('scroll', onS);
   }, []);
 
   const idx = Math.min(stages.length - 1, Math.floor(p * stages.length * 0.999));
@@ -34,19 +36,11 @@ export default function Motion() {
   const rotate = p * 540;
 
   return (
-    <section
-      ref={ref}
-      className="relative bg-ivory"
-      style={{ height: "320vh" }}
-      aria-label="Jewelry in motion"
-    >
+    <section ref={ref} className="relative bg-ivory" style={{ height: '320vh' }} aria-label="Jewelry in motion">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* Background diamond zoom */}
-        <div
-          className="absolute inset-0 grid place-items-center pointer-events-none"
-          style={{ transform: `scale(${zoom})`, opacity: 1 - p * 0.4 }}
-        >
-          <svg viewBox="0 0 200 200" className="w-[40vw] max-w-[600px]" style={{ color: "rgba(201,174,138,0.2)" }}>
+        <div className="absolute inset-0 grid place-items-center pointer-events-none" style={{ transform: `scale(${zoom})`, opacity: 1 - p * 0.4 }}>
+          <svg viewBox="0 0 200 200" className="w-[40vw] max-w-[600px]" style={{ color: 'rgba(201,174,138,0.2)' }}>
             <polygon points="100,10 180,80 100,190 20,80" fill="none" stroke="currentColor" strokeWidth="0.6" />
             <polygon points="100,10 60,80 140,80" fill="none" stroke="currentColor" strokeWidth="0.6" />
             <polygon points="20,80 60,80 100,190" fill="none" stroke="currentColor" strokeWidth="0.6" />
@@ -75,8 +69,8 @@ export default function Motion() {
                 style={{
                   opacity: i === idx ? 1 : 0,
                   transform: `rotate(${rotate + i * 90}deg) scale(${i === idx ? 1 : 0.92})`,
-                  transition: "opacity 700ms ease, transform 900ms ease",
-                  boxShadow: "0 0 0 1px rgba(17,17,17,0.1)",
+                  transition: 'opacity 700ms ease, transform 900ms ease',
+                  boxShadow: '0 0 0 1px rgba(17,17,17,0.1)',
                 }}
               />
             ))}
@@ -87,9 +81,7 @@ export default function Motion() {
 
           {/* Text + stage labels */}
           <div className="relative pl-16 md:pl-0 mt-0 md:mt-8 sm:mt-6">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-luxury mb-6">
-              Stage {String(idx + 1).padStart(2, "0")} / 04
-            </p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-luxury mb-6">Stage {String(idx + 1).padStart(2, '0')} / 04</p>
             <h2
               className="font-cormorant text-[clamp(3rem,8vw,8rem)] leading-[0.9] text-primary"
               style={{
@@ -99,17 +91,13 @@ export default function Motion() {
             >
               {stages[idx].t}.
             </h2>
-            <p className="font-cormorant italic text-3xl md:text-2xl sm:text-xl mt-4 text-primary/80">
-              {stages[idx].d}
-            </p>
+            <p className="font-cormorant italic text-3xl md:text-2xl sm:text-xl mt-4 text-primary/80">{stages[idx].d}</p>
 
             <div className="mt-12 flex items-center gap-4">
               {stages.map((s, i) => (
                 <div key={s.t} className="flex items-center gap-3">
-                  <span className={`h-2 w-2 rounded-full ${i === idx ? "bg-luxury" : "bg-primary/20"}`} />
-                  <span className={`text-[10px] uppercase tracking-[0.15em] ${i === idx ? "text-primary" : "text-primary/40"}`}>
-                    {s.t}
-                  </span>
+                  <span className={`h-2 w-2 rounded-full ${i === idx ? 'bg-luxury' : 'bg-primary/20'}`} />
+                  <span className={`text-[10px] uppercase tracking-[0.15em] ${i === idx ? 'text-primary' : 'text-primary/40'}`}>{s.t}</span>
                 </div>
               ))}
             </div>

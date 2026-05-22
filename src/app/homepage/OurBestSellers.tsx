@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { getBestSellers } from '@/services/productService';
+
 import BestSellersCarousel from './BestSellersCarousel';
 
 type SpecialProductTitle = {
@@ -79,7 +80,9 @@ export default function OurBestSellers() {
   useEffect(() => {
     fetchData();
   }, []);
-  if (!productList?.length) return null;
+  if (!productList?.length) {
+    return null;
+  }
 
   return <BestSellersCarousel products={productList} />;
 }

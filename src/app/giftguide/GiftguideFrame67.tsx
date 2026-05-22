@@ -9,9 +9,9 @@ export default function GiftguideFrame67() {
       <div className="flex flex-col items-center sm:hidden my-[60px]  xl:my-[40px] lg:my-[30px]">
         <div className="w-full px-8 mb-[60px]  xl:mb-[40px] lg:mb-[30px] md:px-5">
           <div className="flex items-center justify-between gap-5 md:flex-col">
-             <h2 className="font-cormorant text-3xl mt-4 leading-[0.95] text-primary">
-            " Jewellery to live in. The finishing touches for effortless everyday style. "
-          </h2>
+            <h2 className="font-cormorant text-3xl mt-4 leading-[0.95] text-primary">
+              " Jewellery to live in. The finishing touches for effortless everyday style. "
+            </h2>
           </div>
         </div>
         <div className="flex justify-center gap-2.5 self-stretch md:flex-col">

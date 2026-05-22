@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 const drop = {
-  code: "DR-01",
-  name: "Nocturne Chain",
-  price: "$ 5,400",
-  edition: "of 24",
-  img: "/images/model/editorial.jpg",
+  code: 'DR-01',
+  name: 'Nocturne Chain',
+  price: '$ 5,400',
+  edition: 'of 24',
+  img: '/images/model/editorial.jpg',
 };
 
 function useCountdown(target: number) {
@@ -28,10 +28,10 @@ export default function Drops() {
   const [target] = useState(() => Date.now() + 4 * 86400000 + 7 * 3600000 + 22 * 60000);
   const { d, h, m, s } = useCountdown(target);
   const cells: { v: number; l: string }[] = [
-    { v: d, l: "Days" },
-    { v: h, l: "Hours" },
-    { v: m, l: "Minutes" },
-    { v: s, l: "Seconds" },
+    { v: d, l: 'Days' },
+    { v: h, l: 'Hours' },
+    { v: m, l: 'Minutes' },
+    { v: s, l: 'Seconds' },
   ];
 
   return (
@@ -48,7 +48,7 @@ export default function Drops() {
             <span className="h-2 w-2 bg-luxury rounded-full animate-pulse" /> Limited Drop · {drop.edition}
           </p>
           <h2 className="font-cormorant text-[clamp(2rem,5vw,5rem)] leading-[0.92] text-text_w">
-            {drop.name.split(" ").map((w, i) => (
+            {drop.name.split(' ').map((w, i) => (
               <span key={i} className="inline-block mr-3">
                 {i === 1 ? <span className="italic text-luxury">{w}</span> : w}
               </span>
@@ -63,7 +63,7 @@ export default function Drops() {
             {cells.map((c) => (
               <div key={c.l} className="bg-white/5 border aspect-square border-white/10 px-3 py-4 text-center">
                 <p className="font-cormorant text-5xl lg:text-4xl md:text-3xl sm:text-2xl text-luxury tabular-nums leading-none">
-                  {c.v.toString().padStart(2, "0")}
+                  {c.v.toString().padStart(2, '0')}
                 </p>
                 <p className="mt-2 text-[9px] uppercase tracking-[0.15em] text-text_w/60">{c.l}</p>
               </div>
@@ -77,7 +77,10 @@ export default function Drops() {
             >
               Reserve a number <span className="transition-transform group-hover:translate-x-1.5">→</span>
             </a>
-            <a href="/contact-us" className="text-[11px] uppercase tracking-[0.15em] text-text_w/85 underline underline-offset-4 decoration-luxury/50 hover:decoration-luxury transition-all">
+            <a
+              href="/contact-us"
+              className="text-[11px] uppercase tracking-[0.15em] text-text_w/85 underline underline-offset-4 decoration-luxury/50 hover:decoration-luxury transition-all"
+            >
               Drop archive
             </a>
           </div>
@@ -85,14 +88,7 @@ export default function Drops() {
 
         <div className="w-[55%] flex-shrink-0 md:w-full relative h-[90vh]">
           <div className="relative aspect-[3/4] overflow-hidden">
-            <video
-              src="/videos/model.mp4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+            <video src="/videos/model.mp4" autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-primary/30" />
             <span className="absolute top-5 left-5 text-[10px] uppercase tracking-[0.15em] text-text_w/80">{drop.code}</span>
             <span className="absolute top-5 right-5 text-[10px] uppercase tracking-[0.15em] text-text_w/80">Edition {drop.edition}</span>
@@ -102,10 +98,10 @@ export default function Drops() {
             </div>
             {/* corner accents */}
             {[
-              "top-3 left-3 border-t border-l",
-              "top-3 right-3 border-t border-r",
-              "bottom-3 left-3 border-b border-l",
-              "bottom-3 right-3 border-b border-r",
+              'top-3 left-3 border-t border-l',
+              'top-3 right-3 border-t border-r',
+              'bottom-3 left-3 border-b border-l',
+              'bottom-3 right-3 border-b border-r',
             ].map((c, i) => (
               <span key={i} className={`absolute h-5 w-5 border-luxury/60 ${c}`} />
             ))}

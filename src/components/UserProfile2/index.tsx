@@ -21,7 +21,7 @@ export default function UserProfile2({
   return (
     <Link href={path} {...props} className={`h-[60vh] w-full md:w-full relative 2xl:w-full ${props.className ?? ''}`}>
       <div className="mx-auto h-full w-full flex-1">
-        <Image src={`/images${userImage}`} height={"100%"} width={"100%"} preview={false} alt="Ashclair Image" className="!object-cover h-auto" />
+        <Image src={`/images${userImage}`} height={'100%'} width={'100%'} preview={false} alt="Ashclair Image" className="!object-cover h-auto" />
       </div>
       <div className="absolute w-full bottom-0">
         <Text

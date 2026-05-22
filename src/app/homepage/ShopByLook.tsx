@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -107,13 +108,7 @@ function LookImage({ look, index }: { look: LookItem; index: number }) {
   return (
     <div className="relative w-full h-full overflow-visible">
       <div className="relative w-full h-full">
-        <Image
-          src={look.image}
-          alt={look.alt}
-          fill
-          className="object-cover object-top"
-          sizes="(max-width: 769px) 100vw, 50vw"
-        />
+        <Image src={look.image} alt={look.alt} fill className="object-cover object-top" sizes="(max-width: 769px) 100vw, 50vw" />
       </div>
 
       {look.dots.map((dot) => {

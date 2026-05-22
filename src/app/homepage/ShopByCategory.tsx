@@ -28,11 +28,7 @@ export default function ShopByCategory({ bannerData }: any) {
           }}
         >
           {[a, b].map((dataIndex, i) => (
-            <Link
-              key={i}
-              href={bannerData?.[dataIndex]?.link || CATEGORY_HREFS[dataIndex]}
-              className="relative w-1/2 h-full overflow-hidden block"
-            >
+            <Link key={i} href={bannerData?.[dataIndex]?.link || CATEGORY_HREFS[dataIndex]} className="relative w-1/2 h-full overflow-hidden block">
               <Image
                 src={bannerData?.[dataIndex]?.image}
                 preview={false}

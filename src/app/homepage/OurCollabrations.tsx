@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+
+import { Image } from 'antd';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useLenis } from 'lenis/react';
-import { Image } from 'antd';
 import { FaInstagram } from 'react-icons/fa';
 import { FaFacebook, FaLinkedin, FaPinterest, FaTwitter, FaYoutube } from 'react-icons/fa6';
 import { IoMdClose } from 'react-icons/io';
@@ -20,10 +21,10 @@ import { fetchSocialPosts } from '@/store/slices/Social/socialSlice';
 
 const sourceOptions = [
   { label: 'Instagram', value: '0', icon: <FaInstagram /> },
-  { label: 'YouTube',   value: '1', icon: <FaYoutube /> },
-  { label: 'Facebook',  value: '2', icon: <FaFacebook /> },
-  { label: 'Twitter',   value: '3', icon: <FaTwitter /> },
-  { label: 'LinkedIn',  value: '4', icon: <FaLinkedin /> },
+  { label: 'YouTube', value: '1', icon: <FaYoutube /> },
+  { label: 'Facebook', value: '2', icon: <FaFacebook /> },
+  { label: 'Twitter', value: '3', icon: <FaTwitter /> },
+  { label: 'LinkedIn', value: '4', icon: <FaLinkedin /> },
   { label: 'Pinterest', value: '5', icon: <FaPinterest /> },
 ];
 
@@ -39,7 +40,9 @@ const OurCollaborations = () => {
     dispatch(fetchSocialPosts());
   }, [dispatch]);
 
-  if (!socialPost?.length) return null;
+  if (!socialPost?.length) {
+    return null;
+  }
   return <CollaborationsSection socialPost={socialPost} />;
 };
 
@@ -49,27 +52,31 @@ export default OurCollaborations;
 
 function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isOpen, setIsOpen]             = useState(false);
-  const [activeIndex, setActiveIndex]   = useState(0);
-  const [videoError, setVideoError]     = useState(false);
-  const [isBeginning, setIsBeginning]   = useState(true);
-  const [isEnd, setIsEnd]               = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [videoError, setVideoError] = useState(false);
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
 
-  const sectionRef     = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const popupVideoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const suggestedJewelry = socialPost[activeIndex]?.suggestedJewelry || [];
-  const totalSlides      = suggestedJewelry.length;
+  const totalSlides = suggestedJewelry.length;
 
   // Lenis-driven scroll: updated on every animation frame, never stale.
   const scrollY = useMotionValue(0);
-  useLenis(({ scroll }) => { scrollY.set(scroll); });
+  useLenis(({ scroll }) => {
+    scrollY.set(scroll);
+  });
 
   // Section bounds: top = distance from document top, recomputed on resize.
   const [bounds, setBounds] = useState({ top: 9999, height: 600, vh: 768 });
   useEffect(() => {
     const update = () => {
-      if (!sectionRef.current) return;
+      if (!sectionRef.current) {
+        return;
+      }
       setBounds({
         top: sectionRef.current.getBoundingClientRect().top + window.scrollY,
         height: sectionRef.current.offsetHeight,
@@ -82,16 +89,14 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
   }, []);
 
   // 0 when section enters viewport bottom → 1 when section exits viewport top
-  const scrollYProgress = useTransform(
-    scrollY,
-    [bounds.top - bounds.vh, bounds.top + bounds.height],
-    [0, 1],
-    { clamp: true },
-  );
+  const scrollYProgress = useTransform(scrollY, [bounds.top - bounds.vh, bounds.top + bounds.height], [0, 1], { clamp: true });
 
   const stopAllPopupVideos = () => {
     popupVideoRefs.current.forEach((v) => {
-      if (v) { v.pause(); v.currentTime = 0; }
+      if (v) {
+        v.pause();
+        v.currentTime = 0;
+      }
     });
   };
 
@@ -102,17 +107,15 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
   };
 
   useEffect(() => {
-    if (isOpen) popupVideoRefs.current[activeIndex]?.play();
+    if (isOpen) {
+      popupVideoRefs.current[activeIndex]?.play();
+    }
     return () => stopAllPopupVideos();
   }, [isOpen, activeIndex]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="py-[80px] bg-primary overflow-hidden lg:py-10 sm:py-8"
-    >
+    <section ref={sectionRef} className="py-[80px] bg-primary overflow-hidden lg:py-10 sm:py-8">
       <div className="container-xs px-20 md:px-5 sm:px-3">
-
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -123,13 +126,9 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
         >
           <div className="flex items-center justify-center gap-4 mb-4">
             <FaInstagram className="text-luxury text-3xl lg:text-2xl sm:text-xl" />
-            <h2 className="font-cormorant text-[52px] text-text_w uppercase tracking-[2.2px] lg:text-[34px] sm:text-[22px]">
-              Our Collaborations
-            </h2>
+            <h2 className="font-cormorant text-[52px] text-text_w uppercase tracking-[2.2px] lg:text-[34px] sm:text-[22px]">Our Collaborations</h2>
           </div>
-          <p className="font-libre text-sm text-text_w/50 tracking-[0.25em] uppercase">
-            See how our community brings luxury to life
-          </p>
+          <p className="font-libre text-sm text-text_w/50 tracking-[0.25em] uppercase">See how our community brings luxury to life</p>
         </motion.div>
 
         {/* Outer wrapper — nav buttons sit here, outside the clip zone */}
@@ -143,9 +142,9 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
               navigation={{ nextEl: '.collab-next', prevEl: '.collab-prev' }}
               style={{ overflow: 'visible' }}
               breakpoints={{
-                0:    { slidesPerView: 1 },
-                640:  { slidesPerView: 2 },
-                768:  { slidesPerView: 2 },
+                0: { slidesPerView: 1 },
+                640: { slidesPerView: 2 },
+                768: { slidesPerView: 2 },
                 1024: { slidesPerView: Math.min(socialPost.length, 5) },
                 1280: { slidesPerView: Math.min(socialPost.length, 6) },
               }}
@@ -174,14 +173,16 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
             <MdArrowForwardIos size={15} />
           </button>
         </div>
-
       </div>
 
       {/* Popup lightbox */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-[1054]">
           <button
-            onClick={() => { stopAllPopupVideos(); setIsOpen(false); }}
+            onClick={() => {
+              stopAllPopupVideos();
+              setIsOpen(false);
+            }}
             className="absolute top-6 right-6 z-[999] w-10 h-10 border border-text_w/30 flex items-center justify-center text-text_w hover:border-luxury hover:text-luxury transition-all duration-300"
           >
             <IoMdClose size={20} />
@@ -212,14 +213,18 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
                   <div className="relative flex flex-col items-center justify-center">
                     {item.video_url && !videoError ? (
                       <video
-                        ref={(el) => { popupVideoRefs.current[index] = el; }}
+                        ref={(el) => {
+                          popupVideoRefs.current[index] = el;
+                        }}
                         className="w-full h-screen object-cover sm:h-auto sm:object-contain"
                         src={item.video_url}
                         loop
                         controls
                         playsInline
                         preload="metadata"
-                        onLoadedMetadata={(e) => { e.currentTarget.currentTime = 0.1; }}
+                        onLoadedMetadata={(e) => {
+                          e.currentTarget.currentTime = 0.1;
+                        }}
                         onError={() => setVideoError(true)}
                       />
                     ) : (
@@ -236,9 +241,7 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
                     )}
 
                     <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-20">
-                      <p className="font-libre text-xs tracking-[1.5px] uppercase text-text_w/80 truncate w-[60%]">
-                        {item.title}
-                      </p>
+                      <p className="font-libre text-xs tracking-[1.5px] uppercase text-text_w/80 truncate w-[60%]">{item.title}</p>
                       <a
                         href={item.account_link}
                         target="_blank"
@@ -260,14 +263,14 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
                             modules={[Navigation, EffectCoverflow]}
                             navigation={{ nextEl: '.product-next', prevEl: '.product-prev' }}
                             breakpoints={{
-                              0:   { slidesPerView: 1.2 },
+                              0: { slidesPerView: 1.2 },
                               640: { slidesPerView: 1.4 },
                               768: { slidesPerView: 1.4 },
                             }}
                             onSlideChange={(swiper) => setCurrentIndex(swiper.realIndex)}
                           >
                             {suggestedJewelry.map((product: any, i: number) => {
-                              const detail      = product.jewelryDetails?.[0];
+                              const detail = product.jewelryDetails?.[0];
                               const jewelryType = product?.jewelrySubType?.parent_code?.toLowerCase()?.replace(/_/g, '-');
                               return (
                                 <SwiperSlide key={i}>
@@ -275,25 +278,15 @@ function CollaborationsSection({ socialPost }: { socialPost: any[] }) {
                                     <div className="flex items-center gap-3">
                                       <div className="w-12 h-12 overflow-hidden flex-shrink-0 bg-cream">
                                         {detail?.carat_images?.[0] ? (
-                                          <img
-                                            src={detail.carat_images[0]}
-                                            alt={product.title}
-                                            className="w-full h-full object-cover"
-                                          />
+                                          <img src={detail.carat_images[0]} alt={product.title} className="w-full h-full object-cover" />
                                         ) : (
-                                          <div className="w-full h-full flex items-center justify-center text-xs text-mocha">
-                                            No Image
-                                          </div>
+                                          <div className="w-full h-full flex items-center justify-center text-xs text-mocha">No Image</div>
                                         )}
                                       </div>
                                       <div className="flex-1 min-w-0">
-                                        <p className="font-cormorant text-base leading-tight truncate">
-                                          {product.title}
-                                        </p>
+                                        <p className="font-cormorant text-base leading-tight truncate">{product.title}</p>
                                         {detail?.selling_price ? (
-                                          <p className="font-libre text-xs text-luxury">
-                                            ${detail.selling_price.toLocaleString('en-IN')}
-                                          </p>
+                                          <p className="font-libre text-xs text-luxury">${detail.selling_price.toLocaleString('en-IN')}</p>
                                         ) : (
                                           <p className="font-libre text-xs text-text_w/40">Price unavailable</p>
                                         )}
@@ -380,11 +373,7 @@ function ReelCard({
   const [isHovered, setIsHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const y = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    [index % 2 === 0 ? 80 : -80, 0, index % 2 === 0 ? -80 : 80]
-  );
+  const y = useTransform(scrollYProgress, [0, 0.5, 1], [index % 2 === 0 ? 80 : -80, 0, index % 2 === 0 ? -80 : 80]);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -394,7 +383,10 @@ function ReelCard({
   const handleMouseLeave = () => {
     setIsHovered(false);
     const v = videoRef.current;
-    if (v) { v.pause(); v.currentTime = 0; }
+    if (v) {
+      v.pause();
+      v.currentTime = 0;
+    }
   };
 
   const SourceIcon = sourceOptions.find((s) => s.value == item.source?.toString())?.icon;
@@ -424,14 +416,7 @@ function ReelCard({
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-mocha/20">
-          <Image
-            src="/images/ashclair_pdp_logo_image.svg"
-            alt="Ashclair"
-            preview={false}
-            width="100%"
-            height="100%"
-            className="!bg-secondary"
-          />
+          <Image src="/images/ashclair_pdp_logo_image.svg" alt="Ashclair" preview={false} width="100%" height="100%" className="!bg-secondary" />
         </div>
       )}
 
@@ -454,9 +439,7 @@ function ReelCard({
         transition={{ duration: 0.3 }}
         className="absolute bottom-0 left-0 right-0 p-3"
       >
-        <p className="font-libre text-[10px] tracking-wide text-text_w/80 line-clamp-2 uppercase">
-          {item.title}
-        </p>
+        <p className="font-libre text-[10px] tracking-wide text-text_w/80 line-clamp-2 uppercase">{item.title}</p>
       </motion.div>
 
       <motion.div

@@ -71,21 +71,34 @@ export default function Footer({ className, ...props }: Props) {
   };
 
   const runLiveEmailValidation = (value: string) => {
-    if (!value) { setEmailError(''); return; }
-    if (!isValidEmailFormat(value)) { setEmailError('Please enter a valid email address'); return; }
-    if (isDisposableDomain(value)) { setEmailError('Please enter a valid permanent email address'); return; }
+    if (!value) {
+      setEmailError('');
+      return;
+    }
+    if (!isValidEmailFormat(value)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    if (isDisposableDomain(value)) {
+      setEmailError('Please enter a valid permanent email address');
+      return;
+    }
     setEmailError('');
   };
 
   const fetchCoupon = async (id: any) => {
-    if (!id) return;
+    if (!id) {
+      return;
+    }
     try {
       const res = await getCouponData(id);
       if (res.status === 200) {
         const r = res.data.data;
         setDiscountText(`GET ${r?.discount_value}${r?.discount_type === 2 ? '%' : r?.discount_type === 1 ? '$' : ''} OFF`);
       }
-    } catch {}
+    } catch {
+      console.error('Failed to fetch coupon data');
+    }
   };
 
   useEffect(() => {
@@ -100,7 +113,9 @@ export default function Footer({ className, ...props }: Props) {
   }, [introPopUpList]);
 
   const handleSubmit = async () => {
-    if (!isHoneypotClean()) return;
+    if (!isHoneypotClean()) {
+      return;
+    }
 
     if (!isChecked) {
       setConsentError('Please accept the terms to continue');
@@ -145,12 +160,10 @@ export default function Footer({ className, ...props }: Props) {
 
       {/* Main grid */}
       <div className="mx-auto max-w-[1500px] px-12 md:px-5 grid grid-cols-12 gap-10 md:grid-cols-2 md:gap-8 sm:grid-cols-1">
-
         {/* Newsletter — spans 4 cols on desktop, full width on mobile */}
         <div className="col-span-4 md:col-span-2 sm:col-span-1">
           <p className="font-serif text-3xl text-primary leading-tight text-balance">
-            Letters from the{' '}
-            <span className="italic text-mocha">atelier</span>.
+            Letters from the <span className="italic text-mocha">atelier</span>.
           </p>
           <p className="mt-3 text-sm text-mocha max-w-sm">
             {discountText
@@ -168,7 +181,9 @@ export default function Footer({ className, ...props }: Props) {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     runLiveEmailValidation(e.target.value);
-                    if (consentError) setConsentError('');
+                    if (consentError) {
+                      setConsentError('');
+                    }
                   }}
                   className={`flex-1 bg-transparent text-sm text-primary placeholder:text-mocha/50 focus:outline-none py-2 ${emailError ? 'placeholder:text-red-400' : ''}`}
                 />
@@ -190,7 +205,9 @@ export default function Footer({ className, ...props }: Props) {
                   checked={isChecked}
                   onChange={(e) => {
                     setIsChecked(e.target.checked);
-                    if (e.target.checked) setConsentError('');
+                    if (e.target.checked) {
+                      setConsentError('');
+                    }
                   }}
                   className="mt-0.5 accent-primary"
                 />
@@ -272,17 +289,19 @@ export default function Footer({ className, ...props }: Props) {
 
       {/* Large brand wordmark */}
       <div className="mx-auto max-w-[1500px] px-6 md:px-5 mt-16 overflow-hidden">
-        <p className="font-serif text-[16vw] leading-[0.85] tracking-[0.04em] text-primary/90 select-none">
-          PENDYORA
-        </p>
+        <p className="font-serif text-[16vw] leading-[0.85] tracking-[0.04em] text-primary/90 select-none">PENDYORA</p>
       </div>
 
       {/* Bottom bar */}
       <div className="mx-auto max-w-[1500px] px-12 md:px-5 mt-6 flex flex-wrap justify-between gap-4 text-[10px] tracking-[0.25em] uppercase text-mocha">
         <span>© {new Date().getFullYear()} Pendyora</span>
         <span className="flex gap-4">
-          <Link href="/privacy-policy" className="hover:text-primary transition-colors">Privacy</Link>
-          <Link href="/terms-and-conditions" className="hover:text-primary transition-colors">Terms</Link>
+          <Link href="/privacy-policy" className="hover:text-primary transition-colors">
+            Privacy
+          </Link>
+          <Link href="/terms-and-conditions" className="hover:text-primary transition-colors">
+            Terms
+          </Link>
         </span>
       </div>
     </footer>

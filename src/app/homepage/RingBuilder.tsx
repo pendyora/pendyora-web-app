@@ -36,16 +36,12 @@ export default function RingBuilder() {
       <div className="relative mx-auto max-w-[1500px] px-6 md:px-5 grid grid-cols-2 md:grid-cols-1 gap-12 items-center">
         {/* Left — controls */}
         <div>
-          <span className="text-[10px] tracking-[0.25em] uppercase text-secondary font-sans">
-            The Atelier
-          </span>
+          <span className="text-[10px] tracking-[0.25em] uppercase text-secondary font-sans">The Atelier</span>
           <h2 className="mt-4 font-serif text-6xl md:text-4xl text-primary leading-[0.95]">
-            Compose your{' '}
-            <span className="italic text-secondary">heirloom.</span>
+            Compose your <span className="italic text-secondary">heirloom.</span>
           </h2>
           <p className="mt-6 text-mocha max-w-md leading-relaxed font-sans text-sm">
-            Three choices. Infinite consequence. Begin with the metal — your
-            ring evolves in front of you, in real time.
+            Three choices. Infinite consequence. Begin with the metal — your ring evolves in front of you, in real time.
           </p>
 
           <div className="mt-10 space-y-8">
@@ -55,14 +51,10 @@ export default function RingBuilder() {
                   key={m.id}
                   onClick={() => setMetal(m.id)}
                   className={`flex items-center gap-3 border px-4 py-3 transition-all font-sans text-[11px] tracking-[0.25em] uppercase ${
-                    metal === m.id
-                      ? 'border-primary bg-ivory'
-                      : 'border-mocha/30 hover:border-primary'
+                    metal === m.id ? 'border-primary bg-ivory' : 'border-mocha/30 hover:border-primary'
                   }`}
                 >
-                  <span
-                    className={`h-5 w-5 rounded-full ring-1 ring-primary/10 ${m.swatch}`}
-                  />
+                  <span className={`h-5 w-5 rounded-full ring-1 ring-primary/10 ${m.swatch}`} />
                   {m.label} Gold
                 </button>
               ))}
@@ -78,11 +70,7 @@ export default function RingBuilder() {
 
             <Group label="Setting">
               {settings.map((s) => (
-                <Chip
-                  key={s}
-                  active={setting === s}
-                  onClick={() => setSetting(s)}
-                >
+                <Chip key={s} active={setting === s} onClick={() => setSetting(s)}>
                   {s}
                 </Chip>
               ))}
@@ -93,10 +81,7 @@ export default function RingBuilder() {
             <button className="bg-primary text-ivory px-10 py-4 text-[11px] tracking-[0.3em] uppercase hover:bg-mocha transition-colors font-sans">
               Add to bag · From $1,860
             </button>
-            <a
-              href="#"
-              className="text-[11px] tracking-[0.3em] uppercase text-mocha border-b border-mocha pb-1 font-sans"
-            >
+            <a href="#" className="text-[11px] tracking-[0.3em] uppercase text-mocha border-b border-mocha pb-1 font-sans">
               Save design
             </a>
           </div>
@@ -140,39 +125,21 @@ export default function RingBuilder() {
   );
 }
 
-function Group({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Group({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[10px] tracking-[0.25em] uppercase text-secondary font-sans mb-3">
-        {label}
-      </p>
+      <p className="text-[10px] tracking-[0.25em] uppercase text-secondary font-sans mb-3">{label}</p>
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );
 }
 
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
+function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
       className={`px-4 py-2 text-[11px] tracking-[0.25em] uppercase border transition-colors font-sans ${
-        active
-          ? 'bg-primary text-ivory border-primary'
-          : 'bg-transparent text-primary border-mocha/30 hover:border-primary'
+        active ? 'bg-primary text-ivory border-primary' : 'bg-transparent text-primary border-mocha/30 hover:border-primary'
       }`}
     >
       {children}

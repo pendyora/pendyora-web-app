@@ -28,7 +28,11 @@ export default function ShopByCategory({ bannerData }: any) {
           }}
         >
           {[a, b].map((dataIndex, i) => (
-            <Link key={i} href={bannerData?.[dataIndex]?.link || CATEGORY_HREFS[dataIndex]} className="relative w-1/2 h-full overflow-hidden block">
+            <Link
+              key={i}
+              href={bannerData?.[dataIndex]?.link || CATEGORY_HREFS[dataIndex]}
+              className="group relative w-1/2 h-full overflow-hidden block"
+            >
               <Image
                 src={bannerData?.[dataIndex]?.image}
                 preview={false}
@@ -36,6 +40,7 @@ export default function ShopByCategory({ bannerData }: any) {
                 loading="lazy"
                 fallback="/images/ashclair_pdp_logo_image.svg"
                 wrapperStyle={{ width: '100%', height: '100%', display: 'block' }}
+                wrapperClassName="transition-transform duration-500 ease-in-out scale-105 group-hover:scale-100"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
               <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.45),transparent)] px-8 pb-10 pt-24">

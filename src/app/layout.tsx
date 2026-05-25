@@ -75,6 +75,7 @@ async function RootLayout({ children }: { children: ReactNode }) {
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
         <link href="https://fonts.googleapis.com/css2?family=Castoro&display=swap" rel="stylesheet" />
+        {/* Microsoft Clarity — disabled
         <script
           type="text/javascript"
           dangerouslySetInnerHTML={{
@@ -87,9 +88,13 @@ async function RootLayout({ children }: { children: ReactNode }) {
               `,
           }}
         ></script>
-        {/* eslint-disable-next-line react/no-unknown-property */}
-        <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+        */}
 
+        {/* AMP Analytics — disabled
+        <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+        */}
+
+        {/* Google Tag Manager (gtag.js) — disabled
         <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17230998076"></script>
         <script
           type="text/javascript"
@@ -101,9 +106,9 @@ async function RootLayout({ children }: { children: ReactNode }) {
               gtag('config', 'AW-17230998076');`,
           }}
         ></script>
+        */}
 
-        {/* <!-- Google tag (gtag.js) -->  */}
-        {/* Meta Pixel Code */}
+        {/* Meta Pixel Code — disabled
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -120,11 +125,10 @@ async function RootLayout({ children }: { children: ReactNode }) {
     `,
           }}
         />
-
         <noscript>
           <img height="1" width="1" style={{ display: 'none' }} src="https://www.facebook.com/tr?id=714491101467345&ev=PageView&noscript=1" />
         </noscript>
-        {/* End Meta Pixel Code */}
+        */}
       </head>
 
       <body>
@@ -133,6 +137,7 @@ async function RootLayout({ children }: { children: ReactNode }) {
         </AppProviderData>
         <ScrollArrow />
 
+        {/* AMP Analytics gtag div — disabled
         <div
           dangerouslySetInnerHTML={{
             __html: `
@@ -153,7 +158,9 @@ async function RootLayout({ children }: { children: ReactNode }) {
               </amp-analytics>`,
           }}
         />
+        */}
 
+        {/* OnWebChat — disabled
         <script
           type="text/javascript"
           dangerouslySetInnerHTML={{
@@ -161,12 +168,13 @@ async function RootLayout({ children }: { children: ReactNode }) {
               var onWebChat={ar:[], set: function(a,b){if (typeof onWebChat_==='undefined'){this.ar.
               push([a,b]);}else{onWebChat_.set(a,b);}},get:function(a){return(onWebChat_.get(a));},
               w:(function(){ var ga=document.createElement('script'); ga.type = 'text/javascript';
-              ga.async=1;ga.src=('https:'==document.location.protocol?'https:':'http:') + 
+              ga.async=1;ga.src=('https:'==document.location.protocol?'https:':'http:') +
               '//www.onwebchat.com/clientchat/f5879e3080f533c29068efd87f699142';var s=
               document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);})()}
               `,
           }}
         ></script>
+        */}
       </body>
     </html>
   );

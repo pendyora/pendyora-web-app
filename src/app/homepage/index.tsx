@@ -1,5 +1,6 @@
 import React from 'react';
 
+import HeroSection from '@/components/home/HeroSection';
 import InspiredByCommunity from '@/page/InspiredByCommunity';
 import { decrypt } from '@/utils/enc-decy';
 
@@ -80,23 +81,26 @@ export default async function HOMEPAGEPage() {
   return (
     <div className="w-full bg-[#ffffff] sm:relative">
       <div>
-        <HomepageBanner bannerData={initialBannerData} />
-        {/* <div className="mt-16 sm:mt-10" /> */}
+        <HeroSection />
+        {/* <HomepageBanner bannerData={initialBannerData} />
         <Motion />
         <ShopByCategory bannerData={initialCategoryBannerData} />
         <OurBestSellers />
         <Craftsmanship />
         <ShopByLook />
+        <OurCollabrations />
+        <RingBuilder />
+        <Drops />
+        <Testimonials /> */}
+
+        {/* ------ */}
+        {/* <div className="mt-16 sm:mt-10" /> */}
         {/* <CustomizedForYou /> */}
         {/* <ShopGemStone /> */}
-        <OurCollabrations />
 
-        <RingBuilder />
         {/* <AlloryaStory /> */}
 
-        <Drops />
         {/* <GiftguideFrame67 /> */}
-        <Testimonials />
         {/* <WhyAllorya /> */}
         {/* <FeaturedIn /> */}
         {/* <InspiredByCommunity /> */}

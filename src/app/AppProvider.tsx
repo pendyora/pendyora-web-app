@@ -114,11 +114,11 @@ const AppProviderData = ({ children, initialHeaderMegaData, initialPromoData }: 
           >
             <AppProvider>
               <div className="relative">
-                <Header
+                {/* <Header
                   className={isHomepage ? 'bg-transparent fixed top-0 left-0 right-0' : 'bg-transparent sticky top-0'}
                   headerMetaData={initialHeaderMegaData}
                   promoStripData={initialPromoData}
-                />
+                /> */}
                 <Suspense
                   fallback={
                     <div className="flex justify-center items-center h-[80vh] bg-ivory">

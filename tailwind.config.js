@@ -24,6 +24,14 @@ module.exports = {
         section: '#F1E9DE',
         luxury: '#C9AE8A',
         mocha: '#8B7355',
+        forest: {
+          black:  '#050a08',
+          teal:   '#00f5c4',
+          indigo: '#3d00b8',
+          gold:   '#c9a84c',
+          mist:   '#e8f4f0',
+          purple: '#2d1b69',
+        },
       },
 
       boxShadow: {},

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force \"d:\\\\pendyora-web-app\\\\public\\\\pendyora\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"d:\\\\pendyora-web-app\\\\src\\\\components\\\\home\")",
+      "PowerShell(cd \"d:\\\\pendyora-web-app\"; $output = npx tsc --noEmit 2>&1; $output | Where-Object { $_ -match \"home\" -or $_ -match \"HeroSection|VideoScrubber|SceneForest|SceneDragon|SceneGoddess|SceneJewelry|SceneCTA|GrainOverlay|CustomCursor|ParticleOverlay\" } | Select-Object -First 40)",
+      "PowerShell(cd \"d:\\\\pendyora-web-app\"; npx tsc --noEmit 2>&1 | Out-String | Select-String -Pattern \"home\" -AllMatches | ForEach-Object { $_.Matches } | Select-Object -First 5)",
+      "PowerShell(cd \"d:\\\\pendyora-web-app\"; $r = npx tsc --noEmit 2>&1 | Out-String; $r.Split\\(\"`n\"\\) | Where-Object { $_ -match \"components.home\" } | Select-Object -First 30 | Out-String)",
+      "PowerShell(cd \"d:\\\\pendyora-web-app\"; $ErrorActionPreference = 'SilentlyContinue'; $r = npx tsc --noEmit 2>&1; $ErrorActionPreference = 'Continue'; $lines = $r | ForEach-Object { $_.ToString\\(\\) }; $lines | Where-Object { $_ -match \"home\" } | Select-Object -First 20)",
+      "PowerShell(ffmpeg -version 2>&1)",
+      "PowerShell(winget --version)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); ffmpeg -version 2>&1 | Select-Object -First 1)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); \\(Get-Command ffmpeg\\).Source)"
+    ]
+  }
+}

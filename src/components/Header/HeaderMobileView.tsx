@@ -8,13 +8,13 @@ import { useRouter } from 'next/navigation';
 import { GoArrowUpRight } from 'react-icons/go';
 import { IoIosLaptop, IoMdArrowBack } from 'react-icons/io';
 import { MdChevronRight, MdSearch } from 'react-icons/md';
-import { PiHandbagLight } from 'react-icons/pi';
 
-import { useAppDispatch, useAppSelector } from '@/store';
+import { useAppSelector } from '@/store';
+import themeColors from '@/styles/theme-colors';
 import { formatCurrency } from '@/utils/common';
 
 import { Text, Img } from './..';
-import NavigationsMenus from './NavigationsMenus';
+import { BagIcon, HeartIcon, SearchIcon } from './components/HeaderIcons';
 
 const HeaderMobileView = ({
   jewelryData,
@@ -129,59 +129,38 @@ const HeaderMobileView = ({
   };
 
   return (
-    <div className="sm:flex flex-col items-center gap-2 lg:gap-0 self-stretch relative hidden">
-      <div className="w-full relative">
-        <div className="container-xs px-4 ">
-          <div className="flex items-center justify-between">
-            <div className="w-[35%] flex gap-1 justify-start items-center -ml-4 ">
-              <Hamburger toggled={isMenuOpen} toggle={handleMenuToggle} size={20} distance="sm" color="#18381d" />
-              <Link href="/virtual-appointment" className="flex gap-2" onClick={reloadPage}>
-                <IoIosLaptop className="h-[25px] w-[25px] text-primary" />
-              </Link>
-            </div>
-            <div className="w-[45%]">
-              <Link href="/" className="h-[40px] lg:w-full flex justify-center items-center " onClick={reloadPage}>
-                <Image src="/images/logo.png" alt="Ashclair Logo" preview={false} className="object-contain w-[50%] h-[100%] " />
-              </Link>
-            </div>
-            <div className="flex w-[30%] justify-end  gap-[9px] items-center ">
-              <div className="relative">
-                <Image
-                  src="/images/img_search.svg"
-                  preview={false}
-                  width={22}
-                  height={22}
-                  alt="Search"
-                  className="h-[18px] cursor-pointer w-[18px] md:h-[20px] md:w-[20px]"
-                  onClick={handleSearchFocus}
-                />
-              </div>
-              <Link href="/wishlist" className="relative" onClick={reloadPage}>
-                <Image
-                  src="/images/img_fi_833300.svg"
-                  width={24}
-                  height={24}
-                  preview={false}
-                  alt="wishlist"
-                  className="h-[24px] w-[24px] text-primary"
-                />
-                {wishlistProducts?.length > 0 && (
-                  <p className="absolute bottom-[-7px] left-3 m-auto flex h-[16px] w-[16px] items-center justify-center !rounded-lg bg-[#c5ccb4] text-center tracking-[1.20px] !p-2 text-[10px]">
-                    {wishlistProducts?.reduce((total: any, category: any) => total + category.jewelry.length, 0)}
-                  </p>
-                )}
-              </Link>
-              <div className="relative h-[20px] w-[20px]  self-center flex items-center">
-                <Link href="/cart" onClick={reloadPage}>
-                  <PiHandbagLight className="relative left-0 right-0 top-0 m-auto h-[24px] w-[24px]  text-primary" />
-                  {cartProducts?.length > 0 && (
-                    <p className="absolute bottom-[-7px] left-3 m-auto flex h-[16px] w-[16px] items-center justify-center !rounded-lg bg-[#c5ccb4] text-center tracking-[1.20px] !p-2 text-[10px]">
-                      {cartProducts.length}
-                    </p>
-                  )}
-                </Link>
-              </div>
-            </div>
+    <div className="relative hidden flex-col items-center self-stretch lg:flex">
+      <div className="relative w-full">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center border-b border-line bg-paper/95 px-[clamp(16px,3.2vw,56px)] py-2.5 text-ink backdrop-blur-md">
+          <div className="-ml-3 flex items-center gap-1">
+            <Hamburger toggled={isMenuOpen} toggle={handleMenuToggle} size={20} distance="sm" color={themeColors.ink.DEFAULT} label="Open menu" />
+            <Link href="/virtual-appointment" className="flex text-ink hover:text-ink" onClick={reloadPage} aria-label="Book a virtual appointment">
+              <IoIosLaptop className="h-[22px] w-[22px]" />
+            </Link>
+          </div>
+          <Link href="/" className="flex items-center justify-center" onClick={reloadPage} aria-label="Pendyora home">
+            <img src="/images/logo.png" alt="Pendyora" className="h-[26px] w-auto object-contain mix-blend-multiply sm:h-[22px]" />
+          </Link>
+          <div className="flex items-center justify-end gap-3.5">
+            <button type="button" onClick={handleSearchFocus} aria-label="Search" className="flex text-ink">
+              <SearchIcon className="h-5 w-5" />
+            </button>
+            <Link href="/wishlist" onClick={reloadPage} aria-label="Wishlist" className="relative flex text-ink hover:text-ink">
+              <HeartIcon className="h-5 w-5" />
+              {wishlistProducts?.length > 0 && (
+                <span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-ink px-1 text-[9px] tabular-nums text-paper">
+                  {wishlistProducts?.reduce((total: any, category: any) => total + category.jewelry.length, 0)}
+                </span>
+              )}
+            </Link>
+            <Link href="/cart" onClick={reloadPage} aria-label="Bag" className="relative flex text-ink hover:text-ink">
+              <BagIcon className="h-5 w-5" />
+              {cartProducts?.length > 0 && (
+                <span className="absolute -right-2 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-ink px-1 text-[9px] tabular-nums text-paper">
+                  {cartProducts.length}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
 
@@ -255,13 +234,13 @@ const HeaderMobileView = ({
 
         {/* mobile navigation lists */}
         <div
-          className={`absolute top-12 border left-0 inset-0 bg-white z-50 overflow-x-hidden transition-all duration-500 ease-in-out ${
+          className={`absolute top-full border-t border-line left-0 inset-0 bg-paper z-50 overflow-x-hidden transition-all duration-500 ease-in-out ${
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
           style={{ width: '100%', height: 'calc(100dvh - 40px)' }}
         >
           <div
-            className="relative modal-content bg-white h-full p-5 pt-2 overflow-x-hidden overflow-y-auto overscroll-contain"
+            className="relative modal-content bg-paper text-ink h-full p-5 pt-2 overflow-x-hidden overflow-y-auto overscroll-contain"
             style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}
           >
             <ul className="px-0">
@@ -287,12 +266,12 @@ const HeaderMobileView = ({
                             <MdChevronRight className="w-5 h-5" />
                           </div>
                           <div
-                            className={`absolute top-0 left-0 inset-0 bg-white z-50 overflow-x-hidden transition-all duration-500 ease-in-out ${
+                            className={`absolute top-0 left-0 inset-0 bg-paper z-50 overflow-x-hidden transition-all duration-500 ease-in-out ${
                               activeMenu === mainHeader?.main_menu_title ? '-translate-x-0' : ' translate-x-[120%]'
                             }`}
                             style={{ width: '100%', maxHeight: 'calc(100dvh - 70px)' }}
                           >
-                            <div className="relative  bg-white h-full flex flex-col">
+                            <div className="relative bg-paper h-full flex flex-col">
                               <div className="flex justify-between mb-3 -mt-2 px-5 pt-5 flex-shrink-0">
                                 {mainHeader?.main_menu_title_link ? (
                                   <Link href={mainHeader?.main_menu_title_link} className="inline-block">
@@ -328,7 +307,7 @@ const HeaderMobileView = ({
                                                 <div key={i} className={`flex flex-col gap-0 ${showDivider ? 'border-b pb-3' : ''}`}>
                                                   <div
                                                     // item?.sub_menu?.length !== 0 && item?.master?.length !== 0 &&
-                                                    className={`${item?.link ? 'cursor-pointer hover:text-[#256030]' : ''} uppercase font-semibold text-[14px] tracking-[1px] flex items-center gap-0.5`}
+                                                    className={`${item?.link ? 'cursor-pointer hover:text-gilt' : ''} uppercase font-semibold text-[14px] tracking-[1px] flex items-center gap-0.5`}
                                                     onClick={() => {
                                                       // item?.sub_menu?.length === 0 && item?.master?.length === 0 &&
                                                       if (item?.link) {
@@ -392,7 +371,7 @@ const HeaderMobileView = ({
                                                                 router.push(subItem?.link);
                                                                 reloadPage();
                                                               }}
-                                                              className="flex gap-1.5 hover:text-[#256030] grayscale hover:grayscale-0 cursor-pointer min-w-[48%] flex-row  h-[25px] items-center"
+                                                              className="flex gap-1.5 hover:text-gilt grayscale hover:grayscale-0 cursor-pointer min-w-[48%] flex-row  h-[25px] items-center"
                                                             >
                                                               {subItem.image && (
                                                                 <Image
@@ -420,7 +399,7 @@ const HeaderMobileView = ({
                                                                   router.push(subItem?.link);
                                                                   reloadPage();
                                                                 }}
-                                                                className="flex gap-1.5 cursor-pointer hover:text-[#256030] h-[25px] items-center md:w-full flex-row"
+                                                                className="flex gap-1.5 cursor-pointer hover:text-gilt h-[25px] items-center md:w-full flex-row"
                                                               >
                                                                 {subItem.image && (
                                                                   <Image
@@ -458,7 +437,7 @@ const HeaderMobileView = ({
                                             <Text
                                               size="textlg"
                                               as="p"
-                                              className="absolute bottom-0  md:text-[11px] px-2 w-full  m-auto !font-normal uppercase  bg-black/20 !text-[#ffffff]"
+                                              className="absolute bottom-0  md:text-[11px] px-2 w-full  m-auto !font-normal uppercase  bg-noir/30 !text-paper"
                                             >
                                               {item?.title}
                                             </Text>
@@ -550,8 +529,8 @@ const HeaderMobileView = ({
                           <button
                             key={option.value}
                             onClick={() => handleCurrencySelect(option.value)}
-                            className={`w-full p-3 text-left border-b border-gray-200 hover:bg-gray-50 flex items-center justify-between ${
-                              selectedCurrency === option.value ? 'bg-gray-50' : ''
+                            className={`w-full p-3 text-left border-b border-line hover:bg-stone flex items-center justify-between ${
+                              selectedCurrency === option.value ? 'bg-stone' : ''
                             }`}
                           >
                             <span>{option.label}</span>
@@ -562,7 +541,7 @@ const HeaderMobileView = ({
                                 viewBox="0 0 24 24"
                                 strokeWidth={1.5}
                                 stroke="currentColor"
-                                className="w-6 h-6 text-green-600"
+                                className="w-6 h-6 text-gilt"
                               >
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                               </svg>
@@ -580,7 +559,7 @@ const HeaderMobileView = ({
                         </button> */}
                         <button
                           onClick={() => handleCurrencySelect(selectedCurrency)}
-                          className="w-full p-2 text-center bg-[#17381d] text-white rounded hover:bg-[#0f2614]"
+                          className="w-full p-2 text-center bg-ink text-paper hover:bg-ink-hover"
                         >
                           Save
                         </button>
@@ -608,7 +587,6 @@ const HeaderMobileView = ({
             </ul>
           </div>
         </div>
-        <NavigationsMenus header={header} onNavigate={reloadPage} />
       </div>
     </div>
   );

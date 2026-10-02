@@ -1,0 +1,1028 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pendyora Aurelia Solitaire III</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Libre+Franklin:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: "Short path" — everything a buyer weighs (price, proof, pairings) lives in the first
+   two screens. A sticky section bar doubles as the buy bar; editorial content sits below. */
+:root {
+  --porcelain: #FBFAF7;
+  --linen: #F2EFE9;
+  --hairline: #E2DCD2;
+  --ink: #15120F;
+  --graphite: #5C554D;
+  --mute: #8E867C;
+  --onyx: #0F0E0C;
+  --gold: #A8834F;
+  --gold-deep: #85663A;
+  --gold-soft: #D6C09B;
+  --pearl: #EDE7DC;
+
+  --display: "Cormorant Garamond", "Cormorant", Garamond, "Times New Roman", serif;
+  --body: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+
+  --t-xs: 0.6875rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.9375rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.75rem;
+  --t-2xl: clamp(2rem, 3.6vw, 3rem);
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --max: 1440px;
+  --bar: 56px;
+  --ease: cubic-bezier(.22,.61,.36,1);
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--bar) + 16px); }
+body { margin: 0; background: var(--porcelain); color: var(--ink); font-family: var(--body); font-weight: 300; font-size: var(--t-md); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+img { display: block; max-width: 100%; height: auto; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.2; flex: none; }
+.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+.eyebrow { font-size: var(--t-xs); font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-deep); }
+.link-u { font-size: var(--t-xs); letter-spacing: 0.16em; text-transform: uppercase; font-weight: 500; border-bottom: 1px solid currentColor; padding-bottom: 2px; white-space: nowrap; }
+.stars { display: inline-flex; gap: 2px; color: var(--ink); vertical-align: -1px; }
+.stars svg { width: 12px; height: 12px; fill: currentColor; }
+.rule { height: 1px; background: var(--hairline); border: 0; margin: 0; }
+
+/* ---------- Header: wordmark left, nav centre ---------- */
+.announce { background: var(--onyx); color: var(--pearl); font-size: var(--t-xs); letter-spacing: 0.16em; text-transform: uppercase; text-align: center; padding: 9px var(--gutter); }
+.announce span { color: var(--gold-soft); }
+.header { border-bottom: 1px solid var(--hairline); background: var(--porcelain); }
+.header .wrap { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 32px; height: 76px; }
+.wordmark { font-family: var(--display); font-weight: 500; font-size: 1.65rem; letter-spacing: 0.3em; line-height: 1; }
+.nav { display: flex; justify-content: center; gap: clamp(16px, 2.2vw, 34px); }
+.nav a { font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase; color: var(--graphite); padding-block: 6px; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+.nav a:hover, .nav a[aria-current] { color: var(--ink); border-color: var(--ink); }
+.nav a.hj { color: var(--gold-deep); }
+.h-icons { display: flex; gap: 4px; align-items: center; }
+.icon-btn { position: relative; display: inline-grid; place-items: center; width: 36px; height: 36px; }
+.bag-count { position: absolute; top: 2px; right: 0; min-width: 16px; height: 16px; border-radius: 8px; background: var(--ink); color: var(--porcelain); font-size: 10px; font-weight: 500; display: grid; place-items: center; padding-inline: 4px; transition: transform .3s var(--ease); }
+.bag-count.bump { transform: scale(1.35); }
+.menu-btn { display: none; }
+
+/* ---------- Sticky section bar + buy ---------- */
+.secbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; background: color-mix(in srgb, var(--porcelain) 95%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--hairline); }
+.secbar .wrap { display: flex; align-items: center; gap: 24px; height: var(--bar); }
+.sb-name { font-family: var(--display); font-size: 1.15rem; font-weight: 500; white-space: nowrap; opacity: 0; transform: translateY(6px); transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.tabs { display: flex; gap: clamp(14px, 2.4vw, 36px); overflow-x: auto; scrollbar-width: none; flex: 1; justify-content: center; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs a { font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase; color: var(--graphite); white-space: nowrap; height: var(--bar); display: inline-flex; align-items: center; gap: 6px; border-bottom: 1px solid transparent; margin-bottom: -1px; transition: color .2s, border-color .2s; }
+.tabs a small { font-size: 10px; letter-spacing: 0.04em; color: var(--mute); }
+.tabs a.active { color: var(--ink); border-color: var(--ink); }
+.sb-buy { display: flex; align-items: center; gap: 16px; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.sb-buy b { font-family: var(--display); font-size: 1.3rem; font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
+.secbar.buying .sb-buy, .secbar.buying .sb-name { opacity: 1; pointer-events: auto; transform: none; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 54px; padding-inline: 24px; font-size: var(--t-xs); letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; border: 1px solid var(--ink); transition: background .3s var(--ease), color .3s var(--ease), border-color .3s; white-space: nowrap; }
+.btn-sm { height: 38px; padding-inline: 18px; }
+.btn-primary { background: var(--ink); color: var(--porcelain); }
+.btn-primary:hover { background: var(--onyx); box-shadow: inset 0 -2px 0 var(--gold); }
+.btn-ghost { background: transparent; }
+.btn-ghost:hover { background: var(--ink); color: var(--porcelain); }
+
+/* ---------- Above the fold ---------- */
+.crumbs { display: flex; gap: 10px; flex-wrap: wrap; font-size: var(--t-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); padding-block: 18px; }
+.crumbs [aria-current] { color: var(--ink); }
+.top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(28px, 4.5vw, 80px); align-items: start; padding-bottom: clamp(48px, 6vw, 80px); }
+
+/* Gallery: lookbook mosaic (from version 1) */
+.gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tile { position: relative; overflow: hidden; background: var(--linen); margin: 0; }
+.tile img { width: 100%; height: 100%; object-fit: cover; }
+.tile.span { grid-column: span 2; }
+.tile.sq { aspect-ratio: 1 / 1; }
+.tile.portrait { aspect-ratio: 4 / 5; }
+.tile.wide { aspect-ratio: 16 / 9; }
+.tile figcaption { position: absolute; left: 16px; bottom: 14px; right: 16px; font-size: var(--t-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--porcelain); text-shadow: 0 1px 12px rgba(0,0,0,.35); }
+.tile.on-light figcaption { color: var(--graphite); text-shadow: none; }
+.hero-tile { cursor: zoom-in; }
+.hero-tile .stage { position: absolute; inset: 0; }
+.hero-tile .stage img { position: absolute; inset: 0; transition: opacity .6s var(--ease), transform .25s ease-out; transform-origin: 50% 50%; }
+.hero-tile .stage img.out { opacity: 0; }
+.hero-badges { position: absolute; top: 18px; left: 18px; display: flex; gap: 8px; z-index: 2; }
+.badge { background: var(--porcelain); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; padding: 6px 10px; font-weight: 500; }
+.hero-tools { position: absolute; right: 18px; bottom: 18px; display: flex; gap: 8px; z-index: 2; }
+.chip-btn { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding-inline: 14px; background: var(--porcelain); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; border: 1px solid var(--hairline); transition: background .25s, color .25s; }
+.chip-btn:hover { background: var(--ink); color: var(--porcelain); border-color: var(--ink); }
+.chip-btn .icon { width: 16px; height: 16px; }
+.note-tile { background: var(--onyx); color: var(--pearl); display: flex; flex-direction: column; justify-content: space-between; padding: clamp(24px, 3vw, 44px); }
+.note-tile .eyebrow { color: var(--gold-soft); }
+.note-tile blockquote { margin: 0; font-family: var(--display); font-style: italic; font-size: clamp(1.4rem, 2.2vw, 2rem); line-height: 1.25; }
+.note-tile ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: var(--t-sm); color: color-mix(in srgb, var(--pearl) 78%, transparent); }
+.note-tile li { display: flex; gap: 10px; align-items: baseline; }
+.note-tile li::before { content: ""; width: 14px; height: 1px; background: var(--gold-soft); flex: none; transform: translateY(-4px); }
+.gallery-count { display: none; }
+
+/* Buy panel */
+.panel { display: grid; gap: 26px; min-width: 0; }
+.p-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: var(--t-sm); color: var(--graphite); margin-top: 12px; }
+.sku { font-size: var(--t-xs); letter-spacing: 0.12em; color: var(--mute); font-variant-numeric: tabular-nums; }
+.price-note { font-size: var(--t-sm); color: var(--graphite); }
+.segmented.tall { height: auto; }
+.segmented.tall button { padding: 11px 10px; display: grid; gap: 2px; }
+.segmented button small { font-size: var(--t-xs); color: var(--mute); }
+.segmented button[aria-checked="true"] small { color: var(--gold-soft); }
+.carat.dot { height: auto; padding: 12px 6px 10px; gap: 6px; justify-items: center; }
+.carat i { display: block; border-radius: 50%; border: 1px solid var(--graphite); background: radial-gradient(circle at 35% 30%, #fff, #e9e9e9); }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: var(--t-sm); color: var(--graphite); cursor: pointer; }
+.check input { appearance: none; width: 16px; height: 16px; border: 1px solid var(--graphite); margin: 3px 0 0; flex: none; display: grid; place-items: center; cursor: pointer; }
+.check input:checked { background: var(--ink); border-color: var(--ink); }
+.check input:checked::after { content: ""; width: 8px; height: 4px; border: solid var(--porcelain); border-width: 0 0 1.5px 1.5px; transform: rotate(-45deg) translate(1px, -1px); }
+.engrave-box { display: grid; gap: 10px; padding: 16px; background: var(--linen); }
+.engrave-box[hidden] { display: none; }
+.engrave-input { display: flex; border-bottom: 1px solid var(--ink); align-items: center; }
+.engrave-input input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 0; font-size: var(--t-md); outline: none; }
+.engrave-input small { font-size: var(--t-xs); color: var(--mute); font-variant-numeric: tabular-nums; }
+.engrave-preview { font-family: var(--display); font-style: italic; font-size: 1.35rem; color: var(--gold-deep); min-height: 1.6em; text-align: center; }
+.cta-stack { display: grid; gap: 10px; }
+.cta-stack > .btn { width: 100%; }
+.delivery { display: grid; gap: 12px; padding: 18px 20px; background: var(--linen); font-size: var(--t-sm); }
+.delivery-row { display: flex; gap: 14px; align-items: flex-start; }
+.delivery-row .icon { margin-top: 2px; color: var(--gold-deep); }
+.delivery strong { font-weight: 500; }
+.delivery p { color: var(--graphite); }
+.concierge { display: flex; align-items: center; gap: 14px; font-size: var(--t-sm); color: var(--graphite); }
+.concierge .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--onyx); color: var(--gold-soft); display: grid; place-items: center; font-family: var(--display); font-size: 1.1rem; flex: none; }
+.concierge a { color: var(--ink); border-bottom: 1px solid var(--hairline); }
+.dot-live { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #5D8A5E; margin-right: 6px; vertical-align: 1px; }
+.p-title { font-size: clamp(2.1rem, 3.2vw, 3rem); line-height: 1.04; }
+.p-sub { font-family: var(--display); font-style: italic; font-size: var(--t-lg); color: var(--graphite); line-height: 1.3; margin-top: 6px; }
+.price-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.price { font-family: var(--display); font-size: 2rem; font-weight: 500; font-variant-numeric: lining-nums tabular-nums; line-height: 1; }
+.installments { font-size: var(--t-sm); color: var(--graphite); }
+.installments strong { font-weight: 500; color: var(--ink); }
+
+/* Proof card: reviews at a glance, right under the price */
+.proof { border: 1px solid var(--hairline); display: grid; }
+.proof-top { display: flex; align-items: center; gap: 16px; padding: 16px 18px; border-bottom: 1px solid var(--hairline); }
+.proof-score { font-family: var(--display); font-size: 2.4rem; line-height: .9; font-variant-numeric: lining-nums; }
+.proof-top div { display: grid; gap: 2px; font-size: var(--t-sm); color: var(--graphite); flex: 1; }
+.proof-quote { padding: 16px 18px; display: grid; gap: 8px; min-height: 108px; }
+.proof-quote q { font-family: var(--display); font-style: italic; font-size: 1.2rem; line-height: 1.35; quotes: "“" "”"; transition: opacity .4s var(--ease); }
+.proof-quote span { font-size: var(--t-xs); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); }
+.proof-chips { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 18px 16px; }
+.chip { height: 30px; padding-inline: 12px; border: 1px solid var(--hairline); font-size: var(--t-xs); letter-spacing: 0.04em; color: var(--graphite); display: inline-flex; align-items: center; gap: 6px; transition: border-color .2s, color .2s; }
+.chip:hover { border-color: var(--ink); color: var(--ink); }
+.chip b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.opt { display: grid; gap: 12px; }
+.opt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.opt-label { font-size: var(--t-xs); letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; }
+.opt-label em { font-style: normal; font-weight: 300; letter-spacing: 0.04em; text-transform: none; font-size: var(--t-sm); color: var(--graphite); margin-left: 8px; }
+.opt-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.swatches { display: flex; gap: 12px; flex-wrap: wrap; }
+.swatch { width: 38px; height: 38px; border-radius: 50%; padding: 3px; border: 1px solid transparent; transition: border-color .25s; }
+.swatch span { display: block; width: 100%; height: 100%; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.swatch[aria-checked="true"] { border-color: var(--ink); }
+.sw-yellow { background: radial-gradient(circle at 32% 28%, #FBEBC3, #D9B26A 45%, #A57E35 100%); }
+.sw-white { background: radial-gradient(circle at 32% 28%, #FFFFFF, #DADBDC 45%, #A5A7AA 100%); }
+.sw-rose { background: radial-gradient(circle at 32% 28%, #FBE3D6, #E1A88E 45%, #AD6D55 100%); }
+.sw-plat { background: radial-gradient(circle at 32% 28%, #F4F5F6, #C3C6CA 45%, #7E8287 100%); }
+.segmented { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--hairline); height: 44px; }
+.segmented button { font-size: var(--t-sm); transition: background .25s, color .25s; }
+.segmented button[aria-checked="true"] { background: var(--ink); color: var(--porcelain); }
+.carats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.carat { border: 1px solid var(--hairline); height: 52px; display: grid; place-content: center; gap: 2px; text-align: center; transition: border-color .25s; }
+.carat b { font-weight: 400; font-family: var(--display); font-size: 1.15rem; line-height: 1; font-variant-numeric: lining-nums; }
+.carat small { font-size: 10px; color: var(--mute); font-variant-numeric: tabular-nums; }
+.carat[aria-checked="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.select-wrap { position: relative; }
+.select-wrap select { width: 100%; appearance: none; background: transparent; border: 1px solid var(--hairline); border-radius: 0; height: 44px; padding: 0 40px 0 14px; font-size: var(--t-sm); cursor: pointer; }
+.select-wrap .icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; width: 16px; height: 16px; }
+.cta-row { display: grid; grid-template-columns: 1fr 54px; gap: 10px; }
+.wish { width: 54px; height: 54px; border: 1px solid var(--hairline); display: grid; place-items: center; }
+.wish:hover { border-color: var(--ink); }
+.wish[aria-pressed="true"] svg { fill: var(--ink); }
+.ship-line { display: flex; gap: 10px; align-items: center; font-size: var(--t-sm); color: var(--graphite); flex-wrap: wrap; }
+.ship-line .icon { color: var(--gold-deep); width: 18px; height: 18px; }
+.ship-line strong { font-weight: 500; color: var(--ink); }
+
+/* Pairs with: mini strip inside the panel */
+.pairs { display: grid; gap: 12px; padding-top: 4px; }
+.pairs-list { display: grid; gap: 0; border-top: 1px solid var(--hairline); }
+.pair { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding-block: 10px; border-bottom: 1px solid var(--hairline); }
+.pair img { width: 56px; height: 56px; object-fit: cover; background: var(--linen); }
+.pair div { display: grid; min-width: 0; }
+.pair b { font-family: var(--display); font-weight: 500; font-size: 1.08rem; line-height: 1.2; }
+.pair span { font-size: var(--t-xs); color: var(--graphite); font-variant-numeric: tabular-nums; }
+.pair-add { width: 34px; height: 34px; border: 1px solid var(--hairline); display: grid; place-items: center; transition: all .25s; }
+.pair-add:hover { border-color: var(--ink); background: var(--ink); color: var(--porcelain); }
+.pair-add.done { background: var(--ink); color: var(--porcelain); border-color: var(--ink); }
+.pairs-total { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: var(--t-sm); color: var(--graphite); }
+.pairs-total b { font-weight: 500; color: var(--ink); }
+
+.assure { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+.assure div { display: flex; gap: 12px; align-items: center; font-size: var(--t-sm); color: var(--graphite); line-height: 1.35; }
+.assure .icon { width: 22px; height: 22px; color: var(--ink); }
+
+/* ---------- Sections ---------- */
+.section { padding-block: clamp(56px, 7vw, 96px); }
+.sec-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
+.sec-head h2 { font-size: var(--t-2xl); line-height: 1.04; }
+.sec-head h2 em { font-style: italic; color: var(--gold-deep); }
+.sec-head .eyebrow { display: block; margin-bottom: 10px; }
+.arrows { display: flex; gap: 8px; }
+.arrows button { width: 42px; height: 42px; border: 1px solid var(--hairline); display: grid; place-items: center; }
+.arrows button:hover:not(:disabled) { border-color: var(--ink); }
+.arrows button:disabled { opacity: .35; cursor: default; }
+
+/* Reviews: summary column + horizontal rail of review cards */
+.reviews { background: var(--linen); }
+.rv-layout { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: clamp(28px, 4vw, 64px); align-items: start; }
+.rv-sum { display: grid; gap: 18px; }
+.big { display: flex; align-items: end; gap: 14px; }
+.big b { font-family: var(--display); font-weight: 400; font-size: 4.5rem; line-height: .8; font-variant-numeric: lining-nums; }
+.big div { display: grid; gap: 4px; font-size: var(--t-sm); color: var(--graphite); }
+.bars { display: grid; gap: 7px; }
+.bar { display: grid; grid-template-columns: 22px minmax(0, 1fr) 30px; gap: 10px; align-items: center; font-size: var(--t-xs); color: var(--graphite); font-variant-numeric: tabular-nums; }
+.bar .track { height: 2px; background: var(--hairline); position: relative; }
+.bar .track i { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
+.bar span:last-child { text-align: right; }
+.fit { display: grid; gap: 6px; }
+.fit-track { height: 1px; background: var(--ink); position: relative; margin-block: 6px; }
+.fit-track i { position: absolute; top: -5px; width: 11px; height: 11px; border-radius: 50%; background: var(--gold); margin-left: -5px; }
+.fit-ends { display: flex; justify-content: space-between; font-size: var(--t-xs); color: var(--mute); }
+.rv-main { display: grid; gap: 18px; min-width: 0; }
+.rv-tools { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter { height: 32px; padding-inline: 12px; border: 1px solid var(--hairline); font-size: var(--t-xs); letter-spacing: 0.06em; background: var(--porcelain); transition: all .2s; }
+.filter[aria-pressed="true"] { background: var(--ink); color: var(--porcelain); border-color: var(--ink); }
+.photo-strip { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.photo-strip img { width: 76px; height: 76px; object-fit: cover; flex: none; }
+.photo-strip span { width: 76px; height: 76px; flex: none; display: grid; place-items: center; background: var(--ink); color: var(--pearl); font-size: var(--t-xs); letter-spacing: 0.1em; text-align: center; line-height: 1.3; }
+.rail { display: grid; grid-auto-flow: column; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 2px; }
+.rail::-webkit-scrollbar { display: none; }
+.rv-rail { grid-auto-columns: calc((100% - 2 * 16px) / 3); }
+.rv-card { background: var(--porcelain); padding: 22px; display: grid; gap: 10px; align-content: start; scroll-snap-align: start; min-width: 0; }
+.rv-card[hidden] { display: none; }
+.rv-card .top { display: flex; justify-content: space-between; font-size: var(--t-xs); color: var(--mute); }
+.rv-card h3 { font-size: 1.3rem; line-height: 1.2; }
+.rv-card p { font-size: var(--t-sm); color: var(--graphite); }
+.rv-card .who { display: flex; gap: 12px; align-items: center; padding-top: 10px; border-top: 1px solid var(--hairline); margin-top: auto; }
+.rv-card .who img { width: 44px; height: 44px; object-fit: cover; }
+.rv-card .who div { display: grid; font-size: var(--t-xs); color: var(--graphite); line-height: 1.5; }
+.rv-card .who b { font-weight: 500; color: var(--ink); font-size: var(--t-sm); }
+.verified { color: var(--gold-deep); letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px; }
+
+/* Product rails with tabs */
+.ptabs { display: flex; gap: 24px; border-bottom: 1px solid var(--hairline); margin-bottom: 24px; overflow-x: auto; scrollbar-width: none; }
+.ptabs button { height: 44px; font-size: var(--t-xs); letter-spacing: 0.18em; text-transform: uppercase; color: var(--graphite); border-bottom: 1px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.ptabs button[aria-selected="true"] { color: var(--ink); border-color: var(--ink); }
+.p-rail { grid-auto-columns: calc((100% - 3 * 16px) / 4); }
+.p-rail[hidden] { display: none; }
+.card { display: grid; gap: 12px; scroll-snap-align: start; min-width: 0; }
+.card-media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--linen); }
+.card-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+.card:hover .card-media img { transform: scale(1.04); }
+.card-media .badge { position: absolute; top: 10px; left: 10px; }
+.card-wish { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; display: grid; place-items: center; background: color-mix(in srgb, var(--porcelain) 85%, transparent); }
+.card-wish[aria-pressed="true"] svg { fill: var(--ink); }
+.quick { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 42px; background: var(--porcelain); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; transform: translateY(calc(100% + 10px)); transition: transform .4s var(--ease), background .2s, color .2s; }
+.card:hover .quick, .quick:focus-visible { transform: none; }
+.quick:hover { background: var(--ink); color: var(--porcelain); }
+.card h3 { font-size: 1.2rem; line-height: 1.2; }
+.card .meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: var(--t-sm); color: var(--ink); font-variant-numeric: tabular-nums; }
+.card .meta .r { font-size: var(--t-xs); color: var(--graphite); display: inline-flex; gap: 4px; align-items: center; }
+.card .meta .r svg { width: 11px; height: 11px; fill: var(--ink); }
+
+/* Details: tabs beside an image */
+.details { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 80px); align-items: start; }
+.details figure { margin: 0; position: relative; }
+.details figure img { width: 100%; aspect-ratio: 16 / 11; object-fit: cover; background: var(--linen); }
+.details figure figcaption { font-size: var(--t-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); margin-top: 10px; }
+.dpanel { display: grid; gap: 14px; font-size: var(--t-sm); color: var(--graphite); max-width: 60ch; }
+.dpanel[hidden] { display: none; }
+.spec { display: grid; grid-template-columns: auto 1fr; gap: 10px 28px; margin: 0; }
+.spec dt { color: var(--mute); font-size: var(--t-xs); letter-spacing: 0.12em; text-transform: uppercase; padding-top: 2px; }
+.spec dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* Atelier + appointment, combined */
+.house { background: var(--onyx); color: var(--pearl); }
+.house-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 80px); align-items: center; }
+.house img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.house .eyebrow { color: var(--gold-soft); }
+.house h2 { font-size: var(--t-2xl); line-height: 1.04; margin-block: 14px 18px; }
+.house h2 em { color: var(--gold-soft); }
+.house p { color: color-mix(in srgb, var(--pearl) 76%, transparent); max-width: 50ch; }
+.steps { list-style: none; padding: 0; margin: 32px 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid rgba(237,231,220,.16); }
+.steps li { padding: 16px 12px 0 0; display: grid; gap: 4px; }
+.steps i { font-family: var(--display); color: var(--gold-soft); font-size: 1rem; }
+.steps b { font-family: var(--display); font-weight: 400; font-size: 1.25rem; }
+.steps span { font-size: var(--t-xs); color: color-mix(in srgb, var(--pearl) 60%, transparent); }
+.house-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-pearl { background: var(--pearl); color: var(--onyx); border-color: var(--pearl); }
+.btn-pearl:hover { background: transparent; color: var(--pearl); }
+.btn-light { border-color: var(--pearl); color: var(--pearl); }
+.btn-light:hover { background: var(--pearl); color: var(--onyx); }
+
+.services { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--hairline); }
+.service { display: flex; gap: 14px; align-items: center; padding: 26px 20px; border-right: 1px solid var(--hairline); font-size: var(--t-sm); color: var(--graphite); }
+.service:last-child { border-right: 0; }
+.service .icon { width: 26px; height: 26px; color: var(--gold-deep); stroke-width: 1; }
+.service b { display: block; font-family: var(--display); font-weight: 500; font-size: 1.15rem; color: var(--ink); }
+
+.footer { background: var(--onyx); color: var(--pearl); padding-top: clamp(48px, 7vw, 88px); overflow: hidden; border-top: 1px solid rgba(237,231,220,.08); }
+.foot-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 36px; }
+.foot-grid h4 { font-family: var(--body); font-size: var(--t-xs); letter-spacing: 0.22em; text-transform: uppercase; font-weight: 500; color: var(--gold-soft); margin-bottom: 16px; }
+.foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; font-size: var(--t-sm); }
+.foot-grid ul a { color: color-mix(in srgb, var(--pearl) 70%, transparent); }
+.foot-grid ul a:hover { color: var(--pearl); }
+.news h3 { font-size: var(--t-xl); margin-bottom: 8px; }
+.news p { font-size: var(--t-sm); color: color-mix(in srgb, var(--pearl) 64%, transparent); margin-bottom: 18px; max-width: 40ch; }
+.news form { display: flex; border-bottom: 1px solid color-mix(in srgb, var(--pearl) 40%, transparent); max-width: 380px; }
+.news input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 12px 0; color: var(--pearl); outline: none; font-size: var(--t-sm); }
+.news input::placeholder { color: color-mix(in srgb, var(--pearl) 45%, transparent); }
+.news button { font-size: var(--t-xs); letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-soft); }
+.news .msg { font-size: var(--t-sm); color: var(--gold-soft); margin-top: 10px; min-height: 1.4em; }
+.foot-mark { font-family: var(--display); font-size: 17.5vw; line-height: .78; letter-spacing: 0.04em; text-align: center; color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--gold-soft) 45%, transparent); margin-top: clamp(40px, 6vw, 80px); user-select: none; white-space: nowrap; }
+.foot-bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-block: 20px; border-top: 1px solid rgba(237,231,220,.12); font-size: var(--t-xs); letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb, var(--pearl) 55%, transparent); }
+
+/* Mobile buy bar */
+.mbar { display: none; }
+
+/* Drawers + toast */
+.scrim { position: fixed; inset: 0; background: rgba(15,14,12,.45); z-index: 80; opacity: 0; pointer-events: none; transition: opacity .35s var(--ease); }
+.scrim.show { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); background: var(--porcelain); z-index: 90; transform: translateX(100%); transition: transform .5s var(--ease); display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.drawer.show { transform: none; }
+.drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 26px; border-bottom: 1px solid var(--hairline); }
+.drawer-head h3 { font-size: var(--t-xl); }
+.drawer-body { padding: 26px; overflow-y: auto; display: grid; gap: 20px; align-content: start; flex: 1; }
+.drawer-body p { font-size: var(--t-sm); color: var(--graphite); }
+.drawer-foot { padding: 18px 26px 26px; display: grid; gap: 10px; border-top: 1px solid var(--hairline); }
+.bag-item { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; gap: 16px; align-items: start; padding-bottom: 16px; border-bottom: 1px solid var(--hairline); }
+.bag-item img { width: 80px; height: 80px; object-fit: cover; background: var(--linen); }
+.bag-item h4 { font-size: 1.2rem; }
+.bag-item small { display: block; font-size: var(--t-xs); color: var(--graphite); line-height: 1.6; }
+.bag-item .bp { font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+.bag-total { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-sm); }
+.bag-total b { font-family: var(--display); font-size: 1.5rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.size-table-wrap { overflow-x: auto; }
+.size-table { width: 100%; border-collapse: collapse; font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+.size-table th { text-align: left; font-size: var(--t-xs); letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500; color: var(--mute); padding: 10px 8px; border-bottom: 1px solid var(--ink); }
+.size-table td { padding: 9px 8px; border-bottom: 1px solid var(--hairline); }
+.size-table tr.sel td { background: var(--linen); font-weight: 500; }
+.toast { position: fixed; left: 50%; top: 20px; transform: translate(-50%, -160%); background: var(--ink); color: var(--porcelain); padding: 12px 20px; font-size: var(--t-sm); z-index: 100; transition: transform .45s var(--ease); }
+.toast.show { transform: translate(-50%, 0); }
+
+@keyframes settle { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.panel > * { animation: settle .8s var(--ease) both; }
+.panel > *:nth-child(2) { animation-delay: .05s; } .panel > *:nth-child(3) { animation-delay: .1s; } .panel > *:nth-child(n+4) { animation-delay: .15s; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1180px) {
+  .p-rail { grid-auto-columns: calc((100% - 2 * 16px) / 3); }
+  .rv-rail { grid-auto-columns: calc((100% - 16px) / 2); }
+  .services { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .service:nth-child(2) { border-right: 0; }
+  .service:nth-child(-n+2) { border-bottom: 1px solid var(--hairline); }
+  .foot-grid { grid-template-columns: 1fr 1fr; }
+  .sb-name { display: none; }
+}
+@media (max-width: 900px) {
+  .header .wrap { grid-template-columns: auto 1fr auto; height: 64px; gap: 12px; }
+  .wordmark { font-size: 1.35rem; text-align: center; }
+  .menu-btn { display: inline-grid; }
+  .nav { display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--porcelain); flex-direction: column; align-items: flex-start; padding: 16px var(--gutter) 22px; border-bottom: 1px solid var(--hairline); z-index: 45; }
+  .nav.open { display: flex; }
+  .header { position: relative; }
+  .h-icons .hide-m { display: none; }
+  .top { grid-template-columns: 1fr; }
+  .gallery { display: grid; grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 86%; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); scrollbar-width: none; }
+  .gallery::-webkit-scrollbar { display: none; }
+  .tile, .tile.span { grid-column: auto; aspect-ratio: 4 / 5; scroll-snap-align: start; }
+  .tile.note-tile { display: none; }
+  .gallery-count { display: flex; justify-content: space-between; align-items: center; font-size: var(--t-xs); letter-spacing: 0.16em; color: var(--graphite); padding-top: 12px; text-transform: uppercase; }
+  .gallery-count .track { flex: 1; height: 1px; background: var(--hairline); margin-left: 16px; position: relative; }
+  .gallery-count .track i { position: absolute; top: 0; bottom: 0; left: 0; background: var(--ink); width: 20%; transition: left .25s; }
+  .tabs { justify-content: flex-start; }
+  .sb-buy { display: none; }
+  .rv-layout, .details, .house-grid { grid-template-columns: 1fr; }
+  .mbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--porcelain); border-top: 1px solid var(--hairline); padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom, 0px)); gap: 14px; align-items: center; transform: translateY(110%); transition: transform .4s var(--ease); }
+  .mbar.show { transform: none; }
+  .mbar div { flex: 1; display: grid; min-width: 0; }
+  .mbar b { font-family: var(--display); font-size: 1.35rem; font-weight: 500; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .mbar span { font-size: var(--t-xs); color: var(--graphite); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mbar .btn { height: 46px; }
+}
+@media (max-width: 640px) {
+  .opt-pair { grid-template-columns: 1fr; }
+  .rv-rail { grid-auto-columns: 86%; }
+  .p-rail { grid-auto-columns: 64%; gap: 12px; }
+  .assure { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; row-gap: 12px; }
+  .services { grid-template-columns: 1fr; }
+  .service { border-right: 0; border-bottom: 1px solid var(--hairline); }
+  .service:last-child { border-bottom: 0; }
+  .foot-grid .news { grid-column: 1 / -1; }
+  .quick { display: none; }
+  .sec-head .arrows { display: none; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 6 6.5.6-4.9 4.4 1.5 6.4L12 16.9 6.1 20.2l1.5-6.4L2.7 9.4l6.5-.6z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5c1.2-3.8 4-5.6 7.5-5.6s6.3 1.8 7.5 5.6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0112 7.3a4.3 4.3 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12.5H6z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M14.5 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.2v3.3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+  <symbol id="i-diamond" viewBox="0 0 24 24"><path d="M6.5 4h11l3.5 5-9 11L3 9z"/><path d="M3 9h18M9.5 4L8 9l4 11 4-11-1.5-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6z"/><path d="M8.8 12l2.3 2.3 4.2-4.6"/></symbol>
+  <symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="14.5" r="6.5"/><path d="M9.5 5.5L12 3l2.5 2.5L12 8z"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M8 7L4 11l4 4"/><path d="M4 11h11a5 5 0 010 10h-3"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-4.5L16 4.5l3.5 3.5L8.5 19z"/><path d="M14 7l3.5 3.5"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3.5" y="8.5" width="17" height="4"/><path d="M5 12.5v8h14v-8M12 8.5v12"/><path d="M12 8.5C10 4 6.5 5 7.5 7.5c.5 1 4.5 1 4.5 1zM12 8.5c2-4.5 5.5-3.5 4.5-1-.5 1-4.5 1-4.5 1z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11"/><path d="M16 10.5l5-3v9l-5-3z"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0113.7-5.6M20 12a8 8 0 01-13.7 5.6"/><path d="M17.5 3v3.6h-3.6M6.5 21v-3.6h3.6"/></symbol>
+  <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2M8.5 11h5M11 8.5v5"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/></symbol>
+</svg>
+
+<div class="announce">Complimentary insured shipping <span>·</span> 30-day returns <span>·</span> Free resizing within 60 days</div>
+
+<header class="header">
+  <div class="wrap">
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="menu-btn icon-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><svg class="icon"><use href="#i-menu"/></svg></button>
+      <a href="#" class="wordmark" aria-label="Pendyora home">PENDYORA</a>
+    </div>
+    <nav class="nav" id="nav" aria-label="Primary">
+      <a href="#" class="hj">High Jewellery</a><a href="#" aria-current="page">Engagement</a><a href="#">Wedding</a><a href="#">Rings</a><a href="#">Necklaces</a><a href="#">Earrings</a><a href="#">Bracelets</a><a href="#">Gifts</a>
+    </nav>
+    <div class="h-icons">
+      <button class="icon-btn" aria-label="Search"><svg class="icon"><use href="#i-search"/></svg></button>
+      <button class="icon-btn hide-m" aria-label="Account"><svg class="icon"><use href="#i-user"/></svg></button>
+      <button class="icon-btn hide-m" aria-label="Wishlist"><svg class="icon"><use href="#i-heart"/></svg></button>
+      <button class="icon-btn" id="bagBtn" aria-label="Shopping bag"><svg class="icon"><use href="#i-bag"/></svg><span class="bag-count" id="bagCount">0</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- Sticky section bar: jump links + buy once the main button is out of view -->
+<div class="secbar" id="secbar">
+  <div class="wrap">
+    <span class="sb-name">The Aurelia Solitaire</span>
+    <nav class="tabs" id="tabs" aria-label="On this page">
+      <a href="#overview" class="active">Overview</a>
+      <a href="#reviews">Reviews <small>212</small></a>
+      <a href="#pairs">Pairs with</a>
+      <a href="#details">Details</a>
+      <a href="#atelier">The atelier</a>
+    </nav>
+    <div class="sb-buy"><b id="sbPrice">$6,980</b><button class="btn btn-primary btn-sm" id="sbAdd" type="button" tabindex="-1">Add to bag</button></div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap" id="overview">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span>/</span><a href="#">Engagement</a><span>/</span><a href="#">Solitaires</a><span>/</span><span aria-current="page">The Aurelia</span></nav>
+
+    <section class="top">
+      <div>
+        <div class="gallery" id="gallery">
+          <figure class="tile span sq hero-tile" id="heroTile">
+            <div class="hero-badges"><span class="badge">Made to order</span><span class="badge">Signature</span></div>
+            <div class="stage" id="stage">
+              <img src="img/ring-yellow.jpg" alt="The Aurelia Solitaire in 18K yellow gold with a round brilliant diamond" id="heroImg" width="1000" height="1000">
+            </div>
+            <div class="hero-tools">
+              <button class="chip-btn" type="button"><svg class="icon"><use href="#i-rotate"/></svg>360° view</button>
+              <button class="chip-btn" type="button"><svg class="icon"><use href="#i-zoom"/></svg>Zoom</button>
+            </div>
+          </figure>
+          <figure class="tile portrait">
+            <img src="img/hand-satin.jpg" alt="The Aurelia worn on a hand resting on ivory silk" loading="lazy" width="1000" height="1250">
+            <figcaption>Worn on a size 6 · 1.50 ct</figcaption>
+          </figure>
+          <figure class="tile portrait">
+            <img src="img/hand-lace.jpg" alt="Hand wearing fine rings against navy lace" loading="lazy" width="1000" height="1250">
+            <figcaption>Stacked with the Aurelia band</figcaption>
+          </figure>
+          <figure class="tile span wide on-light">
+            <img src="img/macro.jpg" alt="Close view of the six-claw head holding the diamond" loading="lazy" width="1200" height="676">
+            <figcaption>Six claws, hand-shaped to sit the stone low</figcaption>
+          </figure>
+          <figure class="tile portrait">
+            <img src="img/hand-gold.jpg" alt="Hand in gold satin wearing slim gold rings" loading="lazy" width="1000" height="1250">
+            <figcaption>Everyday, from the first morning</figcaption>
+          </figure>
+          <div class="tile portrait note-tile">
+            <span class="eyebrow">In the box</span>
+            <blockquote>“Made for a lifetime of being looked at closely.”</blockquote>
+            <ul>
+              <li>A 10× jeweller’s loupe</li>
+              <li>Walnut ring box &amp; travel pouch</li>
+              <li>Hand-written care card from the atelier</li>
+            </ul>
+          </div>
+        </div>
+        <div class="gallery-count" aria-hidden="true"><span id="gCount">01 / 05</span><span class="track"><i id="gTrack"></i></span></div>
+      </div>
+
+      <aside class="panel" aria-label="Product options">
+        <div>
+          <span class="eyebrow">Engagement · The Aurelia Collection</span>
+          <h1 class="p-title" style="margin-top:10px">The Aurelia Solitaire</h1>
+          <p class="p-sub">A round brilliant held on a slender cathedral setting</p>
+          <div class="p-meta">
+            <a href="#reviews" style="display:inline-flex;gap:10px;align-items:center"><span class="stars" aria-label="Rated 4.9 out of 5"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span><span style="border-bottom:1px solid var(--hairline)">4.9 · 212 reviews</span></a>
+            <span class="sku" id="sku">PD-AUR-150-NY18</span>
+          </div>
+        </div>
+
+        <div style="display:grid;gap:8px">
+          <div class="price-row" style="justify-content:flex-start;gap:14px"><span class="price" id="price">$6,980</span><span class="price-note">Diamond &amp; setting included</span></div>
+          <p class="installments">Or 4 interest-free payments of <strong id="inst">$1,745</strong> with Affirm</p>
+        </div>
+
+        <!-- Reviews at a glance -->
+        <div class="proof">
+          <a class="proof-top" href="#reviews">
+            <span class="proof-score">4.9</span>
+            <div><span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>212 verified reviews · 98% would recommend</div>
+            <span class="link-u">Read all</span>
+          </a>
+          <div class="proof-quote" aria-live="polite">
+            <q id="pqText">She said yes before I finished the question. The stone throws light across the room.</q>
+            <span id="pqWho">Priya S. · 18K Yellow · 1.50 ct</span>
+          </div>
+          <div class="proof-chips">
+            <a class="chip" href="#reviews" data-jump="sparkle">Sparkle <b>86</b></a>
+            <a class="chip" href="#reviews" data-jump="comfort">Sits low &amp; comfortable <b>54</b></a>
+            <a class="chip" href="#reviews" data-jump="fit">True to size <b>41</b></a>
+          </div>
+        </div>
+
+        <hr class="rule">
+
+        <div class="opt" role="radiogroup" aria-labelledby="metalLbl">
+          <span class="opt-label" id="metalLbl">Metal<em id="metalName">18K Yellow Gold</em></span>
+          <div class="swatches" id="metals">
+            <button class="swatch" role="radio" aria-checked="true" data-metal="yellow" aria-label="18K Yellow Gold"><span class="sw-yellow"></span></button>
+            <button class="swatch" role="radio" aria-checked="false" data-metal="white" aria-label="18K White Gold"><span class="sw-white"></span></button>
+            <button class="swatch" role="radio" aria-checked="false" data-metal="rose" aria-label="18K Rose Gold"><span class="sw-rose"></span></button>
+            <button class="swatch" role="radio" aria-checked="false" data-metal="plat" aria-label="Platinum 950"><span class="sw-plat"></span></button>
+          </div>
+        </div>
+
+        <div class="opt">
+          <span class="opt-label">Diamond</span>
+          <div class="segmented tall" role="radiogroup" aria-label="Diamond origin" id="origin">
+            <button role="radio" aria-checked="true" data-origin="natural">Natural<small>Mined, traceable</small></button>
+            <button role="radio" aria-checked="false" data-origin="lab">Lab-grown<small>Same sparkle, lower price</small></button>
+          </div>
+        </div>
+
+        <div class="opt">
+          <span class="opt-label">Carat weight<em>Face-up diameter shown</em></span>
+          <div class="carats" role="radiogroup" aria-label="Carat weight" id="carats">
+            <button class="carat dot" role="radio" aria-checked="false" data-ct="1.00"><i style="width:12px;height:12px"></i><b>1.00</b><small>6.4 mm</small></button>
+            <button class="carat dot" role="radio" aria-checked="true" data-ct="1.50"><i style="width:15px;height:15px"></i><b>1.50</b><small>7.4 mm</small></button>
+            <button class="carat dot" role="radio" aria-checked="false" data-ct="2.00"><i style="width:17px;height:17px"></i><b>2.00</b><small>8.1 mm</small></button>
+            <button class="carat dot" role="radio" aria-checked="false" data-ct="2.50"><i style="width:19px;height:19px"></i><b>2.50</b><small>8.8 mm</small></button>
+          </div>
+        </div>
+
+        <div class="opt">
+          <div class="opt-head"><label class="opt-label" for="ringSize">Ring size</label><button class="link-u" type="button" id="sizeGuideBtn">Size guide</button></div>
+          <div class="select-wrap"><select id="ringSize"></select><svg class="icon"><use href="#i-chev"/></svg></div>
+          <label class="check"><input type="checkbox" id="sizer"> Not sure of the size? Send me a complimentary ring sizer first.</label>
+        </div>
+
+        <div class="opt">
+          <label class="check"><input type="checkbox" id="engraveToggle"> Add a complimentary engraving inside the band</label>
+          <div class="engrave-box" id="engraveBox" hidden>
+            <div class="engrave-input"><input id="engraveText" maxlength="18" placeholder="e.g. Always, A &amp; R" aria-label="Engraving text"><small id="engraveCount">0 / 18</small></div>
+            <div class="engrave-preview" id="engravePreview" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="cta-stack" id="ctaStack">
+          <button class="btn btn-primary" id="addBtn" type="button">Add to bag · <span id="ctaPrice">$6,980</span></button>
+          <div class="cta-row">
+            <button class="btn btn-ghost" type="button"><svg class="icon" style="width:16px;height:16px"><use href="#i-video"/></svg>Try it on over video</button>
+            <button class="wish" id="wishBtn" aria-pressed="false" aria-label="Save to wishlist"><svg class="icon"><use href="#i-heart"/></svg></button>
+          </div>
+        </div>
+
+        <div class="delivery">
+          <div class="delivery-row"><svg class="icon"><use href="#i-truck"/></svg><div><strong>Arrives by <span id="eta">—</span></strong><p>Handmade to order in our atelier, then sent fully insured, signature on delivery.</p></div></div>
+          <div class="delivery-row"><svg class="icon"><use href="#i-return"/></svg><div><strong>30-day returns, 60-day resizing</strong><p>Return or resize without charge. Engraved pieces can still be resized.</p></div></div>
+        </div>
+
+        <!-- Pairs with -->
+        <div class="pairs">
+          <div class="opt-head"><span class="opt-label">Pairs beautifully with</span><a href="#pairs" class="link-u">See all</a></div>
+          <div class="pairs-list">
+            <div class="pair"><img src="img/stack.jpg" alt=""><div><b>Aurelia Pavé Band</b><span>$1,680 · sits flush</span></div><button class="pair-add" data-name="Aurelia Pavé Band" data-price="1680" data-img="img/stack.jpg" aria-label="Add Aurelia Pavé Band"><svg class="icon" style="width:16px;height:16px"><use href="#i-plus"/></svg></button></div>
+            <div class="pair"><img src="img/pendant.jpg" alt=""><div><b>Lumière Pendant</b><span>$1,240 · matching claw</span></div><button class="pair-add" data-name="Lumière Pendant" data-price="1240" data-img="img/pendant.jpg" aria-label="Add Lumière Pendant"><svg class="icon" style="width:16px;height:16px"><use href="#i-plus"/></svg></button></div>
+            <div class="pair"><img src="img/earrings.jpg" alt="" style="object-position:40% 30%"><div><b>Celeste Drop Earrings</b><span>$2,150</span></div><button class="pair-add" data-name="Celeste Drop Earrings" data-price="2150" data-img="img/earrings.jpg" aria-label="Add Celeste Drop Earrings"><svg class="icon" style="width:16px;height:16px"><use href="#i-plus"/></svg></button></div>
+          </div>
+        </div>
+
+        <div class="assure">
+          <div><svg class="icon"><use href="#i-diamond"/></svg>Conflict-free, traceable diamond</div>
+          <div><svg class="icon"><use href="#i-shield"/></svg>Lifetime manufacturing warranty</div>
+          <div><svg class="icon"><use href="#i-leaf"/></svg>Recycled 18K gold &amp; platinum</div>
+          <div><svg class="icon"><use href="#i-sparkle"/></svg>Complimentary yearly clean &amp; check</div>
+        </div>
+
+        <div class="concierge">
+          <span class="avatar">M</span>
+          <span><span class="dot-live"></span>Maya, a Pendyora jeweller, is available now. <a href="#">Start a chat</a></span>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <!-- Reviews -->
+  <section class="section reviews" id="reviews">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="eyebrow">Client reviews</span><h2>Worn, loved, <em>and reviewed</em></h2></div>
+        <div class="arrows"><button id="rvPrev" aria-label="Previous reviews"><svg class="icon"><use href="#i-left"/></svg></button><button id="rvNext" aria-label="Next reviews"><svg class="icon"><use href="#i-right"/></svg></button></div>
+      </div>
+      <div class="rv-layout">
+        <div class="rv-sum">
+          <div class="big"><b>4.9</b><div><span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>212 reviews</div></div>
+          <div class="bars">
+            <div class="bar"><span>5★</span><span class="track"><i style="width:91%"></i></span><span>193</span></div>
+            <div class="bar"><span>4★</span><span class="track"><i style="width:6%"></i></span><span>13</span></div>
+            <div class="bar"><span>3★</span><span class="track"><i style="width:2%"></i></span><span>4</span></div>
+            <div class="bar"><span>2★</span><span class="track"><i style="width:.5%"></i></span><span>1</span></div>
+            <div class="bar"><span>1★</span><span class="track"><i style="width:.5%"></i></span><span>1</span></div>
+          </div>
+          <div class="fit"><span class="opt-label">Sizing</span><div class="fit-track"><i style="left:52%"></i></div><div class="fit-ends"><span>Small</span><span>True to size</span><span>Large</span></div></div>
+          <button class="btn btn-ghost btn-sm" type="button">Write a review</button>
+        </div>
+        <div class="rv-main">
+          <div class="rv-tools">
+            <div class="filters" id="rvFilters">
+              <button class="filter" aria-pressed="true" data-f="all">All</button>
+              <button class="filter" aria-pressed="false" data-f="photo">With photos</button>
+              <button class="filter" aria-pressed="false" data-f="sparkle">Sparkle</button>
+              <button class="filter" aria-pressed="false" data-f="comfort">Comfort</button>
+              <button class="filter" aria-pressed="false" data-f="fit">Sizing</button>
+            </div>
+          </div>
+          <div class="photo-strip" aria-label="Client photos">
+            <img src="img/hand-lace.jpg" alt="Client photo: ring worn with lace"><img src="img/hand-satin.jpg" alt="Client photo: ring worn on silk"><img src="img/hand-gold.jpg" alt="Client photo: stacked rings"><img src="img/stack.jpg" alt="Client photo: ring with necklace"><img src="img/ring-rose.jpg" alt="Client photo: rose gold ring"><span>+38<br>photos</span>
+          </div>
+          <div class="rail rv-rail" id="rvRail">
+            <article class="rv-card" data-tags="photo sparkle"><div class="top"><span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span><span>28 Sep 2026</span></div><h3>She said yes before I finished</h3><p>I compared three houses. The Aurelia sits lower than anything I tried, and the stone throws light across the room.</p><div class="who"><img src="img/hand-lace.jpg" alt=""><div><b>Priya S.</b><span class="verified">Verified buyer</span>18K Yellow · 1.50 ct · Size 5½</div></div></article>
+            <article class="rv-card" data-tags="comfort"><div class="top"><span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span><span>19 Sep 2026</span></div><h3>Never catches on anything</h3><p>I work with my hands all day and forget I’m wearing it. The low setting is the reason I chose it over taller solitaires.</p><div class="who"><div><b>Hannah W.</b><span class="verified">Verified buyer</span>Platinum · 2.00 ct lab-grown · Size 7</div></div></article>
+            <article class="rv-card" data-tags="fit"><div class="top"><span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg style="opacity:.25"><use href="#i-star"/></svg></span><span>02 Sep 2026</span></div><h3>Resizing was painless</h3><p>I guessed the size wrong. It came back resized in nine days at no charge, freshly polished. Order the free sizer first.</p><div class="who"><div><b>Daniel R.</b><span class="verified">Verified buyer</span>18K Rose · 1.00 ct · Size 4½</div></div></article>
+            <article class="rv-card" data-tags="photo sparkle"><div class="top"><span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span><span>24 Aug 2026</span></div><h3>Brighter than the photos</h3><p>Photos don’t do it justice. In candlelight at dinner it was throwing little rainbows on the tablecloth.</p><div class="who"><img src="img/hand-satin.jpg" alt=""><div><b>Amara K.</b><span class="verified">Verified buyer</span>18K White · 1.50 ct · Size 6</div></div></article>
+            <article class="rv-card" data-tags="comfort fit"><div class="top"><span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span><span>11 Aug 2026</span></div><h3>Fits perfectly with my band</h3><p>The pavé band sits completely flush. True to size, and it feels light enough to sleep in.</p><div class="who"><div><b>Sofia L.</b><span class="verified">Verified buyer</span>18K Yellow · 1.00 ct · Size 6½</div></div></article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pairs with + Similar, in one tabbed rail -->
+  <section class="section" id="pairs">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="eyebrow">Curated for the Aurelia</span><h2>Complete it, <em>or compare it</em></h2></div>
+        <div class="arrows"><button id="pPrev" aria-label="Previous products"><svg class="icon"><use href="#i-left"/></svg></button><button id="pNext" aria-label="Next products"><svg class="icon"><use href="#i-right"/></svg></button></div>
+      </div>
+      <div class="ptabs" role="tablist">
+        <button role="tab" aria-selected="true" data-rail="railPairs">Pairs with</button>
+        <button role="tab" aria-selected="false" data-rail="railSimilar">Similar solitaires</button>
+        <button role="tab" aria-selected="false" data-rail="railRecent">Recently viewed</button>
+      </div>
+      <div class="rail p-rail" id="railPairs">
+        <article class="card"><div class="card-media"><img src="img/stack.jpg" alt="Aurelia Pavé Band" loading="lazy"><span class="badge">Sits flush</span><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button><button class="quick" data-name="Aurelia Pavé Band" data-price="1680" data-img="img/stack.jpg">Add to bag</button></div><h3>Aurelia Pavé Band</h3><div class="meta"><span>$1,680</span><span class="r"><svg><use href="#i-star"/></svg>4.9</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/pendant.jpg" alt="Lumière Pendant" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button><button class="quick" data-name="Lumière Pendant" data-price="1240" data-img="img/pendant.jpg">Add to bag</button></div><h3>Lumière Pendant</h3><div class="meta"><span>$1,240</span><span class="r"><svg><use href="#i-star"/></svg>4.8</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/earrings.jpg" alt="Celeste Drop Earrings" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button><button class="quick" data-name="Celeste Drop Earrings" data-price="2150" data-img="img/earrings.jpg">Add to bag</button></div><h3>Celeste Drop Earrings</h3><div class="meta"><span>$2,150</span><span class="r"><svg><use href="#i-star"/></svg>4.9</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/banner.jpg" alt="Riviera Tennis Bracelet" loading="lazy" style="object-position:22% 50%"><span class="badge">Best seller</span><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button><button class="quick" data-name="Riviera Tennis Bracelet" data-price="3900" data-img="img/banner.jpg">Add to bag</button></div><h3>Riviera Tennis Bracelet</h3><div class="meta"><span>$3,900</span><span class="r"><svg><use href="#i-star"/></svg>5.0</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/layering.jpg" alt="Fil d'Or Layered Necklace" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button><button class="quick" data-name="Fil d'Or Layered Necklace" data-price="980" data-img="img/layering.jpg">Add to bag</button></div><h3>Fil d’Or Layered Necklace</h3><div class="meta"><span>$980</span><span class="r"><svg><use href="#i-star"/></svg>4.7</span></div></article>
+      </div>
+      <div class="rail p-rail" id="railSimilar" hidden>
+        <article class="card"><div class="card-media"><img src="img/ring-white.jpg" alt="Elara Cathedral Solitaire" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button></div><h3>Elara Cathedral Solitaire</h3><div class="meta"><span>From $3,980</span><span class="r"><svg><use href="#i-star"/></svg>4.8</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/ring-rose.jpg" alt="Rosa Pavé Solitaire" loading="lazy"><span class="badge">New</span><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button></div><h3>Rosa Pavé Solitaire</h3><div class="meta"><span>From $5,240</span><span class="r"><svg><use href="#i-star"/></svg>4.9</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/hand-satin.jpg" alt="Vesper Bridal Set" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button></div><h3>Vesper Bridal Set</h3><div class="meta"><span>From $6,900</span><span class="r"><svg><use href="#i-star"/></svg>4.9</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/hand-lace.jpg" alt="Ondine Two-Stone" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button></div><h3>Ondine Two-Stone</h3><div class="meta"><span>From $4,640</span><span class="r"><svg><use href="#i-star"/></svg>4.7</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/hand-gold.jpg" alt="Margaux Stacking Set" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button></div><h3>Margaux Stacking Set</h3><div class="meta"><span>From $2,380</span><span class="r"><svg><use href="#i-star"/></svg>4.8</span></div></article>
+      </div>
+      <div class="rail p-rail" id="railRecent" hidden>
+        <article class="card"><div class="card-media"><img src="img/ring-rose.jpg" alt="Rosa Pavé Solitaire" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button></div><h3>Rosa Pavé Solitaire</h3><div class="meta"><span>From $5,240</span><span class="r"><svg><use href="#i-star"/></svg>4.9</span></div></article>
+        <article class="card"><div class="card-media"><img src="img/earrings.jpg" alt="Celeste Drop Earrings" loading="lazy"><button class="card-wish" aria-pressed="false" aria-label="Save"><svg class="icon"><use href="#i-heart"/></svg></button></div><h3>Celeste Drop Earrings</h3><div class="meta"><span>$2,150</span><span class="r"><svg><use href="#i-star"/></svg>4.9</span></div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Details -->
+  <section class="section" id="details" style="padding-top:0">
+    <div class="wrap">
+      <hr class="rule" style="margin-bottom:clamp(56px,7vw,96px)">
+      <div class="details">
+        <figure><img src="img/macro.jpg" alt="Close view of the six-claw setting" loading="lazy"><figcaption>Six claws, hand-shaped to sit the stone low</figcaption></figure>
+        <div>
+          <span class="eyebrow">The details</span>
+          <h2 style="font-size:var(--t-2xl);line-height:1.04;margin:10px 0 20px">Everything about <em style="color:var(--gold-deep)">your Aurelia</em></h2>
+          <div class="ptabs" role="tablist" id="dTabs">
+            <button role="tab" aria-selected="true" data-d="dPiece">The piece</button>
+            <button role="tab" aria-selected="false" data-d="dSpecs">Specifications</button>
+            <button role="tab" aria-selected="false" data-d="dCare">Care</button>
+            <button role="tab" aria-selected="false" data-d="dShip">Shipping</button>
+          </div>
+          <div class="dpanel" id="dPiece">
+            <p>The Aurelia is our most requested solitaire. A single round brilliant sits in a six-claw head that rises from a tapered 1.8 mm band. The setting is low, so the ring wears comfortably and a wedding band sits flush beside it.</p>
+            <p>Each ring is cast, set and polished by hand, then signed off by the setter who made it.</p>
+          </div>
+          <div class="dpanel" id="dSpecs" hidden>
+            <dl class="spec">
+              <dt>Metal</dt><dd id="specMetal">18K Yellow Gold, recycled</dd>
+              <dt>Centre stone</dt><dd id="specStone">1.50 ct natural round brilliant</dd>
+              <dt>Band width</dt><dd>1.8 mm tapering to 1.6 mm</dd>
+              <dt>Setting height</dt><dd>6.2 mm</dd>
+              <dt>Metal weight</dt><dd>≈ 2.9 g (size 6)</dd>
+            </dl>
+          </div>
+          <div class="dpanel" id="dCare" hidden>
+            <p>Remove before swimming, the gym and the garden. Soak in warm water with a drop of mild soap, then brush gently behind the stone with a soft brush.</p>
+            <p>Bring it to any boutique once a year for a free clean, claw check and re-polish.</p>
+          </div>
+          <div class="dpanel" id="dShip" hidden>
+            <p>Complimentary insured shipping, signature on delivery. Made-to-order pieces ship in 15–20 business days.</p>
+            <p>Return within 30 days for a full refund. Resizing is free for the first 60 days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="services">
+    <div class="service"><svg class="icon"><use href="#i-pen"/></svg><span><b>Engraving</b>Up to 18 characters, free</span></div>
+    <div class="service"><svg class="icon"><use href="#i-ring"/></svg><span><b>Resizing</b>Free within 60 days</span></div>
+    <div class="service"><svg class="icon"><use href="#i-sparkle"/></svg><span><b>Lifetime care</b>Yearly clean &amp; check</span></div>
+    <div class="service"><svg class="icon"><use href="#i-gift"/></svg><span><b>Walnut box</b>Gift-wrapped, with a loupe</span></div>
+  </div></div>
+
+  <!-- Atelier + appointment -->
+  <section class="section house" id="atelier" style="margin-top:clamp(56px,7vw,96px)">
+    <div class="wrap house-grid">
+      <img src="img/atelier.jpg" alt="Portrait in dramatic light wearing sculptural gold jewellery" loading="lazy">
+      <div>
+        <span class="eyebrow">The atelier</span>
+        <h2>Fourteen pairs of hands, <em>one ring</em></h2>
+        <p>An Aurelia takes about three weeks. It is drawn, cast, set and polished by one small team. Want to see it first? Book time with a jeweller in a boutique or over video.</p>
+        <ol class="steps">
+          <li><i>i.</i><b>Drawing</b><span>Days 1–2</span></li>
+          <li><i>ii.</i><b>Casting</b><span>Days 3–8</span></li>
+          <li><i>iii.</i><b>Setting</b><span>Days 9–14</span></li>
+          <li><i>iv.</i><b>Finishing</b><span>Days 15–18</span></li>
+        </ol>
+        <div class="house-actions"><a href="#" class="btn btn-pearl"><svg class="icon" style="width:16px;height:16px"><use href="#i-video"/></svg>Book an appointment</a><a href="#" class="btn btn-light">Inside the atelier</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="news">
+        <h3>Letters from the atelier</h3>
+        <p>New collections, private previews and the stories behind each piece. Once a month.</p>
+        <form id="newsForm" novalidate><label class="sr" for="newsEmail">Email address</label><input id="newsEmail" type="email" placeholder="Your email address" autocomplete="email"><button type="submit">Subscribe</button></form>
+        <p class="msg" id="newsMsg" aria-live="polite"></p>
+      </div>
+      <div><h4>Shop</h4><ul><li><a href="#">Engagement</a></li><li><a href="#">Wedding bands</a></li><li><a href="#">High jewellery</a></li><li><a href="#">Gifts</a></li></ul></div>
+      <div><h4>Client care</h4><ul><li><a href="#">Contact a jeweller</a></li><li><a href="#">Shipping &amp; returns</a></li><li><a href="#">Ring size guide</a></li><li><a href="#">FAQs</a></li></ul></div>
+      <div><h4>The house</h4><ul><li><a href="#">About Pendyora</a></li><li><a href="#">The atelier</a></li><li><a href="#">Responsible sourcing</a></li><li><a href="#">Journal</a></li></ul></div>
+    </div>
+    <div class="foot-mark" aria-hidden="true">PENDYORA</div>
+  </div>
+  <div class="wrap foot-bottom"><span>© 2026 Pendyora</span><span>Terms · Privacy · Accessibility</span><span>United States · USD</span></div>
+</footer>
+
+<div class="mbar" id="mbar" aria-hidden="true">
+  <div><b id="mbPrice">$6,980</b><span id="mbConfig">18K Yellow · 1.50 ct · Size 6</span></div>
+  <button class="btn btn-primary" id="mbAdd" type="button" tabindex="-1">Add to bag</button>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="sizeDrawer" aria-label="Ring size guide" aria-hidden="true">
+  <div class="drawer-head"><h3>Ring size guide</h3><button class="icon-btn" data-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button></div>
+  <div class="drawer-body">
+    <p>Measure the inside diameter of a ring that already fits, then match it below. Between two sizes? Choose the larger.</p>
+    <div class="size-table-wrap"><table class="size-table"><thead><tr><th>US</th><th>UK</th><th>EU</th><th>Diameter</th></tr></thead><tbody id="sizeRows"></tbody></table></div>
+  </div>
+</aside>
+<aside class="drawer" id="bagDrawer" aria-label="Your bag" aria-hidden="true">
+  <div class="drawer-head"><h3>Your bag</h3><button class="icon-btn" data-close aria-label="Close"><svg class="icon"><use href="#i-close"/></svg></button></div>
+  <div class="drawer-body" id="bagBody"></div>
+  <div class="drawer-foot"><button class="btn btn-primary" type="button">Checkout securely</button><button class="btn btn-ghost" type="button" data-close>Continue shopping</button></div>
+</aside>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+
+  const METALS = {
+    yellow: { name: '18K Yellow Gold', short: '18K Yellow', code: 'Y18', img: 'img/ring-yellow.jpg', add: 0 },
+    white:  { name: '18K White Gold',  short: '18K White', code: 'W18',  img: 'img/ring-white.jpg',  add: 0 },
+    rose:   { name: '18K Rose Gold',   short: '18K Rose', code: 'R18',   img: 'img/ring-rose.jpg',   add: 0 },
+    plat:   { name: 'Platinum 950',    short: 'Platinum', code: 'PT9',   img: 'img/ring-white.jpg',  add: 420 }
+  };
+  const PRICES = { natural: { '1.00': 3450, '1.50': 6980, '2.00': 11400, '2.50': 16900 }, lab: { '1.00': 1690, '1.50': 2480, '2.00': 3380, '2.50': 4450 } };
+  const state = { metal: 'yellow', origin: 'natural', ct: '1.50', size: '6', engraving: '' };
+  const bag = [];
+
+  // Sizes
+  const UK = ['F','G','H','I','J½','K½','L½','M½','N½','O½','P½','Q½','R½'];
+  const sizes = UK.map((uk, i) => { const us = 3 + i * .5, d = 11.63 + .8128 * us; return { us, uk, d: d.toFixed(1), eu: Math.round(Math.PI * d) }; });
+  const usL = us => us % 1 ? Math.floor(us) + '½' : String(us);
+  $('#ringSize').innerHTML = sizes.map(s => `<option value="${s.us}" ${s.us === 6 ? 'selected' : ''}>US ${usL(s.us)} · UK ${s.uk}</option>`).join('');
+
+  const eta = new Date(); eta.setDate(eta.getDate() + 23);
+  $('#eta').textContent = eta.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' });
+
+  const price = () => PRICES[state.origin][state.ct] + METALS[state.metal].add;
+  const config = () => `${METALS[state.metal].short} · ${state.ct} ct ${state.origin === 'lab' ? 'lab-grown' : 'natural'} · Size ${usL(+state.size)}`;
+
+  // Hero: metal swap with crossfade
+  const stage = $('#stage');
+  function swapHero() {
+    const src = METALS[state.metal].img, cur = $('#heroImg');
+    if (cur.getAttribute('src') === src) return;
+    const nx = cur.cloneNode(); nx.removeAttribute('id'); nx.src = src; nx.alt = `The Aurelia Solitaire in ${METALS[state.metal].name}`; nx.style.transform = ''; nx.classList.add('out');
+    stage.appendChild(nx);
+    requestAnimationFrame(() => requestAnimationFrame(() => { nx.classList.remove('out'); cur.classList.add('out'); }));
+    setTimeout(() => { cur.remove(); nx.id = 'heroImg'; }, 650);
+  }
+  // Hover zoom on the hero
+  const heroTile = $('#heroTile');
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    heroTile.addEventListener('mousemove', e => { const r = heroTile.getBoundingClientRect(), img = $('#heroImg'); img.style.transformOrigin = `${(e.clientX - r.left) / r.width * 100}% ${(e.clientY - r.top) / r.height * 100}%`; img.style.transform = 'scale(1.9)'; });
+    heroTile.addEventListener('mouseleave', () => { $('#heroImg').style.transform = ''; });
+  }
+  // Mobile gallery counter
+  const gal = $('#gallery');
+  gal.addEventListener('scroll', () => {
+    const tiles = $$('.tile:not(.note-tile)', gal), w = tiles[0].getBoundingClientRect().width + 8;
+    const i = Math.min(tiles.length - 1, Math.round(gal.scrollLeft / w));
+    $('#gCount').textContent = `${String(i + 1).padStart(2, '0')} / ${String(tiles.length).padStart(2, '0')}`;
+    $('#gTrack').style.left = (i / tiles.length) * 100 + '%';
+  }, { passive: true });
+  // Engraving
+  $('#engraveToggle').addEventListener('change', e => { $('#engraveBox').hidden = !e.target.checked; if (e.target.checked) $('#engraveText').focus(); });
+  $('#engraveText').addEventListener('input', e => { state.engraving = e.target.value; $('#engraveCount').textContent = `${e.target.value.length} / 18`; $('#engravePreview').textContent = e.target.value; });
+
+  function render() {
+    const p = price();
+    ['#price', '#ctaPrice', '#sbPrice', '#mbPrice'].forEach(s => $(s).textContent = fmt(p));
+    $('#inst').textContent = fmt(p / 4);
+    $('#metalName').textContent = METALS[state.metal].name;
+    $('#mbConfig').textContent = config();
+    $('#specMetal').textContent = METALS[state.metal].name + ', recycled';
+    $('#specStone').textContent = `${state.ct} ct ${state.origin === 'lab' ? 'lab-grown' : 'natural'} round brilliant`;
+    $('#sku').textContent = `PD-AUR-${state.ct.replace('.', '')}-${state.origin === 'lab' ? 'L' : 'N'}${METALS[state.metal].code}`;
+  }
+  function radio(group, attr, key) {
+    $$(group + ' [role=radio]').forEach(btn => btn.addEventListener('click', () => {
+      $$(group + ' [role=radio]').forEach(b => b.setAttribute('aria-checked', String(b === btn)));
+      state[key] = btn.dataset[attr];
+      if (key === 'metal') swapHero();
+      render();
+    }));
+  }
+  radio('#metals', 'metal', 'metal'); radio('#origin', 'origin', 'origin'); radio('#carats', 'ct', 'ct');
+  $('#ringSize').addEventListener('change', e => { state.size = e.target.value; render(); });
+
+  // Rotating review quote in the proof card
+  const QUOTES = [
+    ['She said yes before I finished the question. The stone throws light across the room.', 'Priya S. · 18K Yellow · 1.50 ct'],
+    ['I work with my hands all day and forget I’m wearing it. The low setting sold me.', 'Hannah W. · Platinum · 2.00 ct'],
+    ['Brighter than the photos. In candlelight it threw little rainbows on the tablecloth.', 'Amara K. · 18K White · 1.50 ct']
+  ];
+  let qi = 0;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setInterval(() => {
+      qi = (qi + 1) % QUOTES.length; const q = $('#pqText');
+      q.style.opacity = 0;
+      setTimeout(() => { q.textContent = QUOTES[qi][0]; $('#pqWho').textContent = QUOTES[qi][1]; q.style.opacity = 1; }, 400);
+    }, 6000);
+  }
+
+  // Toast + drawers
+  let tt;
+  const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2200); };
+  const scrim = $('#scrim');
+  const openD = d => { scrim.classList.add('show'); d.classList.add('show'); d.setAttribute('aria-hidden', 'false'); $('[data-close]', d).focus(); };
+  const closeAll = () => { scrim.classList.remove('show'); $$('.drawer').forEach(d => { d.classList.remove('show'); d.setAttribute('aria-hidden', 'true'); }); };
+  scrim.addEventListener('click', closeAll); $$('[data-close]').forEach(b => b.addEventListener('click', closeAll));
+  document.addEventListener('keydown', e => e.key === 'Escape' && closeAll());
+  $('#sizeGuideBtn').addEventListener('click', () => {
+    $('#sizeRows').innerHTML = sizes.map(s => `<tr class="${String(s.us) === state.size ? 'sel' : ''}"><td>${usL(s.us)}</td><td>${s.uk}</td><td>${s.eu}</td><td>${s.d} mm</td></tr>`).join('');
+    openD($('#sizeDrawer'));
+  });
+
+  function renderBag() {
+    const c = $('#bagCount'); c.textContent = bag.length; c.classList.add('bump'); setTimeout(() => c.classList.remove('bump'), 300);
+    const total = bag.reduce((a, b) => a + b.price, 0);
+    $('#bagBody').innerHTML = bag.map(b => `<div class="bag-item"><img src="${b.img}" alt=""><div><h4>${b.name}</h4><small>${b.detail}</small></div><span class="bp">${fmt(b.price)}</span></div>`).join('')
+      + `<p>Every piece arrives gift-wrapped in our walnut box.</p><div class="bag-total"><span>Subtotal · ${bag.length} ${bag.length === 1 ? 'piece' : 'pieces'}</span><b>${fmt(total)}</b></div>`;
+  }
+  function add(item, open = true) { bag.push(item); renderBag(); open ? openD($('#bagDrawer')) : toast(`${item.name} added to your bag`); }
+  const addMain = () => {
+    let d = config();
+    if (state.engraving) d += `<br>Engraving: “${state.engraving.replace(/[<>&]/g, '')}”`;
+    if ($('#sizer').checked) d += '<br>Complimentary ring sizer first';
+    add({ name: 'The Aurelia Solitaire', price: price(), img: METALS[state.metal].img, detail: d });
+  };
+  ['#addBtn', '#sbAdd', '#mbAdd'].forEach(s => $(s).addEventListener('click', addMain));
+  $('#bagBtn').addEventListener('click', () => bag.length ? openD($('#bagDrawer')) : toast('Your bag is empty'));
+  $$('.pair-add').forEach(b => b.addEventListener('click', () => {
+    if (b.classList.contains('done')) return;
+    b.classList.add('done'); b.innerHTML = '<svg class="icon" style="width:16px;height:16px"><use href="#i-check"/></svg>';
+    add({ name: b.dataset.name, price: +b.dataset.price, img: b.dataset.img, detail: '18K Yellow Gold' }, false);
+  }));
+  $$('.quick').forEach(b => b.addEventListener('click', () => add({ name: b.dataset.name, price: +b.dataset.price, img: b.dataset.img, detail: '18K Yellow Gold' })));
+  $$('#wishBtn, .card-wish').forEach(b => b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); toast(on ? 'Saved to your wishlist' : 'Removed from your wishlist'); }));
+
+  // Section bar: buy appears when the main button scrolls away; scroll-spy for tabs
+  const secbar = $('#secbar'), mbar = $('#mbar');
+  let gone = false, footIn = false;
+  const sync = () => {
+    secbar.classList.toggle('buying', gone); $('#sbAdd').tabIndex = gone ? 0 : -1;
+    const m = gone && !footIn; mbar.classList.toggle('show', m); mbar.setAttribute('aria-hidden', String(!m)); $('#mbAdd').tabIndex = m ? 0 : -1;
+  };
+  new IntersectionObserver(([e]) => { gone = !e.isIntersecting && e.boundingClientRect.top < 0; sync(); }).observe($('#ctaStack'));
+  new IntersectionObserver(([e]) => { footIn = e.isIntersecting; sync(); }).observe($('.footer'));
+  const links = $$('#tabs a'), secs = links.map(a => $(a.getAttribute('href')));
+  const spy = () => {
+    const y = scrollY + 140; let k = 0;
+    secs.forEach((s, i) => { if (s.getBoundingClientRect().top + scrollY <= y) k = i; });
+    links.forEach((a, i) => a.classList.toggle('active', i === k));
+  };
+  addEventListener('scroll', spy, { passive: true }); spy();
+
+  // Review filters (also driven by the proof chips)
+  function filterReviews(f) {
+    $$('#rvFilters .filter').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.f === f)));
+    $$('.rv-card').forEach(r => r.hidden = f !== 'all' && !r.dataset.tags.split(' ').includes(f));
+    $('#rvRail').scrollLeft = 0; railSync('#rvRail', '#rvPrev', '#rvNext');
+  }
+  $$('#rvFilters .filter').forEach(b => b.addEventListener('click', () => filterReviews(b.dataset.f)));
+  $$('[data-jump]').forEach(c => c.addEventListener('click', () => filterReviews(c.dataset.jump)));
+
+  // Rails
+  function railSync(rail, prev, next) {
+    const r = $(rail); if (!r) return; const max = r.scrollWidth - r.clientWidth;
+    $(prev).disabled = r.scrollLeft < 4; $(next).disabled = r.scrollLeft > max - 4;
+  }
+  function wire(railSel, prev, next) {
+    const step = () => { const r = $(railSel()); const c = r.querySelector(':scope > :not([hidden])'); return c ? c.getBoundingClientRect().width + 16 : 300; };
+    $(prev).addEventListener('click', () => $(railSel()).scrollBy({ left: -step(), behavior: 'smooth' }));
+    $(next).addEventListener('click', () => $(railSel()).scrollBy({ left: step(), behavior: 'smooth' }));
+  }
+  wire(() => '#rvRail', '#rvPrev', '#rvNext');
+  $('#rvRail').addEventListener('scroll', () => railSync('#rvRail', '#rvPrev', '#rvNext'), { passive: true });
+  let activeRail = '#railPairs';
+  wire(() => activeRail, '#pPrev', '#pNext');
+  $$('.p-rail').forEach(r => r.addEventListener('scroll', () => railSync(activeRail, '#pPrev', '#pNext'), { passive: true }));
+  $$('#pairs .ptabs button').forEach(b => b.addEventListener('click', () => {
+    $$('#pairs .ptabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    $$('.p-rail').forEach(r => r.hidden = r.id !== b.dataset.rail);
+    activeRail = '#' + b.dataset.rail; railSync(activeRail, '#pPrev', '#pNext');
+  }));
+  $$('#dTabs button').forEach(b => b.addEventListener('click', () => {
+    $$('#dTabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    $$('.dpanel').forEach(p => p.hidden = p.id !== b.dataset.d);
+  }));
+  const syncAll = () => { railSync('#rvRail', '#rvPrev', '#rvNext'); railSync(activeRail, '#pPrev', '#pNext'); };
+  addEventListener('resize', syncAll); syncAll();
+
+  $('#menuBtn').addEventListener('click', e => { const o = $('#nav').classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', String(o)); });
+  $('#newsForm').addEventListener('submit', e => { e.preventDefault(); const v = $('#newsEmail').value.trim(); $('#newsMsg').textContent = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'Thank you. Your first letter arrives next month.' : 'Enter an email address like name@example.com.'; });
+
+  render();
+})();
+</script>

@@ -199,10 +199,10 @@ const Header: React.FC<HeaderProps> = ({ className, headerMetaData, promoStripDa
   };
 
   return (
-    <header ref={headerRef} className={`${className} flex flex-col z-[51] lg:border-none overflow-x-clip overflow-y-visible`}>
+    <header ref={headerRef} className={`${className} flex flex-col z-[51] overflow-x-clip overflow-y-visible`}>
       <PromotionalStrip data={promoStripData} />
 
-      <div className="flex flex-col items-center gap-2 lg:gap-0 self-stretch sm:hidden">
+      <div className="flex flex-col items-center self-stretch lg:hidden">
         <div className="w-full">
           <HeaderTopPart
             isFocused={isFocused}

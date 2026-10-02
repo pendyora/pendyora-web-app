@@ -29,6 +29,7 @@ import { formatCurrency } from '@/utils/common';
 import { trackAddToWishlist } from '@/utils/metaPixel';
 
 import { Text } from './..';
+import PlpCard, { PlpBadge, PlpMetalTone, PlpSwatch } from './PlpCard';
 import ProductName from './ProductName';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -70,6 +71,7 @@ interface Props {
   productVariation?: number | string | null;
   is_customizable?: boolean;
   is_stackable?: boolean;
+  layout?: 'default' | 'plp';
 }
 
 export default function ProductProfile({
@@ -103,6 +105,7 @@ export default function ProductProfile({
   metal_type_id = null,
   metal_color_id = null,
   is_stackable = false,
+  layout = 'default',
   ...props
 }: Props) {
   const dispatch = useAppDispatch();
@@ -630,70 +633,174 @@ export default function ProductProfile({
     handleSwiperSlideChange();
   }, [variation_to_show, selectedVariant]);
 
+  const handleOpen = () => {
+    if (selectionRoute && state) {
+      router.push(`/custom-jewelry?type=${selectionRoute}&state=${state}&id=${selectedVariant?.sku_slug}${dId ? `&did=${dId}` : ''}`);
+    } else {
+      if (is_stackable) {
+        const productDetail = {
+          stackId: productStack?.length < 4 ? productStack?.length + 1 : 4,
+          productImage: selectedVariant?.carat_images?.[0] ?? productImage,
+          stackable_image: selectedVariant?.stackable_image ?? stackable_image,
+          productHoverImage: selectedVariant?.carat_images?.[1] ?? productHoverImage,
+          productName,
+          productPrice: selectedVariant?.selling_price ?? productPrice,
+          productFullTitle,
+          productDescription,
+          slug: selectedVariant?.sku_slug,
+          sku_master_id: selectedVariant?.sku_master_id ?? sku_master_id,
+          jewelry_type,
+          jewelry_id,
+          discount_type: selectedVariant?.discount_type ?? discount_type,
+          discount_value: selectedVariant?.discount_value ?? discount_value,
+          discounted_price: selectedVariant?.discounted_price ?? discounted_price,
+          is_customizable,
+          isWishlist,
+          is_stackable,
+          metal_type_id: selectedVariant?.metal_type_id ?? metal_type_id,
+          metal_color_id: selectedVariant?.metal_color_id ?? metal_color_id,
+          ring_size_id,
+          handling_days,
+        };
+        if (isStackedProduct) {
+          const updatedStack = productStack?.filter((item: any) => item.slug !== selectedVariant?.sku_slug);
+          dispatch(setProductStack(updatedStack));
+        } else {
+          const stackProduct = productStack?.length < 4 ? [...productStack, productDetail] : [...productStack]?.toSpliced(3, 1, productDetail);
+          dispatch(setProductStack(stackProduct));
+        }
+      } else {
+        router.push(
+          path == '/wishlist'
+            ? is_customizable
+              ? `/custom-jewelry?type=2&state=s&id=${selectedVariant?.sku_slug}`
+              : `/${jewelryTypeData}/premade?slug=${selectedVariant?.sku_slug}`
+            : is_customizable
+              ? `/custom-jewelry?type=2&state=s&id=${selectedVariant?.sku_slug}`
+              : `/${jewelryTypeData}/premade?slug=${selectedVariant?.sku_slug}`,
+        );
+        dispatch(clearSelectedProduct());
+        dispatch(setSelectedSettingStore(null));
+        dispatch(setSelectedRingSizeRedux(ring_size_id));
+        dispatch(setSelectedRingSizeId(ring_size_id));
+        dispatch(setSelectedSettingSkuData(null));
+        dispatch(setSelectedDiamondStore(null));
+        dispatch(setSelectedAppraisal(null));
+        dispatch(setSelectedWarranty(null));
+        dispatch(setSelectedEngraving(null));
+        YotpoReviewsRefresh();
+      }
+    }
+  };
+
+  if (layout === 'plp') {
+    const activeVariant = (hoveredOption && hoverVarient) || selectedVariant;
+    const variantSlug = selectedVariant?.sku_slug ?? jewelryDetails?.sku_slug;
+    const href = is_customizable ? `/custom-jewelry?type=2&state=s&id=${variantSlug}` : `/${jewelryTypeData}/premade?slug=${variantSlug}`;
+
+    const metalLabel = (colorId?: string, typeId?: string) => {
+      const color = master?.find((item: any) => item.id === colorId);
+      const type = master?.find((item: any) => item.id === typeId);
+      const karat = type?.code === 'SILVER_925' ? '925' : type?.code;
+      return [karat, color?.name].filter(Boolean).join(' ');
+    };
+    const metalTone = (colorId?: string): PlpMetalTone => {
+      const color = master?.find((item: any) => item.id === colorId);
+      const code = String(color?.code ?? '').toUpperCase();
+      const name = String(color?.name ?? '').toLowerCase();
+      if (code === 'YG' || name.includes('yellow')) {
+        return 'yellow';
+      }
+      if (code === 'RG' || name.includes('rose') || name.includes('pink')) {
+        return 'rose';
+      }
+      if (code === 'BG' || name.includes('black')) {
+        return 'black';
+      }
+      return 'white';
+    };
+
+    const metalAxis = variation_to_show?.find((el: any) => el?.name === 'metal_type');
+    const swatches: PlpSwatch[] =
+      metalAxis?.details?.map((d: any) => ({
+        key: `${d?.metal_color_id}-${d?.metal_type_id}`,
+        label: metalLabel(d?.metal_color_id, d?.metal_type_id),
+        tone: metalTone(d?.metal_color_id),
+        active:
+          toComparable(selectedVariant?.metal_color_id) === toComparable(d?.metal_color_id) &&
+          toComparable(selectedVariant?.metal_type_id) === toComparable(d?.metal_type_id),
+        onSelect: () => handleSelectedVatiation(d?.metal_color_id, d?.metal_type_id, 'metal_type'),
+        onPreview: () => {
+          if (windowWidth >= 868) {
+            setHoveredOption(true);
+            handleHowerVatiation(d?.metal_color_id, d?.metal_type_id, 'metal_type');
+          }
+        },
+        onPreviewEnd: () => setHoveredOption(false),
+      })) ?? [];
+    if (swatches.length === 0 && (activeVariant?.metal_color_id || jewelryDetails?.metal_color_id)) {
+      const colorId = activeVariant?.metal_color_id ?? jewelryDetails?.metal_color_id;
+      const typeId = activeVariant?.metal_type_id ?? jewelryDetails?.metal_type_id;
+      swatches.push({
+        key: 'single',
+        label: metalLabel(colorId, typeId),
+        tone: metalTone(colorId),
+        active: true,
+        onSelect: () => undefined,
+        onPreview: () => undefined,
+        onPreviewEnd: () => undefined,
+      });
+    }
+
+    const sellingPrice = Number(activeVariant?.selling_price ?? jewelryDetails?.selling_price ?? productPrice ?? 0);
+    const hasDiscount = !!activeVariant?.discount_value;
+    const offLabel = hasDiscount
+      ? activeVariant?.discount_type == (2 as any)
+        ? `−${activeVariant?.discount_value}%`
+        : `${formatCurrency(activeVariant?.discount_value)} off`
+      : null;
+
+    const fastDeliveryDay = projectSetting?.fastDeliveryDay?.data?.delivery_day;
+    const isFastDelivery =
+      (!!estimated_delivery_days && !!fastDeliveryDay && Number(estimated_delivery_days) <= Number(fastDeliveryDay)) ||
+      (!!handling_days && handling_days <= 2);
+    const badges: PlpBadge[] = [];
+    if (Array.isArray(specialProductTitles) && specialProductTitles[0]?.title) {
+      badges.push({ label: specialProductTitles[0].title, tone: 'gilt' });
+    }
+    if (isFastDelivery) {
+      badges.push({ label: 'Fast delivery', tone: 'muted' });
+    }
+
+    return (
+      <PlpCard
+        href={href}
+        onOpen={handleOpen}
+        name={String(productName ?? '')}
+        mainImage={activeVariant?.carat_images?.[0] ?? productImage}
+        hoverImage={activeVariant?.carat_images?.[1] ?? productHoverImage}
+        spec={metalLabel(
+          activeVariant?.metal_color_id ?? jewelryDetails?.metal_color_id,
+          activeVariant?.metal_type_id ?? jewelryDetails?.metal_type_id,
+        )}
+        price={formatCurrency(hasDiscount ? Number(activeVariant?.discounted_price) : sellingPrice)}
+        comparePrice={hasDiscount ? formatCurrency(sellingPrice) : null}
+        offLabel={offLabel}
+        badges={badges}
+        ctaLabel={is_customizable ? 'Customize' : 'View details'}
+        swatches={swatches}
+        isWishlisted={isInWishlist || (!!user && !!wId)}
+        onToggleWishlist={() => void handleAddtoWishlist()}
+      />
+    );
+  }
+
   return (
     <div {...props} className={`${props.className} flex bg-white flex-col items-start gap-3 pb-5 sm:pb-1 lg:gap-3 sm:gap-2 overflow-hidden relative`}>
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onClick={() => {
-          if (selectionRoute && state) {
-            router.push(`/custom-jewelry?type=${selectionRoute}&state=${state}&id=${selectedVariant?.sku_slug}${dId ? `&did=${dId}` : ''}`);
-          } else {
-            if (is_stackable) {
-              const productDetail = {
-                stackId: productStack?.length < 4 ? productStack?.length + 1 : 4,
-                productImage: selectedVariant?.carat_images?.[0] ?? productImage,
-                stackable_image: selectedVariant?.stackable_image ?? stackable_image,
-                productHoverImage: selectedVariant?.carat_images?.[1] ?? productHoverImage,
-                productName,
-                productPrice: selectedVariant?.selling_price ?? productPrice,
-                productFullTitle,
-                productDescription,
-                slug: selectedVariant?.sku_slug,
-                sku_master_id: selectedVariant?.sku_master_id ?? sku_master_id,
-                jewelry_type,
-                jewelry_id,
-                discount_type: selectedVariant?.discount_type ?? discount_type,
-                discount_value: selectedVariant?.discount_value ?? discount_value,
-                discounted_price: selectedVariant?.discounted_price ?? discounted_price,
-                is_customizable,
-                isWishlist,
-                is_stackable,
-                metal_type_id: selectedVariant?.metal_type_id ?? metal_type_id,
-                metal_color_id: selectedVariant?.metal_color_id ?? metal_color_id,
-                ring_size_id,
-                handling_days,
-              };
-              if (isStackedProduct) {
-                const updatedStack = productStack?.filter((item: any) => item.slug !== selectedVariant?.sku_slug);
-                dispatch(setProductStack(updatedStack));
-              } else {
-                const stackProduct = productStack?.length < 4 ? [...productStack, productDetail] : [...productStack]?.toSpliced(3, 1, productDetail);
-                dispatch(setProductStack(stackProduct));
-              }
-            } else {
-              router.push(
-                path == '/wishlist'
-                  ? is_customizable
-                    ? `/custom-jewelry?type=2&state=s&id=${selectedVariant?.sku_slug}`
-                    : `/${jewelryTypeData}/premade?slug=${selectedVariant?.sku_slug}`
-                  : is_customizable
-                    ? `/custom-jewelry?type=2&state=s&id=${selectedVariant?.sku_slug}`
-                    : `/${jewelryTypeData}/premade?slug=${selectedVariant?.sku_slug}`,
-              );
-              dispatch(clearSelectedProduct());
-              dispatch(setSelectedSettingStore(null));
-              dispatch(setSelectedRingSizeRedux(ring_size_id));
-              dispatch(setSelectedRingSizeId(ring_size_id));
-              dispatch(setSelectedSettingSkuData(null));
-              dispatch(setSelectedDiamondStore(null));
-              dispatch(setSelectedAppraisal(null));
-              dispatch(setSelectedWarranty(null));
-              dispatch(setSelectedEngraving(null));
-              YotpoReviewsRefresh();
-            }
-          }
-        }}
+        onClick={handleOpen}
         className={`relative h-auto w-full ${isStackedProduct && path === '/design-your-ring-stack' ? 'border-2 border-black' : 'border-2 border-transparent'} !aspect-square bg-[#f8f8f8] cursor-pointer`}
       >
         <div className="relative h-auto w-full aspect-square select-none bg-[#f8f8f8]">

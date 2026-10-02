@@ -56,42 +56,34 @@ const HeaderViewDynamic = ({ headerData, onMenuOpenChange }: any) => {
     }, CLOSE_DELAY);
   };
 
-  const generatePath = (title: string) => {
-    return `${title.trim().replace(/\s+/g, '-').toLowerCase()}`;
-  };
   return (
-    <ul className="flex justify-center lg:justify-around gap-6 lg:gap-4 w-full text-[13px] ">
+    <ul className="m-0 flex list-none flex-wrap gap-x-7 gap-y-1 p-0 xls:gap-x-5">
       {headerData?.length > 0 &&
         headerData?.map((item: any, index: number) => {
-          const formattedPath = `${generatePath(item.main_menu_title)}`;
-          let isActive = false;
-          if (typeof window !== 'undefined') {
-            isActive = path.includes(formattedPath)
-              ? path.includes(formattedPath)
-              : path.includes(window.location.pathname)
-                ? path.includes(window.location.pathname)
-                : false;
-          }
+          const link: string | undefined = item?.main_menu_title_link;
+          const isCurrent = !!link && link !== '/' && path.startsWith(link.split('?')[0]);
+          const highlighted = isCurrent || activeMenu === item.id;
+          const labelClass = `relative inline-block py-1 text-[11.5px] uppercase leading-normal tracking-[0.14em] transition-colors ${
+            highlighted
+              ? "text-ink after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:bg-ink after:content-['']"
+              : 'text-ink-soft hover:text-ink'
+          }`;
           if (item?.is_web_visible == true) {
             return (
-              <li key={index} className=" lg:mx-2  md:mx-0 ">
+              <li key={index}>
                 <div onMouseEnter={() => scheduleOpen(item.id)} onMouseLeave={scheduleClose}>
-                  <p className={`tracking-[0.22em] uppercase  text-[12px]  leading-normal pb-0 font-primary `}>
-                    {item?.main_menu_title_link ? (
-                      <Link href={item?.main_menu_title_link}>
-                        <span className={`${activeMenu === item.id ? '!font-normal border-b border-black' : ''}`}>{item.main_menu_title}</span>
-                      </Link>
-                    ) : (
-                      <span className={`${activeMenu === item.id ? '!font-normal border-b border-black' : ''}`}>{item.main_menu_title}</span>
-                    )}
-                  </p>
+                  {link ? (
+                    <Link href={link} className={labelClass} aria-current={isCurrent ? 'page' : undefined}>
+                      {item.main_menu_title}
+                    </Link>
+                  ) : (
+                    <span className={labelClass}>{item.main_menu_title}</span>
+                  )}
                   {activeMenu == item.id && (
                     <div
                       onMouseEnter={cancelClose}
                       onMouseLeave={scheduleClose}
-                      className={`absolute top-full left-0 w-full bg-white shadow-lg z-50 transition-opacity duration-300 ease-in-out transform${
-                        activeMenu ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                      }`}
+                      className="absolute left-0 top-full z-50 w-full bg-paper shadow-lg shadow-ink/5"
                     >
                       <MenuPreview Details={item} setActiveMenu={setActiveMenu} />
                     </div>

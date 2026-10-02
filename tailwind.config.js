@@ -1,3 +1,5 @@
+const themeColors = require('./src/styles/theme-colors');
+
 module.exports = {
   mode: 'jit',
   content: ['./src/**/**/*.{js,ts,jsx,tsx,html,mdx}', './src/**/*.{js,ts,jsx,tsx,html,mdx}'],
@@ -14,16 +16,18 @@ module.exports = {
           },
         },
       },
-      colors: {
-        primary: '#111111',
-        secondary: '#C9AE8A',
-        text_w: '#ffffff',
-        text: '#111111',
-        ivory: '#FAF9F6',
-        cream: '#F8F4EE',
-        section: '#F1E9DE',
-        luxury: '#C9AE8A',
-        mocha: '#8B7355',
+      colors: themeColors,
+      transitionTimingFunction: {
+        luxe: 'cubic-bezier(0.2, 0.7, 0.2, 1)',
+      },
+      keyframes: {
+        shimmer: {
+          from: { backgroundPosition: '120% 0' },
+          to: { backgroundPosition: '-120% 0' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 1.2s linear infinite',
       },
 
       boxShadow: {},

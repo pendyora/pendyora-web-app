@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pendyora Fine Jewelry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Franklin:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: editorial header → style rail → sticky filter bar → 4-col gallery on stone tiles,
+   broken twice by 2×2 editorial tiles (one light, one noir) for rhythm and contrast. Single deliberate light theme. */
+:root{
+  color-scheme: light;
+  --paper:#FCFBF9;      /* page ground: barely-warm white */
+  --stone:#ECEAE6;      /* product tile: cool grey so gold reads warm */
+  --stone-2:#E3E0DA;
+  --ink:#17140F;        /* text, primary buttons */
+  --ink-2:#6B645A;      /* secondary text */
+  --line:#DDD8D0;
+  --gilt:#A2845A;       /* Pendyora champagne, deepened for legibility */
+  --gilt-soft:#D9C7A7;
+  --noir:#0F0E0C;
+  --on-noir:#F3EEE6;
+
+  --f-display:"Cormorant Garamond", "Cormorant", Garamond, "Times New Roman", serif;
+  --f-ui:"Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+
+  --gutter:clamp(16px, 3.2vw, 56px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.55 var(--f-ui);-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:1.5px solid var(--ink);outline-offset:3px}
+.wrap{padding-inline:var(--gutter)}
+.caps{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:500}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ───── Announcement + header ───── */
+.announce{background:var(--noir);color:var(--on-noir);text-align:center;padding:9px var(--gutter);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
+.announce b{color:var(--gilt-soft);font-weight:500}
+.site{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-block:22px;border-bottom:1px solid var(--line)}
+.site nav{display:flex;gap:28px}
+.site nav a{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;position:relative;padding-block:4px}
+.site nav a[aria-current]{color:var(--ink)}
+.site nav a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;background:var(--ink)}
+.site nav a:not([aria-current]){color:var(--ink-2)}
+.site nav a:hover{color:var(--ink)}
+.mark{font-family:var(--f-display);font-weight:500;font-size:28px;letter-spacing:.34em;margin-right:-.34em;line-height:1}
+.tools{display:flex;justify-content:flex-end;gap:22px;align-items:center}
+.tools button{display:flex;align-items:center;gap:6px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+.tools svg{width:19px;height:19px}
+.bag-n{font-variant-numeric:tabular-nums}
+.burger{display:none}
+
+/* ───── Intro ───── */
+.intro{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:end;padding-block:44px 34px}
+.crumbs{display:flex;gap:10px;color:var(--ink-2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}
+.crumbs span[aria-hidden]{color:var(--line)}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(46px,6.4vw,96px);line-height:.92;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 em{font-style:italic;color:var(--gilt)}
+.lede{max-width:44ch;justify-self:end;color:var(--ink-2);font-size:14.5px;margin:0 0 6px}
+.lede strong{color:var(--ink);font-weight:500}
+
+/* ───── Style rail ───── */
+.rail{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;margin-bottom:30px;scrollbar-width:thin}
+.rail::-webkit-scrollbar{height:3px}.rail::-webkit-scrollbar-thumb{background:var(--line)}
+.rail button{flex:0 0 clamp(108px,10.5vw,148px);text-align:left;display:grid;gap:10px}
+.rail .th{aspect-ratio:1;background:var(--stone);overflow:hidden;position:relative}
+.rail .th img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.rail button:hover .th img{transform:scale(1.05)}
+.rail .lb{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid transparent}
+.rail .lb small{font-size:10px;color:var(--ink-2);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.rail button[aria-pressed="true"] .lb{border-color:var(--ink);font-weight:600}
+.rail button[aria-pressed="true"] .th::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--ink)}
+
+/* ───── Toolbar ───── */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-block:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:12px}
+.bar .l,.bar .r{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.fbtn{border:1px solid var(--line);padding:10px 16px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;display:inline-flex;gap:8px;align-items:center;transition:border-color .2s}
+.fbtn:hover{border-color:var(--ink)}
+.fbtn svg{width:14px;height:14px}
+.fbtn .n{background:var(--ink);color:var(--paper);font-size:10px;min-width:17px;height:17px;border-radius:9px;display:inline-grid;place-items:center;letter-spacing:0;padding:0 5px}
+.fbtn .n[hidden]{display:none!important}
+.count{color:var(--ink-2);font-size:12px;font-variant-numeric:tabular-nums;margin-right:8px}
+.view{display:flex;gap:2px;border-left:1px solid var(--line);padding-left:14px;margin-right:6px}
+.view button{width:30px;height:30px;display:grid;place-items:center;color:var(--ink-2)}
+.view button[aria-pressed="true"]{color:var(--ink)}
+.view svg{width:15px;height:15px}
+.sort{position:relative;display:flex;align-items:center;gap:6px;border-left:1px solid var(--line);padding-left:16px}
+.sort label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.sort select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;padding:6px 18px 6px 0;cursor:pointer}
+.sort::after{content:"";position:absolute;right:2px;top:50%;width:6px;height:6px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:14px}
+.chips:empty{display:none}
+.chip{display:inline-flex;gap:8px;align-items:center;background:var(--stone);padding:7px 10px 7px 12px;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.chip:hover{background:var(--stone-2)}
+.chip svg{width:10px;height:10px}
+.clear{font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-decoration:underline;text-underline-offset:4px;color:var(--ink-2);margin-left:6px}
+
+/* ───── Grid ───── */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row dense;column-gap:12px;row-gap:44px;padding-block:26px 20px}
+.grid.large{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;row-gap:56px}
+
+.card{min-width:0;display:flex;flex-direction:column}
+.mwrap{position:relative;overflow:hidden}
+.media{position:relative;aspect-ratio:4/5;background:var(--stone);overflow:hidden;display:block}
+.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s var(--ease),transform 1.2s var(--ease)}
+.media .alt{opacity:0}
+.card:hover .media .alt{opacity:1}
+.card:hover .media .main{transform:scale(1.035)}
+.card:hover .media.has-alt .main{opacity:0}
+.badge{position:absolute;left:14px;top:13px;z-index:2;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gilt);font-weight:600}
+.qa{position:absolute;left:10px;right:10px;bottom:10px;z-index:2;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transform:translateY(calc(100% + 14px));transition:transform .45s var(--ease);display:flex;align-items:center;justify-content:center;gap:4px;min-height:46px;padding:6px}
+.card:hover .qa,.card:focus-within .qa{transform:none}
+.qa > span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin-right:8px}
+.qa .sz{width:32px;height:32px;font-size:12px;font-variant-numeric:tabular-nums;border:1px solid transparent}
+.qa .sz:hover{border-color:var(--ink)}
+.qa .add{width:100%;height:34px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600}
+.qa-touch{display:none;position:absolute;right:10px;bottom:10px;z-index:2;width:34px;height:34px;border-radius:50%;background:var(--paper);place-items:center}
+.qa-touch svg{width:14px;height:14px}
+
+.meta{padding-top:16px;display:grid;gap:5px}
+.meta .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.name{font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:500;line-height:1.45;margin:0}
+.wish{flex:none;width:22px;height:22px;display:grid;place-items:center;margin-top:-3px;color:var(--ink)}
+.wish svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2;transition:fill .2s}
+.wish[aria-pressed="true"] svg{fill:var(--ink)}
+.spec{color:var(--ink-2);font-size:12.5px;line-height:1.45}
+.price{font-size:13px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.sw{display:flex;gap:10px;margin-top:9px;align-items:center}
+.sw button{width:16px;height:16px;border-radius:50%;position:relative}
+.sw button::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid transparent;transition:border-color .2s}
+.sw button[aria-pressed="true"]::after{border-color:var(--ink)}
+.sw button:hover::after{border-color:var(--ink-2)}
+.m-yellow{background:linear-gradient(135deg,#F6E3A6 0%,#D8B25A 55%,#B88E35 100%)}
+.m-white{background:linear-gradient(135deg,#FAFAF8 0%,#D7D6D2 55%,#AFAEAA 100%)}
+.m-rose{background:linear-gradient(135deg,#F7D4C2 0%,#DCA28A 55%,#BF7E66 100%)}
+
+/* Editorial tiles */
+.promo{grid-column:span 2;grid-row:span 2;display:flex;flex-direction:column;min-width:0}
+.promo.left{grid-column:1 / span 2}
+.promo .pm{position:relative;flex:1;min-height:420px;background:var(--stone);overflow:hidden}
+.promo .pm img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.6s var(--ease)}
+.promo:hover .pm img{transform:scale(1.03)}
+.promo .cap{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding-top:18px}
+.eyebrow{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gilt);font-weight:600}
+.promo h2{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,3.4vw,52px);line-height:1;margin:6px 0 6px}
+.promo h2 em{font-style:italic}
+.promo p{margin:0;color:var(--ink-2);max-width:38ch}
+.pill{flex:none;display:inline-flex;align-items:center;gap:10px;border:1px solid var(--ink);border-radius:999px;padding:11px 20px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;transition:background .25s,color .25s}
+.pill:hover{background:var(--ink);color:var(--paper)}
+.pill svg{width:13px;height:13px}
+.promo.noir .pm{background:var(--noir)}
+.promo.noir .pm img{object-position:50% 30%}
+.promo.noir .pm::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(10,9,8,.85) 100%)}
+.promo.noir .ov{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:clamp(20px,3vw,40px);color:var(--on-noir);display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.promo.noir h2{color:var(--on-noir)}
+.promo.noir .eyebrow{color:var(--gilt-soft)}
+.promo.noir p{color:color-mix(in srgb,var(--on-noir) 72%,transparent)}
+.promo.noir .pill{border-color:var(--on-noir);color:var(--on-noir)}
+.promo.noir .pill:hover{background:var(--on-noir);color:var(--noir)}
+
+.empty{grid-column:1/-1;text-align:center;padding:80px 0;display:grid;gap:12px;justify-items:center}
+.empty h3{font-family:var(--f-display);font-weight:400;font-size:34px;margin:0}
+.empty p{color:var(--ink-2);margin:0}
+
+/* Pagination */
+.more{display:grid;justify-items:center;gap:16px;padding-block:34px 72px}
+.more .txt{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.prog{width:200px;height:1px;background:var(--line);position:relative}
+.prog i{position:absolute;inset:0 auto 0 0;background:var(--ink);transition:width .5s var(--ease)}
+.btn-dark{background:var(--ink);color:var(--paper);padding:15px 40px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;transition:background .2s}
+.btn-dark:hover{background:#2c2720}
+
+/* Promise strip + footer */
+.promise{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}
+.promise div{padding:28px 24px 30px 0;display:grid;gap:4px}
+.promise div + div{padding-left:24px;border-left:1px solid var(--line)}
+.promise h4{font-family:var(--f-display);font-weight:500;font-size:22px;margin:0}
+.promise p{margin:0;color:var(--ink-2);font-size:13px}
+footer{background:var(--noir);color:var(--on-noir);padding-block:56px 30px}
+.ft{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:32px}
+.ft h5{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gilt-soft);margin:0 0 14px;font-weight:500}
+.ft ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:13px;color:color-mix(in srgb,var(--on-noir) 75%,transparent)}
+.ft .mark{font-size:24px;display:block;margin-bottom:16px}
+.news{display:flex;border-bottom:1px solid color-mix(in srgb,var(--on-noir) 35%,transparent);max-width:320px;margin-top:18px}
+.news input{flex:1;min-width:0;background:transparent;border:0;padding:10px 0;color:var(--on-noir);font-size:13px}
+.news input::placeholder{color:color-mix(in srgb,var(--on-noir) 50%,transparent)}
+.news button{font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.legal{margin-top:44px;padding-top:20px;border-top:1px solid color-mix(in srgb,var(--on-noir) 15%,transparent);font-size:11.5px;color:color-mix(in srgb,var(--on-noir) 55%,transparent);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* ───── Filter drawer ───── */
+.scrim{position:fixed;inset:0;background:rgba(15,14,12,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .35s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--paper);z-index:41;transform:translateX(100%);transition:transform .5s var(--ease);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer.on{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:22px 28px;border-bottom:1px solid var(--line)}
+.dh .t{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:500}
+.dh .t span{color:var(--ink-2);font-weight:400}
+.x{background:var(--ink);color:var(--paper);padding:8px 14px;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase}
+.db{flex:1;overflow-y:auto;padding:0 28px}
+details{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:22px 0;font-family:var(--f-display);font-size:22px;font-weight:500}
+summary::-webkit-details-marker{display:none}
+summary .pm-i{width:12px;height:12px;position:relative}
+summary .pm-i::before,summary .pm-i::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--ink)}
+summary .pm-i::after{transform:rotate(90deg);transition:transform .3s}
+details[open] summary .pm-i::after{transform:rotate(0)}
+summary small{font-family:var(--f-ui);font-size:11px;letter-spacing:.1em;color:var(--gilt);margin-left:auto;margin-right:16px;text-transform:uppercase}
+.opts{display:grid;gap:4px;padding-bottom:22px}
+.opt{display:flex;align-items:center;gap:12px;padding:7px 0;cursor:pointer;font-size:13.5px}
+.opt input{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:1px solid #B9B2A7;margin:0;display:grid;place-items:center;flex:none;cursor:pointer}
+.opt input:checked{background:var(--ink);border-color:var(--ink)}
+.opt input:checked::after{content:"";width:8px;height:4px;border-left:1.5px solid var(--paper);border-bottom:1.5px solid var(--paper);transform:translateY(-1px) rotate(-45deg)}
+.opt .dot{width:14px;height:14px;border-radius:50%;flex:none}
+.opt .c{margin-left:auto;color:var(--ink-2);font-size:12px;font-variant-numeric:tabular-nums}
+.g-diamond{background:radial-gradient(circle at 35% 30%,#fff 0 25%,#DCE3E8 60%,#AEB8C0 100%)}
+.g-sapphire{background:radial-gradient(circle at 35% 30%,#6E8BD6 0 15%,#22408F 60%,#132457 100%)}
+.g-pearl{background:radial-gradient(circle at 35% 30%,#fff 0 20%,#EDE6DA 60%,#CFC3B0 100%)}
+.g-none{background:linear-gradient(135deg,#F6E3A6,#B88E35)}
+.sizes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;padding-bottom:12px}
+.sizes button,.tags button{border:1px solid var(--line);height:42px;font-size:12.5px;font-variant-numeric:tabular-nums;transition:border-color .2s}
+.sizes button:hover,.tags button:hover{border-color:var(--ink)}
+.sizes button[aria-pressed="true"],.tags button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.hint{font-size:12px;color:var(--ink-2);margin:0 0 22px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:22px}
+.tags button{padding:0 16px;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.df{display:flex;gap:12px;padding:18px 28px;border-top:1px solid var(--line);align-items:center}
+.df .clear{margin:0}
+.df .btn-dark{flex:1}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--ink);color:var(--paper);padding:14px 20px;font-size:12.5px;z-index:60;transition:transform .45s var(--ease);display:flex;gap:14px;align-items:center;max-width:calc(100% - 32px)}
+.toast.on{transform:translate(-50%,0)}
+.toast b{font-weight:500;color:var(--gilt-soft);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase}
+
+/* ───── Responsive ───── */
+@media (max-width:1100px){
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .site nav{gap:18px}
+}
+@media (max-width:860px){
+  .site nav{display:none}.burger{display:flex!important}
+  .tools .lbl{display:none}
+  .intro{grid-template-columns:1fr;gap:16px;padding-block:28px 22px}
+  .lede{justify-self:start}
+  .bar .l .fbtn.q{display:none}
+  .view{display:none}
+  .grid,.grid.large{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:8px;row-gap:32px}
+  .grid.large{grid-template-columns:1fr}
+  .promo,.promo.left{grid-column:1/-1;grid-row:span 1}
+  .promo .pm{min-height:0;aspect-ratio:4/5;flex:none}
+  .promo.noir .pm{aspect-ratio:3/4}
+  .promo .cap{flex-direction:column;align-items:flex-start}
+  .promise{grid-template-columns:1fr}
+  .promise div,.promise div + div{padding:20px 0;border-left:0;border-top:1px solid var(--line)}
+  .promise div:first-child{border-top:0}
+  .ft{grid-template-columns:1fr 1fr}
+  .ft > div:first-child{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .mark{font-size:22px}
+  .tools{gap:14px}
+  .tools .hide-s{display:none}
+  .name{font-size:11px;letter-spacing:.1em}
+  .spec{font-size:11.5px}
+  .count{display:none}
+  .sort label{display:none}
+  .sizes{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .dh,.df{padding-inline:18px}.db{padding-inline:18px}
+}
+@media (hover:none){
+  .qa{display:none}
+  .qa-touch{display:grid}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+
+<div class="announce">Complimentary insured shipping over $250 &nbsp;·&nbsp; <b>Lifetime resizing</b> on every ring</div>
+
+<header class="site wrap">
+  <nav aria-label="Main">
+    <a href="#" aria-current="page">Jewelry</a>
+    <a href="#">Bridal</a>
+    <a href="#">Gifts</a>
+    <a href="#">Bespoke</a>
+    <a href="#">Journal</a>
+  </nav>
+  <button class="burger" aria-label="Open menu" style="display:none;justify-self:start"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 7h18M3 12h18M3 17h12"/></svg></button>
+  <a class="mark" href="#">PENDYORA</a>
+  <div class="tools">
+    <button aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span class="lbl">Search</span></button>
+    <button class="hide-s" aria-label="Wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg></button>
+    <button aria-label="Bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="bag-n" id="bagN">0</span></button>
+  </div>
+</header>
+
+<main>
+  <section class="intro wrap">
+    <div>
+      <div class="crumbs"><a href="#">Home</a><span aria-hidden="true">/</span><span>Fine Jewelry</span></div>
+      <h1>Fine <em>Jewelry</em></h1>
+    </div>
+    <p class="lede">Rings, earrings and chains in <strong>recycled 14K and 18K gold</strong>, set by hand with conflict-free diamonds and gemstones. Each piece is finished in our atelier and comes with a grading certificate.</p>
+  </section>
+
+  <div class="wrap">
+    <div class="rail" id="rail" role="toolbar" aria-label="Shop by style"></div>
+  </div>
+
+  <div class="bar wrap" id="bar">
+    <div class="l">
+      <button class="fbtn q" data-open="metal">Metal</button>
+      <button class="fbtn q" data-open="stone">Stone</button>
+      <button class="fbtn q" data-open="price">Price</button>
+      <button class="fbtn" data-open="">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.1"><path d="M1 4h14M1 12h14"/><circle cx="5" cy="4" r="1.8" fill="var(--paper)"/><circle cx="11" cy="12" r="1.8" fill="var(--paper)"/></svg>
+        All filters <span class="n" id="fN" hidden>0</span>
+      </button>
+    </div>
+    <div class="r">
+      <span class="count" id="count"></span>
+      <div class="view" role="group" aria-label="Grid size">
+        <button aria-pressed="true" data-view="dense" aria-label="Four per row"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="3" height="14"/><rect x="5" y="1" width="2.5" height="14"/><rect x="8.5" y="1" width="2.5" height="14"/><rect x="12" y="1" width="3" height="14"/></svg></button>
+        <button aria-pressed="false" data-view="large" aria-label="Two per row"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6.3" height="14"/><rect x="8.7" y="1" width="6.3" height="14"/></svg></button>
+      </div>
+      <div class="sort">
+        <label for="sort">Sort</label>
+        <select id="sort">
+          <option value="featured">Featured</option>
+          <option value="new">Newest</option>
+          <option value="low">Price, low to high</option>
+          <option value="high">Price, high to low</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+    <div class="more" id="more"></div>
+  </div>
+
+  <section class="promise wrap" aria-label="Our promise">
+    <div><h4>Recycled gold</h4><p>Every setting is cast from 100% recycled 14K or 18K gold.</p></div>
+    <div><h4>Lifetime care</h4><p>Free resizing, cleaning and prong checks for as long as you own it.</p></div>
+    <div><h4>30-day returns</h4><p>Insured shipping both ways, in our signature linen box.</p></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="ft">
+    <div>
+      <span class="mark">PENDYORA</span>
+      <p style="margin:0;max-width:36ch;color:color-mix(in srgb,var(--on-noir) 70%,transparent);font-size:13px">New collections, private previews and care notes, about once a month.</p>
+      <form class="news" id="news"><label class="sr" for="email">Email address</label><input id="email" type="email" placeholder="Email address"><button type="submit">Join</button></form>
+    </div>
+    <div><h5>Shop</h5><ul><li>Rings</li><li>Earrings</li><li>Necklaces</li><li>Bracelets</li></ul></div>
+    <div><h5>Atelier</h5><ul><li>Bespoke design</li><li>Our gold</li><li>Diamond guide</li><li>Ring size guide</li></ul></div>
+    <div><h5>Client care</h5><ul><li>Shipping & returns</li><li>Lifetime care</li><li>Book an appointment</li><li>Contact</li></ul></div>
+  </div>
+  <div class="legal"><span>© 2026 Pendyora</span><span>Privacy · Terms · Accessibility</span></div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Filters" aria-hidden="true">
+  <div class="dh"><span class="t">Refine <span id="dSel"></span></span><button class="x" id="close">Close</button></div>
+  <div class="db" id="db">
+    <details open id="sec-metal"><summary>Metal <small id="s-metal"></small><span class="pm-i"></span></summary><div class="opts" id="o-metal"></div></details>
+    <details open id="sec-stone"><summary>Stone <small id="s-stone"></small><span class="pm-i"></span></summary><div class="opts" id="o-stone"></div></details>
+    <details open id="sec-price"><summary>Price <small id="s-price"></small><span class="pm-i"></span></summary><div class="opts" id="o-price"></div></details>
+    <details id="sec-size"><summary>Ring size <small id="s-size"></small><span class="pm-i"></span></summary><div class="sizes" id="o-size"></div><p class="hint">US sizing. Choosing a size shows rings only. Every ring can be resized free within 60 days.</p></details>
+    <details id="sec-style"><summary>Style <small id="s-style"></small><span class="pm-i"></span></summary><div class="tags" id="o-style"></div></details>
+  </div>
+  <div class="df"><button class="clear" id="dClear">Clear all</button><button class="btn-dark" id="dApply">Show pieces</button></div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const METAL = {
+  yellow:{label:'Yellow Gold', cls:'m-yellow'},
+  white:{label:'White Gold', cls:'m-white'},
+  rose:{label:'Rose Gold', cls:'m-rose'}
+};
+const STONE = {diamond:'Diamond', sapphire:'Sapphire', pearl:'Pearl', none:'Gold only'};
+const PRICE = [
+  {k:'u500', label:'Under $500', t:p=>p<500},
+  {k:'500', label:'$500 – $1,000', t:p=>p>=500&&p<1000},
+  {k:'1000', label:'$1,000 – $2,000', t:p=>p>=1000&&p<2000},
+  {k:'2000', label:'Over $2,000', t:p=>p>=2000}
+];
+const STYLE = {everyday:'Everyday', solitaire:'Solitaire', hoops:'Hoops', stacking:'Stacking', statement:'Statement', bridal:'Bridal'};
+const SIZES = ['4','4½','5','5½','6','6½','7','7½','8','8½','9','9½'];
+
+/* rank = featured order; added = days since launch */
+const P = [
+  {id:1, name:'Aurelia Solitaire Ring', cat:'rings', k:'18K', stone:'diamond', note:'1.00 ct lab diamond', price:1850, badge:'Bestseller', styles:['solitaire','bridal'], added:90,
+   metals:{yellow:'p-ring-yellow', white:'p-ring-white', rose:'p-ring-rose'}, alt:'m-hand-thin'},
+  {id:2, name:'Lumen Pavé Hoops', cat:'earrings', k:'18K', stone:'diamond', note:'0.42 ct pavé', price:690, badge:'New', styles:['hoops'], added:6,
+   metals:{yellow:'p-pave-circle', white:null}, alt:'m-ear-pearl'},
+  {id:3, name:'Solenne Pendant', cat:'necklaces', k:'18K', stone:'diamond', note:'0.30 ct round brilliant', price:540, styles:['everyday'], added:40,
+   metals:{white:'p-pendant', yellow:null}, alt:'m-neck-layers'},
+  {id:4, name:'Perle Chain Bracelet', cat:'bracelets', k:'14K', stone:'pearl', note:'8 mm Akoya pearl', price:320, styles:['everyday'], added:30,
+   metals:{white:'p-pearl-bracelet', yellow:null}, alt:'m-hand-white'},
+  {id:5, name:'Cascade Halo Ring', cat:'rings', k:'18K', stone:'diamond', note:'1.25 ct total weight', price:2400, styles:['statement','bridal'], added:120,
+   metals:{white:'p-halo'}, alt:'m-bw-hand'},
+  {id:6, name:'Mira Mini Hoops', cat:'earrings', k:'14K', stone:'none', note:'Solid gold, 12 mm', price:180, badge:'Bestseller', styles:['hoops','everyday'], added:200,
+   metals:{yellow:'p-mini-hoops', white:null}, alt:'m-bw-ear'},
+  {id:7, name:'Céleste Sapphire Ring', cat:'rings', k:'18K', stone:'sapphire', note:'0.80 ct cushion sapphire', price:1280, badge:'New', styles:['statement'], added:3,
+   metals:{white:'p-sapphire-silk', yellow:null}, alt:'m-hand-sepia'},
+  {id:8, name:'Ondine Twist Huggies', cat:'earrings', k:'18K', stone:'none', note:'Solid gold, 15 mm', price:240, styles:['hoops','everyday'], added:60,
+   metals:{yellow:'p-gold-hoops'}, alt:'m-hands-stack'},
+  {id:9, name:'Galet Pavé Hoops', cat:'earrings', k:'18K', stone:'diamond', note:'0.60 ct pavé', price:860, styles:['hoops'], added:25,
+   metals:{yellow:'p-pebble-hoops', white:null}, alt:'m-ear-pearl'},
+  {id:10, name:'Larme Teardrop Earrings', cat:'earrings', k:'18K', stone:'diamond', note:'0.35 ct micro-pavé', price:720, badge:'New', styles:['statement'], added:9,
+   metals:{rose:'p-teardrop', yellow:null}, alt:null},
+  {id:11, name:'Atelier Stacking Set', cat:'rings', k:'14K', stone:'none', note:'Set of five bands', price:460, styles:['stacking','everyday'], added:70,
+   metals:{yellow:'p-ring-stack'}, alt:'m-hand-satin'},
+  {id:12, name:'Duo Sapphire Ring', cat:'rings', k:'18K', stone:'sapphire', note:'Twin 0.25 ct sapphires', price:1120, styles:['statement'], added:14,
+   metals:{white:'p-sapphire-pedestal'}, alt:'m-hands-hold'},
+  {id:13, name:'Étoile Four-Claw Solitaire', cat:'rings', k:'18K', stone:'diamond', note:'1.50 ct lab diamond', price:3150, styles:['solitaire','bridal'], added:150,
+   metals:{white:'p-solitaire-shadow', yellow:null}, alt:'m-hand-sepia'},
+  {id:14, name:'Eternity Band', cat:'rings', k:'18K', stone:'diamond', note:'1.00 ct total weight', price:1690, styles:['stacking','bridal'], added:110,
+   metals:{white:'p-eternity-macro'}, alt:'m-bw-hand'},
+  {id:15, name:'Riviera Layered Chains', cat:'necklaces', k:'18K', stone:'none', note:'Three chains, 40–50 cm', price:380, styles:['everyday'], added:20,
+   metals:{yellow:'m-neck-layers'}, alt:'m-hands-stack'},
+  {id:16, name:'Brillante Stud Earrings', cat:'earrings', k:'18K', stone:'diamond', note:'1.00 ct total weight', price:1450, styles:['everyday','bridal'], added:45,
+   metals:{white:'p-loose-diamond', yellow:null}, alt:'m-bw-ear'}
+];
+P.forEach((p,i)=>{p.rank=i; p.active=Object.keys(p.metals)[0];});
+
+const RAIL = [
+  {k:'all', label:'Shop all', img:'m-hands-stack', t:()=>true},
+  {k:'rings', label:'Rings', img:'p-ring-yellow', t:p=>p.cat==='rings'},
+  {k:'earrings', label:'Earrings', img:'p-pebble-hoops', t:p=>p.cat==='earrings'},
+  {k:'necklaces', label:'Necklaces', img:'p-pendant', t:p=>p.cat==='necklaces'},
+  {k:'bracelets', label:'Bracelets', img:'p-pearl-bracelet', t:p=>p.cat==='bracelets'},
+  {k:'bridal', label:'Bridal', img:'p-halo', t:p=>p.styles.includes('bridal')},
+  {k:'gems', label:'Gemstones', img:'p-sapphire-pedestal', t:p=>p.stone==='sapphire'||p.stone==='pearl'},
+  {k:'stacks', label:'Stacking', img:'p-ring-stack', t:p=>p.styles.includes('stacking')}
+];
+
+const S = {rail:'all', metal:new Set(), stone:new Set(), price:new Set(), size:new Set(), style:new Set(), sort:'featured', view:'dense', pages:1};
+const $ = s=>document.querySelector(s);
+const img = n=>`img/${n}.jpg`;
+const money = n=>'$'+n.toLocaleString('en-US');
+const I = {
+  heart:'<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg>',
+  arrow:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 13 13 3M5 3h8v8"/></svg>',
+  x:'<svg viewBox="0 0 10 10" stroke="currentColor" stroke-width="1.2"><path d="m1 1 8 8M9 1 1 9"/></svg>',
+  plus:'<svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="1.2"><path d="M7 1v12M1 7h12"/></svg>'
+};
+
+function filtersOn(){return S.metal.size+S.stone.size+S.price.size+S.size.size+S.style.size}
+function match(p, skip){
+  const r = RAIL.find(r=>r.k===S.rail);
+  if(!r.t(p)) return false;
+  if(skip!=='metal' && S.metal.size && !Object.keys(p.metals).some(m=>S.metal.has(m))) return false;
+  if(skip!=='stone' && S.stone.size && !S.stone.has(p.stone)) return false;
+  if(skip!=='price' && S.price.size && !PRICE.some(b=>S.price.has(b.k)&&b.t(p.price))) return false;
+  if(skip!=='size' && S.size.size && p.cat!=='rings') return false;
+  if(skip!=='style' && S.style.size && !p.styles.some(s=>S.style.has(s))) return false;
+  return true;
+}
+function list(){
+  let L = P.filter(p=>match(p));
+  const f = {featured:(a,b)=>a.rank-b.rank, new:(a,b)=>a.added-b.added, low:(a,b)=>a.price-b.price, high:(a,b)=>b.price-a.price}[S.sort];
+  return L.sort(f);
+}
+function variantImg(p){return p.metals[p.active] || Object.values(p.metals).find(Boolean)}
+function specText(p){return `${p.k} ${METAL[p.active].label} · ${p.note}`}
+
+function card(p, eager){
+  // when a metal filter is on, show that metal first
+  if(S.metal.size && !S.metal.has(p.active)){const m=Object.keys(p.metals).find(m=>S.metal.has(m)); if(m) p.active=m;}
+  const ring = p.cat==='rings';
+  const sw = Object.keys(p.metals).map(m=>`<button class="${METAL[m].cls}" data-m="${m}" aria-pressed="${m===p.active}" aria-label="${p.k} ${METAL[m].label}" title="${METAL[m].label}"></button>`).join('');
+  const qa = ring
+    ? `<span>Size</span>${['5','6','7','8','9'].map(s=>`<button class="sz" data-add="${p.id}" data-size="${s}">${s}</button>`).join('')}`
+    : `<button class="add" data-add="${p.id}">Add to bag</button>`;
+  return `<article class="card" data-id="${p.id}">
+    <div class="mwrap"><a class="media${p.alt?' has-alt':''}" href="#" aria-label="${p.name}">
+      ${p.badge?`<span class="badge">${p.badge}</span>`:''}
+      <img class="main" src="${img(variantImg(p))}" alt="${p.name}, ${METAL[p.active].label}" ${eager?'':'loading="lazy"'}>
+      ${p.alt?`<img class="alt" src="${img(p.alt)}" alt="" loading="lazy">`:''}
+    </a>
+    <div class="qa" onclick="event.stopPropagation()">${qa}</div>
+    <button class="qa-touch" data-add="${p.id}" aria-label="Add ${p.name} to bag">${I.plus}</button></div>
+    <div class="meta">
+      <div class="row"><h3 class="name"><a href="#">${p.name}</a></h3><button class="wish" data-wish="${p.id}" aria-pressed="${!!p.wish}" aria-label="Save ${p.name}">${I.heart}</button></div>
+      <div class="spec">${specText(p)}</div>
+      <div class="price">${money(p.price)}</div>
+      ${Object.keys(p.metals).length>1?`<div class="sw" role="group" aria-label="Metal">${sw}</div>`:`<div class="sw"><span class="${METAL[p.active].cls}" style="width:16px;height:16px;border-radius:50%" title="${METAL[p.active].label}"></span></div>`}
+    </div>
+  </article>`;
+}
+const PROMO_A = `<article class="promo">
+  <a class="pm" href="#"><img src="${img('promo-neck')}" alt="Model wearing the Lumière pendant in 18K gold" loading="lazy"></a>
+  <div class="cap"><div><div class="eyebrow">New collection</div><h2>Lumière</h2><p>Fine chains and pendants in 18K gold, made to sit at the collarbone.</p></div><a class="pill" href="#">Discover ${I.arrow}</a></div>
+</article>`;
+const PROMO_B = `<article class="promo left noir">
+  <a class="pm" href="#"><img src="${img('promo-chain')}" alt="Layered 18K gold curb chains" loading="lazy">
+    <div class="ov"><div><div class="eyebrow">The Chain Edit</div><h2>Gold, <em>layered</em></h2><p>Curb, rope and paperclip chains in recycled 18K gold. From $280.</p></div><span class="pill">Shop chains ${I.arrow}</span></div>
+  </a>
+</article>`;
+
+function renderGrid(){
+  const L = list();
+  const plain = !filtersOn() && S.rail==='all' && S.sort==='featured';
+  let items = L.map((p,i)=>card(p,i<4));
+  if(plain){ items.splice(2,0,PROMO_A); items.splice(13,0,PROMO_B); }
+  if(plain && S.pages>1){ items = items.concat([...L].reverse().map(p=>card(p))); }
+  $('#grid').innerHTML = L.length ? items.join('') :
+    `<div class="empty"><h3>Nothing matches yet</h3><p>Try removing a filter, or book a bespoke consultation.</p><button class="clear" onclick="clearAll()">Clear all filters</button></div>`;
+  $('#grid').className = 'grid' + (S.view==='large'?' large':'');
+  const shown = plain ? L.length*S.pages : L.length;
+  $('#count').textContent = `${plain?128:L.length} pieces`;
+  // illustrative pagination: full catalogue is 128 pieces, mock shows 16 per page
+  $('#more').innerHTML = plain && shown<128
+    ? `<div class="txt">Showing ${shown} of 128</div><div class="prog"><i style="width:${shown/128*100}%"></i></div><button class="btn-dark" id="loadMore">Load more</button>`
+    : (L.length?`<div class="txt">Showing all ${L.length} pieces</div>`:'');
+  const lm = $('#loadMore'); if(lm) lm.onclick=()=>{S.pages++; renderGrid();};
+}
+
+function renderRail(){
+  $('#rail').innerHTML = RAIL.map(r=>`<button aria-pressed="${S.rail===r.k}" data-rail="${r.k}">
+    <span class="th"><img src="${img(r.img)}" alt="" loading="lazy"></span>
+    <span class="lb">${r.label}<small>${r.k==='all'?128:P.filter(r.t).length}</small></span></button>`).join('');
+}
+
+function renderChips(){
+  const c=[];
+  S.metal.forEach(v=>c.push(['metal',v,METAL[v].label]));
+  S.stone.forEach(v=>c.push(['stone',v,STONE[v]]));
+  S.price.forEach(v=>c.push(['price',v,PRICE.find(b=>b.k===v).label]));
+  S.size.forEach(v=>c.push(['size',v,'Size '+v]));
+  S.style.forEach(v=>c.push(['style',v,STYLE[v]]));
+  $('#chips').innerHTML = c.length ? c.map(([g,v,l])=>`<button class="chip" data-chip="${g}|${v}">${l} ${I.x}</button>`).join('') + `<button class="clear" onclick="clearAll()">Clear all</button>` : '';
+  const n=filtersOn(); const fN=$('#fN'); fN.hidden=!n; fN.textContent=n;
+}
+
+function optRows(group, entries, render){
+  $('#o-'+group).innerHTML = entries.map(([k,label,extra])=>{
+    const n = P.filter(p=>match(p,group)&&test(group,k,p)).length;
+    return `<label class="opt"><input type="checkbox" data-g="${group}" value="${k}" ${S[group].has(k)?'checked':''}>${extra||''}<span>${label}</span><span class="c">${n}</span></label>`;
+  }).join('');
+}
+function test(g,k,p){
+  if(g==='metal') return k in p.metals;
+  if(g==='stone') return p.stone===k;
+  if(g==='price') return PRICE.find(b=>b.k===k).t(p.price);
+}
+function renderDrawer(){
+  optRows('metal', Object.entries(METAL).map(([k,v])=>[k,v.label,`<span class="dot ${v.cls}"></span>`]));
+  optRows('stone', Object.entries(STONE).map(([k,v])=>[k,v,`<span class="dot g-${k}"></span>`]));
+  optRows('price', PRICE.map(b=>[b.k,b.label]));
+  $('#o-size').innerHTML = SIZES.map(s=>`<button data-g="size" data-v="${s}" aria-pressed="${S.size.has(s)}">${s}</button>`).join('');
+  $('#o-style').innerHTML = Object.entries(STYLE).map(([k,v])=>`<button data-g="style" data-v="${k}" aria-pressed="${S.style.has(k)}">${v}</button>`).join('');
+  ['metal','stone','price','size','style'].forEach(g=>$('#s-'+g).textContent = S[g].size?S[g].size+' selected':'');
+  const n=filtersOn(); $('#dSel').textContent = n?`· ${n} selected`:'';
+  const c=list().length; $('#dApply').textContent = c?`Show ${c} piece${c===1?'':'s'}`:'No matches';
+}
+
+function render(){S.pages=1; renderChips(); renderGrid(); renderDrawer();}
+function clearAll(){['metal','stone','price','size','style'].forEach(g=>S[g].clear()); render();}
+window.clearAll = clearAll;
+
+/* drawer */
+function openDrawer(sec){
+  $('#drawer').classList.add('on'); $('#scrim').classList.add('on'); $('#drawer').setAttribute('aria-hidden','false');
+  if(sec){const d=$('#sec-'+sec); d.open=true; requestAnimationFrame(()=>d.scrollIntoView({block:'start'}));}
+  $('#close').focus();
+}
+function closeDrawer(){$('#drawer').classList.remove('on'); $('#scrim').classList.remove('on'); $('#drawer').setAttribute('aria-hidden','true');}
+document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openDrawer(b.dataset.open));
+$('#close').onclick=closeDrawer; $('#scrim').onclick=closeDrawer; $('#dApply').onclick=closeDrawer;
+$('#dClear').onclick=clearAll;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+$('#db').addEventListener('change',e=>{const i=e.target; if(!i.dataset.g)return; S[i.dataset.g][i.checked?'add':'delete'](i.value); render();});
+$('#db').addEventListener('click',e=>{const b=e.target.closest('button[data-g]'); if(!b)return; const s=S[b.dataset.g]; s.has(b.dataset.v)?s.delete(b.dataset.v):s.add(b.dataset.v); render();});
+
+/* toolbar */
+$('#sort').onchange=e=>{S.sort=e.target.value; render();};
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{
+  S.view=b.dataset.view; document.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-pressed',x===b)); renderGrid();
+});
+$('#chips').addEventListener('click',e=>{const c=e.target.closest('[data-chip]'); if(!c)return; const [g,v]=c.dataset.chip.split('|'); S[g].delete(v); render();});
+$('#rail').addEventListener('click',e=>{const b=e.target.closest('[data-rail]'); if(!b)return; S.rail=b.dataset.rail; renderRail(); render();});
+
+/* cards */
+let bag=0, tt;
+function toast(html){const t=$('#toast'); t.innerHTML=html; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),2600);}
+$('#grid').addEventListener('click',e=>{
+  const sw=e.target.closest('.sw button[data-m]');
+  if(sw){
+    const cardEl=sw.closest('.card'), p=P.find(x=>x.id==cardEl.dataset.id);
+    p.active=sw.dataset.m;
+    cardEl.querySelectorAll('.sw button').forEach(b=>b.setAttribute('aria-pressed',b===sw));
+    const im=cardEl.querySelector('.main'); im.src=img(variantImg(p)); im.alt=`${p.name}, ${METAL[p.active].label}`;
+    cardEl.querySelector('.spec').textContent=specText(p);
+    return;
+  }
+  const w=e.target.closest('[data-wish]');
+  if(w){const p=P.find(x=>x.id==w.dataset.wish); p.wish=!p.wish; w.setAttribute('aria-pressed',p.wish); toast(p.wish?`<b>Saved</b> ${p.name}`:`<b>Removed</b> ${p.name}`); return;}
+  const a=e.target.closest('[data-add]');
+  if(a){e.preventDefault(); const p=P.find(x=>x.id==a.dataset.add); bag++; $('#bagN').textContent=bag;
+    toast(`<b>Added to bag</b> ${p.name} · ${p.k} ${METAL[p.active].label}${a.dataset.size?' · Size '+a.dataset.size:''}`); return;}
+  if(e.target.closest('a[href="#"]')) e.preventDefault();
+});
+$('#news').addEventListener('submit',e=>{e.preventDefault(); toast('<b>Subscribed</b> Welcome to Pendyora');});
+document.querySelectorAll('a[href="#"]').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
+
+renderRail(); render();
+</script>
+
+</html>

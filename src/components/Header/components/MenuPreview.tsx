@@ -18,7 +18,7 @@ const MenuPreview = ({ Details, setActiveMenu }: any) => {
   // console.log(Details);
 
   return (
-    <div className="flex flex-row cursor-default bg-white w-full z-[9999px] px-12 lg:px-0 shadow-md border items-start pt-[5px] pb-[5px]">
+    <div className="flex flex-row cursor-default bg-paper text-ink w-full z-[9999px] px-12 lg:px-0 border-t border-line items-start pt-[5px] pb-[5px]">
       <div className="w-full flex flex-row justify-between  p-5 gap-5 ">
         <div className="grid grid-cols-4 w-[calc(100%-270px)]">
           {menuColumnList?.map((item: any, index: number) => {
@@ -26,12 +26,12 @@ const MenuPreview = ({ Details, setActiveMenu }: any) => {
               return (
                 <div
                   key={index}
-                  className={`flex gap-4 ${Details[item].length > 1 && index === 0 ? '' : 'border-l first-of-type:border-0'} px-4 lg:px-3 md:px-2 flex-col`}
+                  className={`flex gap-4 ${Details[item].length > 1 && index === 0 ? '' : 'border-l border-line first-of-type:border-0'} px-4 lg:px-3 md:px-2 flex-col`}
                 >
                   {Details?.[item]?.map((item: any, i: number) => (
                     <div key={i} className="flex flex-col gap-2">
                       <div
-                        className={`${item?.link ? 'cursor-pointer hover:text-[#256030] hover:underline' : ''} uppercase font-semibold text-[13px] lg:text-[11px] md:text-[10px]`}
+                        className={`${item?.link ? 'cursor-pointer hover:text-gilt hover:underline' : ''} uppercase font-semibold tracking-[0.12em] text-[12px] lg:text-[11px] md:text-[10px]`}
                         onClick={() => {
                           if (item?.link) {
                             router.push(item.link);
@@ -55,7 +55,7 @@ const MenuPreview = ({ Details, setActiveMenu }: any) => {
                                         router.push(masterItem.value);
                                         reloadPage();
                                       }}
-                                      className="flex hover:text-[#256030] items-center cursor-pointer min-w-[48%] h-[30px] lg:w-full flex-row gap-2 md:w-full"
+                                      className="flex hover:text-gilt items-center cursor-pointer min-w-[48%] h-[30px] lg:w-full flex-row gap-2 md:w-full"
                                     >
                                       {masterItem && (
                                         <Image
@@ -86,7 +86,7 @@ const MenuPreview = ({ Details, setActiveMenu }: any) => {
                                       router.push(subItem?.link);
                                       reloadPage();
                                     }}
-                                    className="flex gap-2 hover:text-[#256030] cursor-pointer min-w-[48%] lg:w-full flex-row  h-[30px] items-center md:w-full"
+                                    className="flex gap-2 hover:text-gilt cursor-pointer min-w-[48%] lg:w-full flex-row  h-[30px] items-center md:w-full"
                                   >
                                     {subItem.image && (
                                       <Image
@@ -115,7 +115,7 @@ const MenuPreview = ({ Details, setActiveMenu }: any) => {
                                       router.push(subItem?.link);
                                       reloadPage();
                                     }}
-                                    className="flex gap-2 cursor-pointer hover:text-[#256030] h-[30px] items-center md:w-full flex-row"
+                                    className="flex gap-2 cursor-pointer hover:text-gilt h-[30px] items-center md:w-full flex-row"
                                   >
                                     {subItem.image && (
                                       <Image
@@ -145,7 +145,7 @@ const MenuPreview = ({ Details, setActiveMenu }: any) => {
           })}
         </div>
         {Details?.menu_images?.length > 0 && (Details?.menu_images[0]?.link || Details?.menu_images[0]?.link) && (
-          <div className="flex gap-3 border-l w-[270px] px-4 lg:px-3 md:px-2  lg:hidden flex-col ">
+          <div className="flex gap-3 border-l border-line w-[270px] px-4 lg:px-3 md:px-2  lg:hidden flex-col ">
             {Details?.menu_images?.map((item: any, index: number) => (
               <div
                 key={index}
@@ -163,11 +163,7 @@ const MenuPreview = ({ Details, setActiveMenu }: any) => {
                   height={180}
                   className="!h-[180px] object-cover"
                 />
-                <Text
-                  size="textlg"
-                  as="p"
-                  className="absolute bottom-0  md:text-[11px] px-2 w-full !font-normal uppercase  bg-black/20 !text-[#ffffff]"
-                >
+                <Text size="textlg" as="p" className="absolute bottom-0  md:text-[11px] px-2 w-full !font-normal uppercase  bg-noir/30 !text-paper">
                   {item?.title}
                 </Text>
               </div>

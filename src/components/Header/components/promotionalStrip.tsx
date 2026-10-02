@@ -96,7 +96,7 @@ const PromotionalStrip = ({ data }: any) => {
   return (
     <>
       {data?.isActive && data?.data?.length > 0 && (
-        <div className="bg-white">
+        <div className="bg-noir">
           <Swiper modules={[Navigation, Autoplay]} className="mySwiper !h-full" loop autoplay={{ delay: 10000, disableOnInteraction: false }}>
             {data.data.map((item: any) =>
               item?.endDate &&
@@ -104,41 +104,41 @@ const PromotionalStrip = ({ data }: any) => {
               remainingTimes?.[item?.id]?.days &&
               remainingTimes?.[item?.id]?.hours &&
               remainingTimes?.[item?.id]?.min ? (
-                <SwiperSlide key={item.id} className="p-0 cursor-pointer bg-primary !h-auto shadow-md">
+                <SwiperSlide key={item.id} className="p-0 cursor-pointer bg-noir !h-auto">
                   <div
-                    className="uppercase p-[9px] md:p-[13px] sm:p-[6px] text-wrap text-center h-full  tracking-[1px] text-[12px] sm:text-[8px] text-white bg-primary flex-wrap whitespace-pre-wrap  sm:whitespace-normal  flex items-center justify-center gap-0.5"
+                    className="uppercase px-4 py-[11px] sm:py-2 text-wrap text-center h-full tracking-[0.16em] text-[11px] font-medium text-noir-on bg-noir flex-wrap whitespace-pre-wrap sm:whitespace-normal flex items-center justify-center gap-2"
                     onClick={() => routes.push(item?.link)}
                   >
-                    {item?.prefixText && <p className="whitespace-nowrap text-[12px] sm:text-[11px]">{item.prefixText}</p>}
+                    {item?.prefixText && <p className="whitespace-nowrap text-[11px] sm:text-[10px]">{item.prefixText}</p>}
                     {item?.endDate && remainingTimes?.[item?.id] && remainingTimes?.[item.id]?.days && (
-                      <div className="flex items-center gap-1">
-                        <p className="bg-white py-[1px] px-1 text-[11px] sm:text-[8px] text-center rounded-md text-black">
+                      <div className="flex items-center gap-1 text-gilt-soft tabular-nums">
+                        <p className="bg-noir-on/10 py-[1px] px-1.5 text-[11px] sm:text-[9px] text-center text-gilt-soft">
                           {remainingTimes[item.id]?.days}D
                         </p>
-                        <p className="bg-white py-[1px] px-1 text-[11px] sm:text-[8px] rounded-md text-center text-black">
+                        <p className="bg-noir-on/10 py-[1px] px-1.5 text-[11px] sm:text-[9px] text-center text-gilt-soft">
                           {remainingTimes?.[item?.id]?.hours}H
                         </p>
                         :
-                        <p className="bg-white py-[1px] px-1 text-[11px] sm:text-[8px] rounded-md text-center text-black">
+                        <p className="bg-noir-on/10 py-[1px] px-1.5 text-[11px] sm:text-[9px] text-center text-gilt-soft">
                           {remainingTimes?.[item?.id]?.min}M
                         </p>
                         :
-                        <p className="bg-white py-[1px] px-1 text-[11px] sm:text-[8px] rounded-md text-center text-black">
+                        <p className="bg-noir-on/10 py-[1px] px-1.5 text-[11px] sm:text-[9px] text-center text-gilt-soft">
                           {remainingTimes?.[item?.id]?.sec}S
                         </p>
                       </div>
                     )}
-                    {item?.title && <p className="text-wrap text-[12px] sm:text-[11px]"> {item.title}</p>}
+                    {item?.title && <p className="text-wrap text-[11px] sm:text-[10px]"> {item.title}</p>}
                   </div>
                 </SwiperSlide>
               ) : (
                 !item?.enableEndDate && (
-                  <SwiperSlide key={item.id} className="p-0 cursor-pointer bg-primary !h-auto shadow-md">
+                  <SwiperSlide key={item.id} className="p-0 cursor-pointer bg-noir !h-auto">
                     <div
-                      className="uppercase p-[9px] md:p-[13px] sm:p-[6px] text-wrap text-center h-full  tracking-[1px] text-[12px] sm:text-[8px] text-white bg-primary flex-wrap whitespace-pre-wrap  sm:whitespace-normal  flex items-center justify-center gap-0.5"
+                      className="uppercase px-4 py-[11px] sm:py-2 text-wrap text-center h-full tracking-[0.16em] text-[11px] font-medium text-noir-on bg-noir flex-wrap whitespace-pre-wrap sm:whitespace-normal flex items-center justify-center gap-2"
                       onClick={() => routes.push(item?.link)}
                     >
-                      {item?.title && <p className="text-wrap text-[12px] sm:text-[11px]"> {item.title}</p>}
+                      {item?.title && <p className="text-wrap text-[11px] sm:text-[10px]"> {item.title}</p>}
                     </div>
                   </SwiperSlide>
                 )

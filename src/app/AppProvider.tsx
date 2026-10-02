@@ -115,7 +115,9 @@ const AppProviderData = ({ children, initialHeaderMegaData, initialPromoData }: 
             <AppProvider>
               <div className="relative">
                 <Header
-                  className={isHomepage ? 'bg-transparent fixed top-0 left-0 right-0' : 'bg-transparent sticky top-0'}
+                  className={
+                    isHomepage ? 'bg-transparent fixed top-0 left-0 right-0' : 'bg-transparent sticky top-0 [[data-header-static]_&]:!relative' // pages can opt out via useStaticHeader()
+                  }
                   headerMetaData={initialHeaderMegaData}
                   promoStripData={initialPromoData}
                 />

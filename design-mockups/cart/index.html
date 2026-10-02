@@ -258,6 +258,143 @@ footer{background:var(--noir);color:var(--on-noir);padding-block:44px 28px}
 .ft .mark{font-size:22px}
 .ft p{margin:0;font-size:12px;color:color-mix(in srgb,var(--on-noir) 60%,transparent)}
 
+
+/* ───── Checkout steps ───── */
+.co-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;padding-block:20px;border-bottom:1px solid var(--line)}
+.co-head .back{justify-self:start}
+.co-head .secure{justify-self:end;display:flex;gap:8px;align-items:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.co-head .secure svg{width:15px;height:15px;color:var(--gilt)}
+.steps button{display:flex;align-items:center;gap:8px;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit}
+.steps button:disabled{cursor:default}
+.steps li.is-done i{background:var(--gilt);border-color:var(--gilt);color:var(--paper)}
+.steps li.is-done button:hover{color:var(--ink)}
+.co{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,410px);gap:clamp(28px,4vw,64px);align-items:start;padding-bottom:80px}
+.form-sec{border-top:1px solid var(--line);padding-block:26px 30px;display:grid;gap:18px}
+.form-sec:first-child{border-top:0;padding-top:0}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.sec-h h2{font-family:var(--f-display);font-weight:500;font-size:28px;margin:0;line-height:1}
+.sec-h p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.sec-h a,.sec-h button{font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+.fgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.f{display:grid;gap:6px;grid-column:span 6;align-content:start}
+.f.s2{grid-column:span 2}.f.s3{grid-column:span 3}
+.f > label,.f .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.f > label i{font-style:normal;letter-spacing:.04em;text-transform:none}
+.tx{width:100%;height:48px;border:1px solid var(--line);background:transparent;padding:0 14px;font-size:13.5px;border-radius:0;appearance:none;-webkit-appearance:none}
+.tx:hover{border-color:var(--line-strong)}
+.tx:focus{outline:none;border-color:var(--ink)}
+.tx[aria-invalid="true"]{border-color:var(--danger)}
+.f .select .tx{padding-right:34px}
+.f .hint{font-size:11.5px;color:var(--ink-2)}
+.f .err{font-size:12px;color:var(--danger)}
+.f .err:empty{display:none}
+.phone{display:flex}
+.phone .select{flex:0 0 112px}
+.phone .select .tx{border-right:0}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:13px;cursor:pointer}
+.check input{width:16px;height:16px;margin:2px 0 0;accent-color:var(--ink);flex:none}
+.check small{display:block;color:var(--ink-2);font-size:12px}
+.radios{display:grid;gap:10px}
+.rcard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid var(--line);padding:16px 18px;cursor:pointer;transition:border-color .2s,background .2s}
+.rcard:hover{border-color:var(--line-strong)}
+.rcard:has(input:checked){border-color:var(--ink);background:color-mix(in srgb,var(--stone) 40%,var(--paper))}
+.rcard input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:1px solid var(--line-strong);border-radius:50%;margin:0;display:grid;place-items:center;cursor:pointer}
+.rcard input:checked{border-color:var(--ink)}
+.rcard input:checked::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink)}
+.rcard .rt{font-size:13.5px;font-weight:500}
+.rcard .rt small{display:block;font-weight:400;font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.rcard .rp{font-size:13px}
+.rcard.is-off{opacity:.55;cursor:not-allowed}
+.pm{border:1px solid var(--line);transition:border-color .2s}
+.pm:has(> .rcard input:checked){border-color:var(--ink)}
+.pm > .rcard{border:0}
+.pm-body{padding:4px 18px 20px 50px;display:grid;gap:14px}
+.marks{display:flex;gap:5px}
+.marks span{border:1px solid var(--line);font-size:9px;letter-spacing:.06em;padding:3px 6px;font-weight:600;color:var(--ink-2);background:var(--paper)}
+.marks span.on{border-color:var(--ink);color:var(--ink)}
+.lock-note{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink-2)}
+.lock-note svg{width:14px;height:14px;color:var(--gilt);flex:none}
+.review{display:grid;border:1px solid var(--line);margin:0}
+.review > div{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line);font-size:13px;align-items:start}
+.review > div:last-child{border-bottom:0}
+.review dt{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);padding-top:2px}
+.review dd{margin:0;line-height:1.55}
+.review button{font-size:12px;text-decoration:underline;text-underline-offset:3px;color:var(--ink-2)}
+.place{display:grid;gap:12px;margin-top:6px}
+.place .btn-dark{height:56px;font-size:12px}
+.place p{margin:0;font-size:12px;color:var(--ink-2);text-align:center}
+.place p a{text-decoration:underline;text-underline-offset:3px}
+.btn-dark[disabled]{opacity:.7;cursor:progress}
+.spin{width:16px;height:16px;border:1.5px solid color-mix(in srgb,var(--paper) 35%,transparent);border-top-color:var(--paper);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.form-err{border:1px solid var(--danger);color:var(--danger);padding:12px 14px;font-size:12.5px}
+
+/* Checkout summary */
+.co-sum{position:sticky;top:24px;border:1px solid var(--line)}
+.co-sum > summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px 26px 0;cursor:default}
+.co-sum > summary::-webkit-details-marker{display:none}
+.co-sum > summary h2{font-family:var(--f-display);font-weight:400;font-size:28px;margin:0;line-height:1}
+.co-sum > summary .sum-total{display:none}
+.co-sum .co-in{padding:18px 26px 24px;display:grid;gap:18px}
+.mini{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.mini li{display:grid;grid-template-columns:60px minmax(0,1fr) auto;gap:14px;align-items:center;font-size:12.5px}
+.mini .th{position:relative;aspect-ratio:4/5;background:var(--stone)}
+.mini .th img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.mini .th b{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:10.5px;font-weight:500;display:grid;place-items:center}
+.mini .nm{font-weight:500;font-size:13px;display:block}
+.mini small{color:var(--ink-2);font-size:12px}
+.edit-bag{justify-self:start}
+
+/* Confirmation */
+.done{max-width:760px;margin:0 auto;padding-block:30px 90px;display:grid;gap:28px}
+.done-top{display:grid;gap:12px;justify-items:center;text-align:center}
+.done-top .ok{width:56px;height:56px;border-radius:50%;border:1px solid var(--gilt);display:grid;place-items:center;color:var(--gilt)}
+.done-top .ok svg{width:24px;height:24px}
+.done-top .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2)}
+.done-top p{margin:0;max-width:52ch;color:var(--ink-2)}
+.timeline{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line)}
+.timeline li{padding:18px 16px;display:grid;gap:6px;border-right:1px solid var(--line);font-size:12.5px;color:var(--ink-2);position:relative;align-content:start}
+.timeline li:last-child{border-right:0}
+.timeline li b{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--ink-2)}
+.timeline li.is-done b{color:var(--gilt)}
+.timeline li.is-now{background:color-mix(in srgb,var(--stone) 45%,var(--paper))}
+.timeline li.is-now b{color:var(--ink)}
+.timeline li::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:transparent}
+.timeline li.is-done::before{background:var(--gilt)}
+.timeline li.is-now::before{background:linear-gradient(90deg,var(--gilt) 50%,var(--line) 50%)}
+.done-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.done-grid dl{margin:0;display:grid;gap:4px;font-size:13px}
+.done-grid dd{margin:0}
+.save-acct{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.save-acct .btn-dark{width:auto;padding:0 24px;height:48px}
+
+@media (max-width:1024px){
+  .co{grid-template-columns:1fr}
+  .co aside{order:-1}
+  .co-sum{position:static}
+  .co-sum > summary{cursor:pointer;padding:16px 20px}
+  .co-sum[open] > summary{padding-bottom:0}
+  .co-sum > summary h2{font-size:22px;display:flex;gap:12px;align-items:center}
+  .co-sum > summary h2::after{content:"";width:7px;height:7px;border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);transform:rotate(45deg) translateY(-3px);transition:transform .25s}
+  .co-sum[open] > summary h2::after{transform:rotate(-135deg) translateY(-1px)}
+  .co-sum > summary .sum-total{display:block;font-family:var(--f-display);font-size:24px}
+  .co-sum .co-in{padding:16px 20px 20px}
+}
+@media (max-width:720px){
+  .fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .f,.f.s3{grid-column:span 2}
+  .f.s2{grid-column:span 1}
+  .pm-body{padding-left:18px}
+  .review > div{grid-template-columns:minmax(0,1fr) auto}
+  .review dt{grid-column:1/-1}
+  .timeline{grid-template-columns:1fr 1fr}
+  .timeline li:nth-child(2){border-right:0}
+  .timeline li:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .done-grid{grid-template-columns:1fr}
+  .co-head .secure span{display:none}
+  .save-acct{grid-template-columns:1fr}
+}
+
 /* ───── Responsive ───── */
 @media (max-width:1024px){
   .site nav{display:none}
@@ -308,20 +445,26 @@ footer{background:var(--noir);color:var(--on-noir);padding-block:44px 28px}
     <button aria-label="Currency" class="lbl">USD</button>
   </div>
 </header>
+<header class="co-head wrap" id="coHead" hidden>
+  <button class="link back" data-go="bag">← Bag</button>
+  <span class="mark">PENDYORA</span>
+  <span class="secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="10.5" width="14" height="10"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>Secure checkout</span></span>
+</header>
 
 <main class="wrap">
   <div class="head">
     <div>
-      <div class="crumbs"><a href="#">Home</a><span aria-hidden="true">/</span><span>Bag</span></div>
-      <h1>Your <em>Bag</em><small class="num" id="headCount">4 pieces</small></h1>
+      <div class="crumbs"><a href="#">Home</a><span aria-hidden="true">/</span><span id="crumbNow">Bag</span></div>
+      <h1><span id="titleText">Your <em>Bag</em></span><small class="num" id="headCount">4 pieces</small></h1>
     </div>
-    <ol class="steps" aria-label="Checkout progress">
-      <li aria-current="step"><i>1</i><span class="t">Bag</span></li><li class="sep" aria-hidden="true"></li>
-      <li><i>2</i><span class="t">Delivery</span></li><li class="sep" aria-hidden="true"></li>
-      <li><i>3</i><span class="t">Payment</span></li>
+    <ol class="steps" aria-label="Checkout progress" id="steps">
+      <li data-step="bag" aria-current="step"><button data-go="bag" disabled><i>1</i><span class="t">Bag</span></button></li><li class="sep" aria-hidden="true"></li>
+      <li data-step="delivery"><button data-go="delivery" disabled><i>2</i><span class="t">Delivery</span></button></li><li class="sep" aria-hidden="true"></li>
+      <li data-step="payment"><button data-go="payment" disabled><i>3</i><span class="t">Payment</span></button></li>
     </ol>
   </div>
 
+  <div id="vBag">
   <div id="full">
     <div class="cart">
       <section aria-label="Pieces in your bag">
@@ -375,7 +518,7 @@ footer{background:var(--noir);color:var(--on-noir);padding-block:44px 28px}
           <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.5"/><circle cx="17" cy="17.5" r="1.5"/></svg><p style="margin:0"><b>Insured shipping worldwide</b><span>Duties and taxes are shown before you pay.</span></p></div>
           <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 12a8 8 0 1 1 2.3 5.6"/><path d="M4 18v-6h6"/></svg><p style="margin:0"><b>30-day returns</b><span>Engraved and resized pieces excepted.</span></p></div>
         </div>
-        <div class="pay-icons" aria-label="Accepted payment methods"><span>VISA</span><span>MASTERCARD</span><span>AMEX</span><span>PAYPAL</span><span>APPLE PAY</span><span>GOOGLE PAY</span><span>KLARNA</span></div>
+        <div class="pay-icons" aria-label="Accepted payment methods"><span>VISA</span><span>MASTERCARD</span><span>AMEX</span><span>PAYPAL</span><span>APPLE PAY</span><span>GOOGLE PAY</span><span>DISCOVER</span><span>AFFIRM · US</span></div>
       </aside>
     </div>
   </div>
@@ -392,6 +535,129 @@ footer{background:var(--noir);color:var(--on-noir);padding-block:44px 28px}
     <div class="recs-head"><h2 id="recsH">Pairs <em>well with</em></h2><a href="#" class="link">View all</a></div>
     <div class="grid" id="recs"></div>
   </section>
+  </div>
+
+  <!-- ───── Step 2 · Delivery ───── -->
+  <div id="vDelivery" hidden>
+    <div class="co">
+      <form id="fDelivery" novalidate>
+        <section class="form-sec">
+          <div class="sec-h"><h2>Contact</h2><p>Have an account? <a href="#">Sign in</a> for faster checkout.</p></div>
+          <div class="fgrid">
+            <div class="f"><label for="email">Email</label><input class="tx" id="email" type="email" autocomplete="email" value="amelia.hart@example.com"><span class="hint">Your order confirmation and tracking details go here.</span><span class="err" id="e-email"></span></div>
+          </div>
+          <label class="check"><input type="checkbox" id="news"><span>Email me about new collections and private previews<small>Optional. Unsubscribe at any time.</small></span></label>
+        </section>
+
+        <section class="form-sec">
+          <div class="sec-h"><h2>Delivery address</h2></div>
+          <div class="fgrid">
+            <div class="f"><label for="country">Country / region</label><div class="select"><select class="tx" id="country" autocomplete="country"></select></div><span class="hint" id="countryHint"></span></div>
+            <div class="f s3"><label for="fn">First name</label><input class="tx" id="fn" autocomplete="given-name" value="Amelia"><span class="err" id="e-fn"></span></div>
+            <div class="f s3"><label for="ln">Last name</label><input class="tx" id="ln" autocomplete="family-name" value="Hart"><span class="err" id="e-ln"></span></div>
+            <div class="f"><label for="a1">Address</label><input class="tx" id="a1" autocomplete="address-line1" placeholder="Street and house number" value="14 Marylebone High Street"><span class="err" id="e-a1"></span></div>
+            <div class="f"><label for="a2">Apartment, suite, building <i>(optional)</i></label><input class="tx" id="a2" autocomplete="address-line2"></div>
+            <div class="f s2" id="fCity"><label for="city">City</label><input class="tx" id="city" autocomplete="address-level2" value="London"><span class="err" id="e-city"></span></div>
+            <div class="f s2" id="fRegion"><label for="region" id="regionL">Region</label><div id="regionWrap"></div><span class="err" id="e-region"></span></div>
+            <div class="f s2" id="fPostal"><label for="postal" id="postalL">Postcode</label><input class="tx" id="postal" autocomplete="postal-code" value="W1U 4QW"><span class="err" id="e-postal"></span></div>
+            <div class="f"><label for="phone">Phone</label><div class="phone"><div class="select"><select class="tx" id="dial" aria-label="Country calling code"></select></div><input class="tx num" id="phone" type="tel" autocomplete="tel-national" value="7700 900123"></div><span class="hint">Only for the courier, in case they need to reach you about delivery.</span><span class="err" id="e-phone"></span></div>
+          </div>
+        </section>
+
+        <section class="form-sec">
+          <div class="sec-h"><h2>Delivery method</h2><p id="dispatchNote"></p></div>
+          <div class="radios" id="methods"></div>
+          <label class="check"><input type="checkbox" checked disabled><span>Signature required on delivery<small>Every order is fully insured until it is signed for.</small></span></label>
+        </section>
+
+        <div class="place">
+          <button class="btn-dark" type="submit">Continue to payment</button>
+          <button type="button" class="link" data-go="bag" style="justify-self:center">← Return to bag</button>
+        </div>
+      </form>
+      <aside><details class="co-sum" id="sumD" open></details></aside>
+    </div>
+  </div>
+
+  <!-- ───── Step 3 · Payment ───── -->
+  <div id="vPayment" hidden>
+    <div class="co">
+      <form id="fPayment" novalidate>
+        <section class="form-sec">
+          <div class="sec-h"><h2>Review</h2></div>
+          <dl class="review" id="review"></dl>
+        </section>
+
+        <section class="form-sec">
+          <div class="sec-h"><h2>Payment</h2><p class="lock-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="10.5" width="14" height="10"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Encrypted and processed securely. We never store your full card number.</p></div>
+          <div class="radios">
+            <div class="pm">
+              <label class="rcard"><input type="radio" name="pay" value="card" checked><span class="rt">Credit or debit card</span><span class="marks" id="ccMarks"><span data-b="visa">VISA</span><span data-b="mc">MASTERCARD</span><span data-b="amex">AMEX</span><span data-b="disc">DISCOVER</span></span></label>
+              <div class="pm-body" data-pay="card">
+                <div class="fgrid">
+                  <div class="f"><label for="cc">Card number</label><input class="tx num" id="cc" inputmode="numeric" autocomplete="cc-number" placeholder="1234 1234 1234 1234"><span class="err" id="e-cc"></span></div>
+                  <div class="f s3"><label for="exp">Expiry date</label><input class="tx num" id="exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY"><span class="err" id="e-exp"></span></div>
+                  <div class="f s3"><label for="cvc">Security code</label><input class="tx num" id="cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="3 or 4 digits"><span class="err" id="e-cvc"></span></div>
+                  <div class="f"><label for="ccName">Name on card</label><input class="tx" id="ccName" autocomplete="cc-name"><span class="hint">Mockup: try 4242 4242 4242 4242, any future date, any 3 digits.</span><span class="err" id="e-ccName"></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="pm">
+              <label class="rcard"><input type="radio" name="pay" value="paypal"><span class="rt">PayPal<small>Approve the payment with PayPal, then return here to finish.</small></span><span class="marks"><span>PAYPAL</span></span></label>
+            </div>
+            <div class="pm" id="pmAffirm">
+              <label class="rcard"><input type="radio" name="pay" value="affirm"><span class="rt">Affirm<small id="affirmNote"></small></span><span class="marks"><span>AFFIRM</span></span></label>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-sec">
+          <div class="sec-h"><h2>Billing address</h2></div>
+          <label class="check"><input type="checkbox" id="sameBill" checked><span>Same as delivery address<small id="billSummary"></small></span></label>
+          <div class="fgrid" id="billForm" hidden>
+            <div class="f"><label for="bCountry">Country / region</label><div class="select"><select class="tx" id="bCountry" autocomplete="billing country"></select></div></div>
+            <div class="f"><label for="bA1">Address</label><input class="tx" id="bA1" autocomplete="billing address-line1"><span class="err" id="e-bA1"></span></div>
+            <div class="f s3"><label for="bCity">City</label><input class="tx" id="bCity" autocomplete="billing address-level2"><span class="err" id="e-bCity"></span></div>
+            <div class="f s3"><label for="bPostal">Postal code <i>(if your country uses one)</i></label><input class="tx" id="bPostal" autocomplete="billing postal-code"></div>
+          </div>
+        </section>
+
+        <div id="payErr" aria-live="assertive"></div>
+        <div class="place">
+          <button class="btn-dark" type="submit" id="placeBtn">Place order</button>
+          <p>By placing your order you agree to our <a href="#">Terms of Sale</a> and <a href="#">Privacy Policy</a>.</p>
+        </div>
+      </form>
+      <aside><details class="co-sum" id="sumP" open></details></aside>
+    </div>
+  </div>
+
+  <!-- ───── Confirmation ───── -->
+  <div id="vDone" hidden>
+    <div class="done">
+      <div class="done-top">
+        <span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
+        <span class="eyebrow num" id="orderNo"></span>
+        <h1 id="thanks"></h1>
+        <p id="doneMsg"></p>
+      </div>
+      <ol class="timeline" id="timeline"></ol>
+      <div class="done-grid">
+        <div class="panel"><h3>Delivering to</h3><dl id="doneAddr"></dl></div>
+        <div class="panel"><h3>Payment</h3><dl id="donePay"></dl></div>
+      </div>
+      <div class="panel"><h3>Order summary</h3><div id="doneSum"></div></div>
+      <div class="panel">
+        <h3>Save your details</h3>
+        <p>Create a password to follow this order and check out faster next time.</p>
+        <form class="save-acct" id="saveAcct" novalidate>
+          <div class="f"><label for="pw">Password</label><input class="tx" id="pw" type="password" autocomplete="new-password" placeholder="At least 8 characters"><span class="err" id="e-pw"></span></div>
+          <button class="btn-dark" type="submit">Create account</button>
+        </form>
+      </div>
+      <div style="display:flex;justify-content:center"><button class="btn-line" data-go="bag" data-reset>Continue shopping</button></div>
+    </div>
+  </div>
 </main>
 
 <footer class="wrap"><div class="ft"><span class="mark">PENDYORA</span><p>© 2026 Pendyora · Privacy · Terms · Accessibility</p></div></footer>
@@ -414,7 +680,7 @@ footer{background:var(--noir);color:var(--on-noir);padding-block:44px 28px}
 </aside>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div class="mock" role="group" aria-label="Mockup state"><span>Mockup</span><button aria-pressed="true" data-state="full">Bag</button><button aria-pressed="false" data-state="empty">Empty</button></div>
+<div class="mock" role="group" aria-label="Mockup state"><span>Mockup</span><button aria-pressed="true" data-state="full">Bag</button><button aria-pressed="false" data-state="empty">Empty</button><button aria-pressed="false" data-state="delivery">Delivery</button><button aria-pressed="false" data-state="payment">Payment</button><button aria-pressed="false" data-state="done">Done</button></div>
 
 <script>
 const IMG = n => `img/${n}.jpg`;
@@ -508,7 +774,7 @@ function renderSummary(){
   const total = pieces + engr + appr + care - off;
   const o = OFFERS.find(x=>x.code===applied);
   $('#promoSlot').innerHTML = o
-    ? `<div class="applied"><div class="code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg><div>${o.code}<small>${o.desc}</small></div></div><div style="display:flex;gap:12px"><button class="link" data-open-drawer>Change</button><button class="link" id="rmCode">Remove</button></div></div>`
+    ? `<div class="applied"><div class="code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg><div>${o.code}<small>${o.desc}</small></div></div><div style="display:flex;gap:12px"><button class="link" data-open-drawer>Change</button><button class="link rm-code">Remove</button></div></div>`
     : `<button class="promo-btn" data-open-drawer><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg>Add a promo code</span><span style="color:var(--gilt)">${OFFERS.filter(x=>eligible(x).ok).length} available</span></button>`;
   const rows = [
     ['Pieces ('+count()+')', money(pieces)],
@@ -525,8 +791,6 @@ function renderSummary(){
   $('#savedNote').textContent = off ? `You save ${money(off)} with ${applied}` : '';
   $('#bagN').textContent = count();
   $('#headCount').textContent = `${count()} piece${count()===1?'':'s'}`;
-  const rm = $('#rmCode'); if(rm) rm.onclick = ()=>{ const was=applied; applied=null; render(); toast(`<b>Removed</b> ${was}`); };
-  document.querySelectorAll('[data-open-drawer]').forEach(b=>b.onclick=openDrawer);
 }
 
 function offerCard(o){
@@ -563,9 +827,10 @@ function apply(code, fromInput){
 function render(){
   const empty = items.length===0;
   $('#full').hidden = empty; $('#emptyView').hidden = !empty;
-  $('#mbar').style.display = empty ? 'none' : '';
+  $('#mbar').style.display = (empty || step !== 'bag') ? 'none' : '';
   if(applied && !eligible(OFFERS.find(o=>o.code===applied)).ok){ toast(`<b>Removed</b> ${applied} no longer applies to this bag`); applied=null; }
   renderItems(); renderSummary(); renderOffers();
+  refreshCo();
 }
 
 /* Recommendations */
@@ -609,14 +874,261 @@ $('#drawer').addEventListener('click', e=>{ const b=e.target.closest('[data-appl
 
 /* Mockup state switch */
 const snapshot = JSON.parse(JSON.stringify(items));
+function restoreFull(){ items.length = 0; snapshot.forEach(x => items.push(JSON.parse(JSON.stringify(x)))); applied = 'AUTUMN10'; render(); }
 document.querySelectorAll('[data-state]').forEach(b => b.onclick = () => {
-  document.querySelectorAll('[data-state]').forEach(x=>x.setAttribute('aria-pressed', x===b));
-  items.length = 0; applied = null; if(b.dataset.state==='full'){ snapshot.forEach(s=>items.push(JSON.parse(JSON.stringify(s)))); applied='AUTUMN10'; }
-  render(); window.scrollTo({top:0});
+  const st = b.dataset.state;
+  if(st === 'empty'){ items.length = 0; applied = null; go('bag'); render(); return; }
+  if(!items.length) restoreFull();
+  if(st === 'done' && payMethod === 'card' && !lastCard){ $('#cc').value = '4242 4242 4242 4242'; lastCard = '4242'; }
+  const target = st === 'full' ? 'bag' : st;
+  reached = Math.max(reached, ORDER.indexOf(target));
+  go(target);
 });
 document.querySelectorAll('a[href="#"]').forEach(a=>a.addEventListener('click',e=>e.preventDefault()));
 
+
+/* ───────── Checkout steps (mockup) ───────── */
+/* Country rules drive the address form, phone prefix, delivery options and duties.
+   Rates are illustrative; production should use the carrier / duties provider quote. */
+const COUNTRIES = {
+  US:{n:'United States', dial:'+1', region:'State', regions:['California','Florida','Illinois','New York','Texas','Washington'], postal:'ZIP code', re:/^\d{5}(-\d{4})?$/, ex:'10001', tax:.0725, taxL:'Sales tax (estimated)', dom:true},
+  GB:{n:'United Kingdom', dial:'+44', region:'County', regionOpt:true, postal:'Postcode', re:/^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, ex:'SW1A 1AA', tax:.20, taxL:'Import VAT & duties'},
+  CA:{n:'Canada', dial:'+1', region:'Province', regions:['Alberta','British Columbia','Ontario','Quebec'], postal:'Postal code', re:/^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i, ex:'M5V 2T6', tax:.13, taxL:'Duties & taxes'},
+  AU:{n:'Australia', dial:'+61', region:'State / territory', regions:['New South Wales','Queensland','Victoria','Western Australia'], postal:'Postcode', re:/^\d{4}$/, ex:'2000', tax:.10, taxL:'GST & duties'},
+  AE:{n:'United Arab Emirates', dial:'+971', region:'Emirate', regions:['Abu Dhabi','Dubai','Sharjah'], postal:null, tax:.05, taxL:'VAT & duties'},
+  DE:{n:'Germany', dial:'+49', region:null, postal:'Postcode', re:/^\d{5}$/, ex:'10115', tax:.19, taxL:'Import VAT & duties'},
+  FR:{n:'France', dial:'+33', region:null, postal:'Postcode', re:/^\d{5}$/, ex:'75001', tax:.20, taxL:'Import VAT & duties'},
+  IN:{n:'India', dial:'+91', region:'State', regions:['Delhi','Gujarat','Karnataka','Maharashtra'], postal:'PIN code', re:/^\d{6}$/, ex:'400001', tax:.03, taxL:'GST & duties'},
+  SG:{n:'Singapore', dial:'+65', region:null, postal:'Postal code', re:/^\d{6}$/, ex:'018956', tax:.09, taxL:'GST & duties'}
+};
+const ORDER = ['bag','delivery','payment','done'];
+const ship = {country:'GB', method:'std'};
+let step = 'bag', reached = 0, payMethod = 'card', lastCard = '';
+const TODAY = new Date(2026, 9, 3);
+const fmtD = d => d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+function addBiz(d, n){ const x = new Date(d); while(n > 0){ x.setDate(x.getDate()+1); if(x.getDay() % 6) n--; } return x; }
+function dispatchDate(){ return items.some(i => i.ship === 'Made to order') ? new Date(2026, 9, 14) : new Date(2026, 9, 6); }
+function methods(){
+  return COUNTRIES[ship.country].dom
+    ? [{k:'std', t:'Insured standard', d:[3,5], p:0}, {k:'exp', t:'Insured express', d:[1,2], p:35}]
+    : [{k:'std', t:'Insured international', d:[5,8], p:45}, {k:'exp', t:'Insured international express', d:[2,4], p:85}];
+}
+function arrival(m){ const s = dispatchDate(); return `${fmtD(addBiz(s, m.d[0]))} – ${fmtD(addBiz(s, m.d[1]))}`; }
+function totals(){
+  const pieces = piecesTotal();
+  const sumK = k => items.reduce((s,i) => s + i.addons.filter(a => a.k === k && a.on).reduce((x,a) => x + a.price, 0), 0);
+  const engr = sumK('engr'), appr = sumK('appr');
+  const care = items.reduce((s,i) => s + i.addons.filter(a => a.plans).reduce((x,a) => x + Number(a.plan), 0), 0);
+  const off = discount(), sub = pieces + engr + appr + care - off;
+  const known = ORDER.indexOf(step) >= 1;
+  const m = methods().find(x => x.k === ship.method) || methods()[0];
+  const shipCost = known ? m.p : 0, tax = known ? (sub + shipCost) * COUNTRIES[ship.country].tax : 0;
+  return {pieces, engr, appr, care, off, sub, m, shipCost, tax, total: sub + shipCost + tax, known};
+}
+
+function summaryLines(t){
+  const c = COUNTRIES[ship.country];
+  return [
+    ['Pieces (' + count() + ')', money(t.pieces)],
+    t.engr ? ['Engraving', money(t.engr)] : null,
+    t.appr ? ['Appraisal', money(t.appr)] : null,
+    t.care ? ['Extended care plan', money(t.care)] : null,
+    t.off ? [`Promo · ${applied}`, '−' + money(t.off), 'save'] : null,
+    ['Shipping · ' + t.m.t, t.shipCost ? money(t.shipCost) : 'Complimentary'],
+    [`${c.taxL} · ${c.n}`, money(t.tax)]
+  ].filter(Boolean).map(([a,b,cl]) => `<div class="${cl||''}"><dt>${a}</dt><dd>${b}</dd></div>`).join('');
+}
+function renderCo(sel){
+  const t = totals(), o = OFFERS.find(x => x.code === applied), el = $(sel);
+  const wasOpen = el.open;
+  el.innerHTML = `<summary><h2>Order summary</h2><span class="sum-total num">${money(t.total)}</span></summary>
+  <div class="co-in">
+    <ul class="mini">${items.map(i => `<li><span class="th"><img src="${IMG(i.img)}" alt=""><b class="num">${i.qty}</b></span><span><span class="nm">${i.name}</span><small>${i.spec[0]}${i.ring ? ' · US ' + i.size : ''}</small></span><span class="num">${money(i.price * i.qty)}</span></li>`).join('')}</ul>
+    <button type="button" class="link edit-bag" data-go="bag">Edit bag</button>
+    ${o ? `<div class="applied"><div class="code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></svg><div>${o.code}<small>${o.desc}</small></div></div><div style="display:flex;gap:12px"><button type="button" class="link" data-open-drawer>Change</button><button type="button" class="link rm-code">Remove</button></div></div>`
+        : `<button type="button" class="promo-btn" data-open-drawer><span>Add a promo code</span><span style="color:var(--gilt)">${OFFERS.filter(x => eligible(x).ok).length} available</span></button>`}
+    <dl class="lines num">${summaryLines(t)}</dl>
+    <div class="total num"><span>Total</span><strong><small>USD</small>${money(t.total)}</strong></div>
+    ${COUNTRIES[ship.country].dom ? '' : '<p class="note">Duties and taxes are prepaid here, so there is nothing to pay when your order arrives.</p>'}
+  </div>`;
+  el.open = window.innerWidth > 1024 ? true : wasOpen;
+}
+
+/* Delivery form */
+function fillCountrySelects(){
+  const opts = Object.entries(COUNTRIES).map(([k,c]) => `<option value="${k}">${c.n}</option>`).join('');
+  $('#country').innerHTML = opts; $('#bCountry').innerHTML = opts;
+  $('#dial').innerHTML = Object.entries(COUNTRIES).map(([k,c]) => `<option value="${k}">${k} ${c.dial}</option>`).join('');
+  $('#country').value = ship.country; $('#dial').value = ship.country; $('#bCountry').value = ship.country;
+}
+function layoutAddress(){
+  const c = COUNTRIES[ship.country];
+  $('#fRegion').hidden = !c.region; $('#fPostal').hidden = !c.postal;
+  const shown = 1 + !!c.region + !!c.postal, span = shown === 3 ? 's2' : shown === 2 ? 's3' : '';
+  ['#fCity','#fRegion','#fPostal'].forEach(s => { $(s).classList.remove('s2','s3'); if(span) $(s).classList.add(span); });
+  const prevRegion = val('region');
+  if(c.region){
+    $('#regionL').innerHTML = c.region + (c.regionOpt ? ' <i>(optional)</i>' : '');
+    $('#regionWrap').innerHTML = c.regions
+      ? `<div class="select"><select class="tx" id="region" autocomplete="address-level1"><option value="">Select</option>${c.regions.map(r => `<option>${r}</option>`).join('')}</select></div>`
+      : `<input class="tx" id="region" autocomplete="address-level1">`;
+    if(prevRegion && (!c.regions || c.regions.includes(prevRegion))) $('#region').value = prevRegion;
+  }
+  else $('#regionWrap').innerHTML = '';
+  if(c.postal){ $('#postalL').textContent = c.postal; $('#postal').placeholder = 'e.g. ' + c.ex; }
+  else $('#postal').value = '';
+  $('#countryHint').textContent = c.dom ? 'Sales tax is added at checkout based on your state.' : `Duties and taxes for ${c.n} are calculated here and prepaid. Nothing to pay on delivery.`;
+  ['region','postal'].forEach(id => setErr(id, ''));
+}
+function renderMethods(){
+  const ms = methods(); if(!ms.some(m => m.k === ship.method)) ship.method = 'std';
+  $('#methods').innerHTML = ms.map(m => `<label class="rcard"><input type="radio" name="ship" value="${m.k}" ${m.k === ship.method ? 'checked' : ''}><span class="rt">${m.t}<small>Arrives ${arrival(m)}</small></span><span class="rp num">${m.p ? money(m.p) : 'Complimentary'}</span></label>`).join('');
+  const made = items.some(i => i.ship === 'Made to order');
+  $('#dispatchNote').textContent = made ? `Everything ships together on ${fmtD(dispatchDate())}, once your ring is made.` : `Ships on ${fmtD(dispatchDate())}.`;
+}
+function setErr(id, msg){ const i = $('#' + id), e = $('#e-' + id); if(i) i.setAttribute('aria-invalid', msg ? 'true' : 'false'); if(e) e.textContent = msg || ''; return !msg; }
+const val = id => ($('#' + id)?.value || '').trim();
+function validateDelivery(){
+  const c = COUNTRIES[ship.country], bad = [];
+  const chk = (id, msg) => { if(!setErr(id, msg)) bad.push(id); };
+  chk('email', !val('email') ? 'Enter your email address.' : /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val('email')) ? '' : 'Enter an email like name@example.com.');
+  chk('fn', val('fn') ? '' : 'Enter your first name.');
+  chk('ln', val('ln') ? '' : 'Enter your last name.');
+  chk('a1', val('a1') ? '' : 'Enter the street address.');
+  chk('city', val('city') ? '' : 'Enter the city.');
+  if(c.region && !c.regionOpt) chk('region', val('region') ? '' : `Select a ${c.region.toLowerCase()}.`);
+  if(c.postal) chk('postal', !val('postal') ? `Enter the ${c.postal.toLowerCase()}.` : c.re.test(val('postal')) ? '' : `Enter a valid ${c.postal.toLowerCase()} for ${c.n}, like ${c.ex}.`);
+  chk('phone', val('phone').replace(/\D/g, '').length >= 6 ? '' : 'Enter a phone number the courier can use.');
+  if(bad.length) $('#' + bad[0]).focus();
+  return !bad.length;
+}
+
+/* Payment */
+const digits = s => s.replace(/\D/g, '');
+function brand(n){ return /^3[47]/.test(n) ? 'amex' : /^4/.test(n) ? 'visa' : /^(5[1-5]|2[2-7])/.test(n) ? 'mc' : /^6(011|5)/.test(n) ? 'disc' : ''; }
+function luhn(n){ let s = 0, alt = false; for(let i = n.length - 1; i >= 0; i--){ let d = +n[i]; if(alt){ d *= 2; if(d > 9) d -= 9; } s += d; alt = !alt; } return s % 10 === 0; }
+function renderPayment(){
+  const c = COUNTRIES[ship.country], t = totals();
+  const addr = [val('a1'), val('a2'), [val('city'), val('region'), val('postal')].filter(Boolean).join(' '), c.n].filter(Boolean);
+  $('#review').innerHTML = [
+    ['Contact', val('email'), 'delivery'],
+    ['Deliver to', `${val('fn')} ${val('ln')}<br>${addr.join('<br>')}<br>${c.dial} ${val('phone')}`, 'delivery'],
+    ['Method', `${t.m.t} · Arrives ${arrival(t.m)}<br><span style="color:var(--ink-2)">Signature required</span>`, 'delivery']
+  ].map(([a,b,g]) => `<div><dt>${a}</dt><dd>${b}</dd><button type="button" data-go="${g}">Edit</button></div>`).join('');
+  $('#billSummary').textContent = `${val('fn')} ${val('ln')}, ${addr.join(', ')}`;
+  const affirmOk = c.dom;
+  $('#pmAffirm .rcard').classList.toggle('is-off', !affirmOk);
+  $('#pmAffirm input').disabled = !affirmOk;
+  $('#affirmNote').textContent = affirmOk ? `Pay over time from ${money(t.total / 12)}/mo for 12 months. Subject to eligibility.` : 'Available for US delivery addresses only.';
+  if(!affirmOk && payMethod === 'affirm'){ payMethod = 'card'; document.querySelector('input[name="pay"][value="card"]').checked = true; }
+  syncPay();
+}
+function syncPay(){
+  document.querySelector('[data-pay="card"]').hidden = payMethod !== 'card';
+  const t = totals();
+  $('#placeBtn').textContent = payMethod === 'paypal' ? `Continue with PayPal · ${money(t.total)}` : payMethod === 'affirm' ? `Continue with Affirm · ${money(t.total)}` : `Pay USD ${money(t.total)}`;
+}
+function validatePayment(){
+  const bad = [], chk = (id, msg) => { if(!setErr(id, msg)) bad.push(id); };
+  if(payMethod === 'card'){
+    const n = digits(val('cc'));
+    chk('cc', !n ? 'Enter your card number.' : (n.length >= 13 && luhn(n)) ? '' : 'Check your card number. It looks incomplete.');
+    const [mm, yy] = val('exp').split('/').map(s => parseInt(s, 10));
+    const expOk = mm >= 1 && mm <= 12 && yy >= 0 && new Date(2000 + yy, mm, 0) >= TODAY;
+    chk('exp', !val('exp') ? 'Enter the expiry date.' : expOk ? '' : (mm >= 1 && mm <= 12 ? 'This card has expired.' : 'Enter the date as MM / YY.'));
+    const need = brand(n) === 'amex' ? 4 : 3;
+    chk('cvc', digits(val('cvc')).length === need ? '' : `Enter the ${need}-digit code on your card.`);
+    chk('ccName', val('ccName') ? '' : 'Enter the name as it appears on the card.');
+    lastCard = n.slice(-4);
+  }
+  if(!$('#sameBill').checked){
+    chk('bA1', val('bA1') ? '' : 'Enter the billing street address.');
+    chk('bCity', val('bCity') ? '' : 'Enter the billing city.');
+  }
+  $('#payErr').innerHTML = bad.length ? `<p class="form-err">Check the highlighted fields, then try again.</p>` : '';
+  if(bad.length) $('#' + bad[0]).focus();
+  return !bad.length;
+}
+
+/* Confirmation */
+function renderDone(){
+  const c = COUNTRIES[ship.country], t = totals(), disp = dispatchDate();
+  const made = items.some(i => i.ship === 'Made to order');
+  $('#orderNo').textContent = 'Order PND-261003-4821';
+  $('#thanks').innerHTML = `Thank you, <em>${val('fn') || 'Amelia'}</em>`;
+  $('#doneMsg').textContent = `A confirmation is on its way to ${val('email')}. We will email tracking details as soon as your order ships.`;
+  const steps = [['Order placed', fmtD(TODAY), 'is-done'], [made ? 'Being made' : 'Preparing', made ? 'Your ring is being set and polished.' : 'Checked, cleaned and packed.', 'is-now'], ['Ships', fmtD(disp), ''], ['Arrives', arrival(t.m), '']];
+  $('#timeline').innerHTML = steps.map(([a,b,cl]) => `<li class="${cl}"><b>${a}</b><span>${b}</span></li>`).join('');
+  $('#doneAddr').innerHTML = `<dd>${val('fn')} ${val('ln')}</dd><dd>${[val('a1'), val('a2')].filter(Boolean).join(', ')}</dd><dd>${[val('city'), val('region'), val('postal')].filter(Boolean).join(' ')}</dd><dd>${c.n}</dd><dd style="color:var(--ink-2);margin-top:6px">${t.m.t} · Signature required</dd>`;
+  $('#donePay').innerHTML = payMethod === 'card'
+    ? `<dd>${({visa:'Visa', mc:'Mastercard', amex:'American Express', disc:'Discover'})[brand(digits(val('cc')))] || 'Card'} ending ${lastCard}</dd><dd style="color:var(--ink-2)">Billing: ${$('#sameBill').checked ? 'same as delivery' : val('bA1') + ', ' + val('bCity')}</dd>`
+    : `<dd>${payMethod === 'paypal' ? 'PayPal' : 'Affirm'}</dd>`;
+  $('#doneSum').innerHTML = `<dl class="lines num">${summaryLines(t)}</dl><div class="total num" style="margin-top:14px"><span>Total paid</span><strong><small>USD</small>${money(t.total)}</strong></div>`;
+}
+
+/* Step routing */
+const TITLES = {bag:'Your <em>Bag</em>', delivery:'Delivery <em>details</em>', payment:'<em>Payment</em>'};
+function go(s){
+  if(s !== 'bag' && s !== 'done' && !items.length) s = 'bag';
+  step = s; reached = Math.max(reached, ORDER.indexOf(s));
+  const co = s === 'delivery' || s === 'payment';
+  $('#vBag').hidden = s !== 'bag'; $('#vDelivery').hidden = s !== 'delivery'; $('#vPayment').hidden = s !== 'payment'; $('#vDone').hidden = s !== 'done';
+  $('.site').hidden = co; $('.announce').hidden = co; $('#coHead').hidden = !co;
+  $('.head').hidden = s === 'done';
+  $('#titleText').innerHTML = TITLES[s] || ''; $('#headCount').hidden = s !== 'bag';
+  $('#crumbNow').textContent = {bag:'Bag', delivery:'Delivery', payment:'Payment'}[s] || '';
+  document.querySelectorAll('#steps li[data-step]').forEach(li => {
+    const i = ORDER.indexOf(li.dataset.step), cur = li.dataset.step === s;
+    li.classList.toggle('is-done', i < ORDER.indexOf(s));
+    cur ? li.setAttribute('aria-current', 'step') : li.removeAttribute('aria-current');
+    li.querySelector('button').disabled = cur || i > reached;
+  });
+  $('#mbar').style.display = s === 'bag' && items.length ? '' : 'none';
+  if(s === 'delivery'){ layoutAddress(); renderMethods(); renderCo('#sumD'); }
+  if(s === 'payment'){ renderPayment(); renderCo('#sumP'); }
+  if(s === 'done') renderDone();
+  document.querySelectorAll('[data-state]').forEach(x => x.setAttribute('aria-pressed', x.dataset.state === s || (x.dataset.state === 'full' && s === 'bag' && items.length > 0) || (x.dataset.state === 'empty' && s === 'bag' && !items.length)));
+  window.scrollTo({top: 0});
+}
+function refreshCo(){ if(step === 'delivery') renderCo('#sumD'); if(step === 'payment'){ renderCo('#sumP'); renderPayment(); } }
+
+/* Events */
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if(g){ e.preventDefault(); if(g.hasAttribute('data-reset')){ restoreFull(); reached = 0; } go(g.dataset.go); return; }
+  if(e.target.closest('[data-open-drawer]')){ e.preventDefault(); openDrawer(); return; }
+  if(e.target.closest('.rm-code')){ const was = applied; applied = null; render(); toast(`<b>Removed</b> ${was}`); return; }
+  const sum = e.target.closest('.co-sum > summary');
+  if(sum && window.innerWidth > 1024) e.preventDefault();
+  if(e.target.closest('.express button')) toast(`<b>Express checkout</b> Opens ${e.target.closest('button').textContent.trim()}`);
+});
+$('#checkout').onclick = () => go('delivery');
+$('#country').addEventListener('change', e => { ship.country = e.target.value; $('#dial').value = ship.country; $('#bCountry').value = ship.country; layoutAddress(); renderMethods(); renderCo('#sumD'); });
+$('#methods').addEventListener('change', e => { ship.method = e.target.value; renderCo('#sumD'); });
+$('#fDelivery').addEventListener('submit', e => { e.preventDefault(); if(validateDelivery()) go('payment'); });
+document.querySelectorAll('#fDelivery .tx').forEach(i => i.addEventListener('input', () => { if(i.getAttribute('aria-invalid') === 'true') setErr(i.id, ''); }));
+document.querySelectorAll('input[name="pay"]').forEach(r => r.addEventListener('change', () => { payMethod = r.value; syncPay(); $('#payErr').innerHTML = ''; }));
+$('#sameBill').addEventListener('change', e => { $('#billForm').hidden = e.target.checked; });
+$('#cc').addEventListener('input', e => {
+  const n = digits(e.target.value).slice(0, 19), b = brand(n);
+  e.target.value = b === 'amex' ? n.replace(/^(\d{0,4})(\d{0,6})(\d{0,5}).*/, (m,a,c,d) => [a,c,d].filter(Boolean).join(' ')) : n.replace(/(\d{4})(?=\d)/g, '$1 ');
+  document.querySelectorAll('#ccMarks span').forEach(s => s.classList.toggle('on', s.dataset.b === b));
+  setErr('cc', '');
+});
+$('#exp').addEventListener('input', e => { const d = digits(e.target.value).slice(0, 4); e.target.value = d.length > 2 ? d.slice(0,2) + ' / ' + d.slice(2) : d; setErr('exp', ''); });
+$('#cvc').addEventListener('input', e => { e.target.value = digits(e.target.value).slice(0, 4); setErr('cvc', ''); });
+$('#ccName').addEventListener('input', () => setErr('ccName', ''));
+$('#fPayment').addEventListener('submit', e => {
+  e.preventDefault(); if(!validatePayment()) return;
+  const b = $('#placeBtn'); b.disabled = true; b.innerHTML = '<span class="spin" aria-hidden="true"></span> Processing payment. Please keep this page open.';
+  setTimeout(() => { b.disabled = false; go('done'); }, 1400);
+});
+$('#saveAcct').addEventListener('submit', e => { e.preventDefault(); if(setErr('pw', val('pw').length >= 8 ? '' : 'Use at least 8 characters.')) toast('<b>Account created</b> Your order is saved to it'); });
+window.addEventListener('resize', () => document.querySelectorAll('.co-sum').forEach(d => { if(window.innerWidth > 1024) d.open = true; }));
+fillCountrySelects();
+
 render();
+go('bag');
 </script>
 
 </html>

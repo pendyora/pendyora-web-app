@@ -26,6 +26,7 @@ import {
 import { fetchWishListProducts, setWishlistProducts } from '@/store/slices/Cart/cartSlice';
 import { setSelectedDiamondStore, setSelectedSettingSkuData, setSelectedSettingStore } from '@/store/slices/customProducts/customProductSlice';
 import { formatCurrency } from '@/utils/common';
+import { metalToneFor } from '@/utils/metalTone';
 import { trackAddToWishlist } from '@/utils/metaPixel';
 
 import { Text } from './..';
@@ -704,21 +705,7 @@ export default function ProductProfile({
       const karat = type?.code === 'SILVER_925' ? '925' : type?.code;
       return [karat, color?.name].filter(Boolean).join(' ');
     };
-    const metalTone = (colorId?: string): PlpMetalTone => {
-      const color = master?.find((item: any) => item.id === colorId);
-      const code = String(color?.code ?? '').toUpperCase();
-      const name = String(color?.name ?? '').toLowerCase();
-      if (code === 'YG' || name.includes('yellow')) {
-        return 'yellow';
-      }
-      if (code === 'RG' || name.includes('rose') || name.includes('pink')) {
-        return 'rose';
-      }
-      if (code === 'BG' || name.includes('black')) {
-        return 'black';
-      }
-      return 'white';
-    };
+    const metalTone = (colorId?: string): PlpMetalTone => metalToneFor(master, colorId);
 
     const metalAxis = variation_to_show?.find((el: any) => el?.name === 'metal_type');
     const swatches: PlpSwatch[] =

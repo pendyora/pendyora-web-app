@@ -2,23 +2,13 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-unsafe-optional-chaining */
 'use client';
-import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState, startTransition } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, startTransition } from 'react';
 
-import Slider from '@mui/material/Slider';
-import { Button, Checkbox, Image, Input, Radio, Select, Skeleton, Tooltip } from 'antd';
+import { Button, Checkbox, ConfigProvider, Input, Radio, Select, Skeleton } from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { BsBoxSeam } from 'react-icons/bs';
-import { FaHeart, FaRegHeart } from 'react-icons/fa6';
-import { FiMinus, FiPlus } from 'react-icons/fi';
-import { PiTruck } from 'react-icons/pi';
-import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { Text } from '@/components';
-import ImageZoom from '@/components/CustomImageZoom';
-import ProtectedVideo from '@/components/ProtectedVideo';
 import { IsRingSizeType } from '@/constants/Header';
 import { apiAddToWishList, apiDeleteFromWishList } from '@/services/cartService';
 import {
@@ -46,14 +36,21 @@ import {
   setSelectedShapesData,
 } from '@/store/slices/customProducts/customProductSlice';
 import { formatCurrency } from '@/utils/common';
+import { metalToneFor } from '@/utils/metalTone';
 import { trackAddToCart, trackAddToWishlist, trackViewContent } from '@/utils/metaPixel';
 
-import 'swiper/css';
-import 'swiper/css/free-mode';
-import 'swiper/css/navigation';
-import 'swiper/css/thumbs';
-import { Engraving } from './Components/Engraving';
 import CustomRequestForm from './CustomRequestForm';
+import PdpAssurance from './pdp/PdpAssurance';
+import PdpAtelier from './pdp/PdpAtelier';
+import PdpBuyBar from './pdp/PdpBuyBar';
+import PdpDetails from './pdp/PdpDetails';
+import PdpEngraving from './pdp/PdpEngraving';
+import PdpGallery, { buildGalleryMedia, Viewport } from './pdp/PdpGallery';
+import { ChoiceChip, ImageSwatch, MetalSwatch, OptionGroup } from './pdp/PdpOptions';
+import PdpReviews from './pdp/PdpReviews';
+import PdpSuggestions from './pdp/PdpSuggestions';
+import { pdpTheme } from './pdp/pdpTheme';
+import useRecentlyViewed, { RecentlyViewedCard } from './pdp/useRecentlyViewed';
 import { YotpoStarReview } from './yotpoReiew';
 
 function getSkuSlug(
@@ -222,7 +219,6 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [imageComponent, setImageComponent] = useState<any>();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isExpandedProductDetails, setIsExpandedProductDetails] = useState(false);
   const [is_appraisal, setIsAppraisalSelected] = useState(appraisal); // State to track checkbox selection
   const [isChecked, setIsChecked] = useState<any>(warranty);
   const [selectedYear, setSelectedYear] = useState<number | null>(year);
@@ -232,21 +228,25 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
   // BRACELET_LENGTH
   const [preMadeBandWidth, setPreMadeBandWidth] = useState<any>();
   const [topOffset, setTopOffset] = useState<any>(0);
-  // Gate the desktop-only 360 iframe on viewport. `sm:hidden` merely hides it
-  // visually on mobile — iOS Safari still boots the iframe's WebGL context,
-  // which combined with the in-swiper mobile 360 iframe causes an OOM kill.
-  const [isDesktopViewport, setIsDesktopViewport] = useState(false);
+  // Gate the 360 iframes on viewport. Hiding with CSS is not enough — iOS Safari still
+  // boots a hidden iframe's WebGL context, and two live 360 views cause an OOM kill.
+  // 'unknown' until measured, so neither layout mounts an iframe it would then discard.
+  const [viewport, setViewport] = useState<Viewport>('unknown');
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {
       return;
     }
-    const mq = window.matchMedia('(min-width: 551px)');
-    const update = () => setIsDesktopViewport(mq.matches);
+    const mq = window.matchMedia('(min-width: 770px)');
+    const update = () => setViewport(mq.matches ? 'desktop' : 'mobile');
     update();
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
   }, []);
+  const isCustomFlow = Boolean(searchParams?.get('id'));
   const cRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const [ctaOutOfView, setCtaOutOfView] = useState(false);
+  const [footerInView, setFooterInView] = useState(false);
 
   // ─── Affirm Promo Messaging ──────────────────────────────────────
   const affirmPriceInCents = useMemo(() => {
@@ -355,10 +355,11 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
       const vw = window.innerWidth;
       const offset = vh - height;
 
+      // A panel taller than the viewport gets a negative top, so it scrolls through and then sticks by its bottom edge.
       let topValue = '';
       if (vw >= 1024) {
         topValue = searchParams?.get('id') ? (offset - 80 > 0 ? `5rem` : `${offset}px`) : offset > 0 ? `0px` : `${offset}px`;
-      } else if (vw >= 768) {
+      } else if (vw >= 770) {
         topValue = searchParams?.get('id') ? (offset - 130 > 0 ? `5rem` : `${offset}px`) : offset > 0 ? `0px` : `${offset}px`;
       } else {
         topValue = '0px';
@@ -535,75 +536,6 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
     }
   };
   const memoizedSuggestion = useMemo(() => suggestion, [suggestion]);
-  const extraTitles = useMemo(() => {
-    return (product?.extra_titles ?? [])
-      .map((item: any) => {
-        const label = item?.master_name?.trim?.() ?? '';
-        const value = item?.value?.trim?.() ?? '';
-        return { id: item?.id, label, value };
-      })
-      .filter((item: { value: string }) => Boolean(item?.value));
-  }, [product?.extra_titles]);
-
-  const productDetailsSection = useMemo(() => {
-    if (!extraTitles?.length) {
-      return null;
-    }
-    return (
-      <div className=" border p-4">
-        <div
-          className="!cursor-pointer font-medium !text-[#707070] flex items-center justify-between"
-          onClick={() => setIsExpandedProductDetails((prev) => !prev)}
-        >
-          <Text size="textxl" className="!font-light  !cursor-pointer !font-sans">
-            PRODUCT DETAILS
-          </Text>
-          {isExpandedProductDetails ? (
-            <FiMinus className="h-[18px] w-[18px] cursor-pointer" />
-          ) : (
-            <FiPlus className="h-[18px] w-[18px] cursor-pointer" />
-          )}
-        </div>
-        <div
-          className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpandedProductDetails ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-        >
-          <div className="rounded-xl border border-[#dde3d1] mt-3 bg-gradient-to-b from-[#fcfdf9] to-[#f6f8f1] shadow-[0_2px_10px_rgba(24,56,29,0.06)] overflow-hidden">
-            {extraTitles.map((item: { id?: string; label: string; value: string }, index: number) => (
-              <div
-                key={`${item?.id ?? item?.value}-${index}`}
-                className="grid grid-cols-[minmax(0,1fr)_24px_minmax(0,1fr)] items-center gap-2 px-4 py-2 border-b border-[#e5e9db] last:border-b-0 hover:bg-white/80 transition-colors duration-200"
-              >
-                <span className="text-[#5f6655] text-[13px] sm:text-[12px] tracking-[0.2px] font-medium capitalize text-left">
-                  {(item?.label || 'Detail').toLowerCase()}
-                </span>
-                <span className="text-[#8b927f] text-[14px] text-center">:</span>
-                <span className="text-[#1d1f1b] text-[13px] sm:text-[12px] font-normal text-left leading-5">{item?.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      // <div className="w-full mt-2 md:mt-3">
-      //   <Text size="textmd" className="!font-medium !font-sans tracking-[1.2px] uppercase !text-black mb-2.5">
-      //     Product Details
-      //   </Text>
-      // <div className="rounded-xl border border-[#dde3d1] bg-gradient-to-b from-[#fcfdf9] to-[#f6f8f1] shadow-[0_2px_10px_rgba(24,56,29,0.06)] overflow-hidden">
-      //   {extraTitles.map((item: { id?: string; label: string; value: string }, index: number) => (
-      //     <div
-      //       key={`${item?.id ?? item?.value}-${index}`}
-      //       className="grid grid-cols-[minmax(0,1fr)_24px_minmax(0,1fr)] items-center gap-2 px-4 py-2 border-b border-[#e5e9db] last:border-b-0 hover:bg-white/80 transition-colors duration-200"
-      //     >
-      //       <span className="text-[#5f6655] text-[13px] sm:text-[12px] tracking-[0.2px] font-medium capitalize text-left">
-      //         {(item?.label || 'Detail').toLowerCase()}
-      //       </span>
-      //       <span className="text-[#8b927f] text-[14px] text-center">:</span>
-      //       <span className="text-[#1d1f1b] text-[13px] sm:text-[12px] font-normal text-left leading-5">{item?.value}</span>
-      //     </div>
-      //   ))}
-      // </div>
-      // </div>
-    );
-  }, [extraTitles, isExpandedProductDetails]);
 
   const fetchSuggestion = useCallback(
     (data: any) => {
@@ -1259,997 +1191,479 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
     );
   };
 
+  // ─── Presentation helpers ────────────────────────────────────────
+  const findName = (id?: string | null) => productFilter?.find((el: any) => el.id === id)?.name;
+  const goToSku = (newSlug?: string) =>
+    changeRouter(
+      isCustomFlow ? `custom-jewelry?type=2&state=s&id=${newSlug}${dId ? `&did=${dId}` : ''}` : `${selectedJewelryType}/premade?slug=${newSlug}`,
+    );
+  const isRingSizeProduct = IsRingSizeType?.includes(selectedProduct?.subType?.jewelry_type?.name);
+  const isSizedRing = selectedJewelryType == 'engagement-rings' || selectedJewelryType == 'wedding-bands';
+
+  const extrasPrice =
+    (productPrice ? productPrice : 0) +
+    (is_appraisal ? appraisalData?.price || 0 : 0) +
+    (selectedYear !== null ? selectedYearValue?.price || 0 : 0) +
+    (engravingText?.Text ? engraving?.data?.engraving_price || 0 : 0);
+  const hasPrice = Boolean(jewelryMetadata?.selling_price);
+  const isDiscounted = Boolean(jewelryMetadata?.discounted_price);
+  const finalPrice = hasPrice ? Math.ceil((isDiscounted ? jewelryMetadata?.discounted_price : jewelryMetadata?.selling_price) + extrasPrice) : 0;
+  const comparePrice = isDiscounted ? Math.ceil(jewelryMetadata?.selling_price + extrasPrice) : null;
+  const offLabel = isDiscounted
+    ? jewelryMetadata?.discount_type == (2 as any)
+      ? `${jewelryMetadata?.discount_value}% off`
+      : `${jewelryMetadata?.currency_symbol ?? ''}${jewelryMetadata?.discount_value} off`
+    : null;
+
+  const specLine = [
+    findName(jewelryMetadata?.metal_type_id),
+    findName(jewelryMetadata?.metal_color_id),
+    findName(isCustomFlow ? jewelryMetadata?.shape_id : jewelryMetadata?.center_diamond_id),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const handling =
+    (isSizedRing && jewelryMetadata?.handling_dates?.find((el: any) => el.ring_size_id == selectedRingSizeId)) ||
+    jewelryMetadata?.handling_dates?.[0];
+  const shipsWithin = handling?.shipping_date;
+  const estimatedDelivery = handling?.estimation_date ?? dayjs().add(product?.estimated_delivery_days, 'day').format('MMMM DD, YYYY');
+  const deliveryNote = product?.jewelry_id ? (
+    <p className="m-0">
+      {shipsWithin != null && (
+        <>
+          Usually ships within {shipsWithin} to {shipsWithin + 1} days.{' '}
+        </>
+      )}
+      Estimated delivery: <span className="text-ink">{estimatedDelivery}</span>.
+    </p>
+  ) : null;
+
+  const isWishlisted = user ? Boolean(wId) : wishlist;
+  const toggleWishlist = () => {
+    if (!user) {
+      setWishlist(!wishlist);
+    }
+    handleAddToWishlist();
+  };
+
+  const media = useMemo(() => buildGalleryMedia(jewelryMetadata), [jewelryMetadata]);
+
+  useEffect(() => {
+    const cta = ctaRef.current;
+    if (!cta) {
+      return;
+    }
+    const io = new IntersectionObserver(([entry]) => setCtaOutOfView(!entry.isIntersecting && entry.boundingClientRect.top < 0));
+    io.observe(cta);
+    const footer = document.querySelector('footer');
+    const fo = footer ? new IntersectionObserver(([entry]) => setFooterInView(entry.isIntersecting)) : null;
+    if (footer && fo) {
+      fo.observe(footer);
+    }
+    return () => {
+      io.disconnect();
+      fo?.disconnect();
+    };
+  }, [product?.jewelry_id]);
+
+  const recentCard: RecentlyViewedCard | null = useMemo(() => {
+    if (isCustomFlow || !product?.jewelry_id || !jewelryMetadata?.sku_slug || !selectedJewelryType) {
+      return null;
+    }
+    return {
+      jewelry_id: product.jewelry_id,
+      sku_master_id: jewelryMetadata.id,
+      slug: `${selectedJewelryType}/premade?slug=${jewelryMetadata.sku_slug}`,
+      productName: product.title ?? product.fullTitle,
+      productImage: jewelryMetadata.carat_images?.[0] ?? '/images/no_images.svg',
+      productHoverImage: jewelryMetadata.carat_images?.[1] ?? '/images/no_images.svg',
+      productPrice: jewelryMetadata.selling_price,
+      jewelryTypeData: selectedJewelryType,
+      jewelry_type: product?.subType?.jewelry_type?.name,
+      is_customizable: false,
+      discount_type: jewelryMetadata.discount_type,
+      discount_value: jewelryMetadata.discount_value,
+      discounted_price: jewelryMetadata.discounted_price,
+      // Only what the PLP card reads, to keep localStorage small.
+      jewelryDetails: {
+        id: jewelryMetadata.id,
+        sku_slug: jewelryMetadata.sku_slug,
+        carat_images: jewelryMetadata.carat_images?.slice(0, 2),
+        selling_price: jewelryMetadata.selling_price,
+        discounted_price: jewelryMetadata.discounted_price,
+        discount_type: jewelryMetadata.discount_type,
+        discount_value: jewelryMetadata.discount_value,
+        metal_type_id: jewelryMetadata.metal_type_id,
+        metal_color_id: jewelryMetadata.metal_color_id,
+      },
+    };
+  }, [isCustomFlow, product?.jewelry_id, jewelryMetadata?.id, selectedJewelryType]);
+  const recentlyViewed = useRecentlyViewed(recentCard);
+
+  const buyLabel = 'Add to bag';
+  const loadingOptions = !product?.jewelry_id;
+  const optionSkeleton = (
+    <div className="grid gap-3">
+      <Skeleton.Input active size="small" />
+      <div className="flex gap-2">
+        <Skeleton.Button active className="!rounded-none" />
+        <Skeleton.Button active className="!rounded-none" />
+        <Skeleton.Button active className="!rounded-none" />
+      </div>
+    </div>
+  );
+  const quickPicks = (suggestion ?? []).slice(0, 3);
+
   return (
-    <div className="container-xs 2xl:px-[50px] xl:px-[50px] lg:px-[30px] md:px-5 sm:px-3">
-      <div
-        className={`flex relative ${
-          searchParams?.get('id') ? '' : 'py-5 pb-0'
-        } sm:pt-0 sm:pb-0 items-start gap-8 lg:gap-[16px] md:gap-[20px] lg:items-start 2xl:items-start sm:flex-col sm:gap-0`}
-      >
-        <div className="grid h-full 2xl:w-full lg:w-2/3 sm:w-full flex-1 grid-cols-1 gap-6 2xl:gap-3 lg:gap-[16px] 2xl:h-fit xl:h-auto lg:grid-cols-1 md:grid-cols-1 sm:flex sm:flex-col xl:grid-cols-1 sm:!gap-0 pb-5 sm:pb-0">
-          <div className="grid h-fit 2xl:w-full lg:w-full sm:w-full flex-1 grid-cols-2 gap-[5px] lg:gap-[8px] 2xl:h-fit xl:h-auto lg:grid-cols-2 md:grid-cols-1 sm:hidden xl:grid-cols-2 mt-5 lg:mt-2">
-            <Suspense fallback={<div>Loading feed...</div>}>
-              {isDesktopViewport && jewelryMetadata?.model_view && (
-                <div className="relative !aspect-square h-auto w-full xl:h-auto lg:h-auto sm:hidden">
-                  <iframe
-                    key={jewelryMetadata?.model_view}
-                    title="scene"
-                    frameBorder="0"
-                    allowFullScreen={true}
-                    allow="autoplay; fullscreen; xr-spatial-tracking; web-share"
-                    className="w-full border-none"
-                    style={{
-                      aspectRatio: '1 / 1',
-                    }}
-                    src={jewelryMetadata?.model_view}
-                  />
-                  <div className="w-[8%] absolute bottom-2 right-3 z-[19] flex items-center select-none">
-                    <Image src="/images/viewIcon.svg" alt="360-view" preview={false} className="!w-[100%] select-none" />
-                  </div>
-                </div>
-              )}
-              {jewelryMetadata && jewelryMetadata?.carat_video?.length > 0 && (
-                <>
-                  {/* <video autoPlay muted loop>
-                  <source src={jewelryMetadata?.carat_video?.[0]} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video> */}
-                  <ProtectedVideo
-                    src={jewelryMetadata?.carat_video?.[0]}
-                    autoPlay={true}
-                    muted={true}
-                    loop={true}
-                    className="w-full h-full object-cover"
-                  />
-                </>
-              )}
-              {jewelryMetadata ? (
-                jewelryMetadata?.carat_images?.length > 0 ? (
-                  jewelryMetadata?.carat_images?.map((d: any, index: number) => {
-                    return <ImageZoom key={index} src={d} alt="Product image" zoom="200" className="!aspect-square sm:hidden" />;
-                  })
-                ) : (
-                  <>
-                    <Image
-                      src="/images/ashclair_pdp_logo_image.svg"
-                      alt="PDP1"
-                      preview={false}
-                      className="sm:hidden"
-                      style={{
-                        borderRadius: '0px',
-                        width: '100%',
-                        height: '100%',
-                        aspectRatio: '1 / 1',
-                        backgroundColor: '#F8F8F8',
-                      }}
-                    />
-                    <Image
-                      src="/images/ashclair_pdp_logo_image.svg"
-                      alt="PDP1"
-                      preview={false}
-                      className="sm:hidden"
-                      style={{
-                        borderRadius: '0px',
-                        width: '100%',
-                        height: '100%',
-                        aspectRatio: '1 / 1',
-                        backgroundColor: '#F8F8F8',
-                      }}
-                    />
-                    <Image
-                      src="/images/ashclair_pdp_logo_image.svg"
-                      alt="PDP1"
-                      preview={false}
-                      className="sm:hidden"
-                      style={{
-                        borderRadius: '0px',
-                        width: '100%',
-                        height: '100%',
-                        aspectRatio: '1 / 1',
-                        backgroundColor: '#F8F8F8',
-                      }}
-                    />
-                    <Image
-                      src="/images/ashclair_pdp_logo_image.svg"
-                      alt="PDP1"
-                      preview={false}
-                      className="sm:hidden"
-                      style={{
-                        borderRadius: '0px',
-                        width: '100%',
-                        height: '100%',
-                        aspectRatio: '1 / 1',
-                        backgroundColor: '#F8F8F8',
-                      }}
-                    />
-                  </>
-                )
-              ) : (
-                <>
-                  <Skeleton.Node
-                    active={true}
-                    className="sm:hidden"
-                    style={{
-                      borderRadius: '0px',
-                      width: '100%',
-                      height: '100%',
-                      aspectRatio: '1 / 1',
-                    }}
-                  />
-                  <Skeleton.Node
-                    active={true}
-                    className="sm:hidden"
-                    style={{
-                      borderRadius: '0px',
-                      width: '100%',
-                      height: '100%',
-                      aspectRatio: '1 / 1',
-                    }}
-                  />
-                  <Skeleton.Node
-                    active={true}
-                    className="sm:hidden"
-                    style={{
-                      borderRadius: '0px',
-                      width: '100%',
-                      height: '100%',
-                      aspectRatio: '1 / 1',
-                    }}
-                  />
-                  <Skeleton.Node
-                    active={true}
-                    className="sm:hidden"
-                    style={{
-                      borderRadius: '0px',
-                      width: '100%',
-                      height: '100%',
-                      aspectRatio: '1 / 1',
-                    }}
-                  />
-                </>
-              )}
-            </Suspense>
-            {jewelryMetadata && jewelryMetadata?.carat_video?.length > 0 && jewelryMetadata?.carat_video?.[1] && (
+    <ConfigProvider theme={pdpTheme}>
+      {/* Mobile only: keeps "Add to bag" in reach once the main button scrolls away. The custom-jewelry flow has its own stepper. */}
+      {!isCustomFlow && (
+        <PdpBuyBar
+          title={product?.fullTitle ?? ''}
+          price={hasPrice ? formatCurrency(finalPrice) : ''}
+          visible={ctaOutOfView && !footerInView}
+          onBuy={handleAddtocart}
+          buyLabel={buyLabel}
+          loading={loading}
+        />
+      )}
+
+      <section id="pdp-overview" className="mx-auto w-full max-w-[1440px] px-[clamp(16px,3.2vw,56px)] pb-[clamp(48px,6vw,80px)]">
+        {!isCustomFlow && (
+          <nav aria-label="Breadcrumb" className="flex flex-wrap gap-2.5 py-5 text-[11px] uppercase tracking-[0.14em] text-ink-soft md:py-3.5">
+            <Link href="/" className="text-ink-soft hover:text-ink">
+              Home
+            </Link>
+            <span aria-hidden>/</span>
+            {selectedProduct?.subType?.jewelry_type?.name && (
               <>
-                {/* <video autoPlay muted loop>
-                <source src={jewelryMetadata?.carat_video?.[1]} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video> */}
-                <ProtectedVideo
-                  src={jewelryMetadata?.carat_video?.[1]}
-                  autoPlay={true}
-                  muted={true}
-                  loop={true}
-                  className="w-full h-full object-cover"
-                />
+                <Link href={`/${selectedJewelryType}`} className="text-ink-soft hover:text-ink">
+                  {selectedProduct.subType.jewelry_type.name}
+                </Link>
+                <span aria-hidden>/</span>
               </>
             )}
-            {imageComponent && imageComponent?.length > 1 && imageComponent?.length % 2 > 0 && (
-              <>
-                <Image
-                  src="/images/ashclair_pdp_logo_image.svg"
-                  alt="PDP1"
-                  preview={false}
-                  className="md:hidden"
-                  style={{
-                    borderRadius: '0px',
-                    width: '100%',
-                    height: '100%',
-                    aspectRatio: '1 / 1',
-                    backgroundColor: '#F8F8F8',
-                  }}
-                />
-              </>
-            )}
-          </div>
-          {/* mobile Product images */}
-          {jewelryMetadata ? (
-            <div className="col-span-2 min-h-fit hidden sm:block sm:pt-2">
-              <Swiper
-                // iOS Safari can reload the page when loop clones the 360 iframe slide.
-                // Keep looping for normal media, but disable it when 360 is present.
-                loop={(swiperData?.length ?? 0) > 1 && !is360}
-                spaceBetween={10}
-                slidesPerView={1}
-                navigation={true}
-                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-                modules={[FreeMode, Navigation, Thumbs]}
-                onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-                className="mySwiper2 min-h-fit mb-3"
-              >
-                {// [
-                //   9,
-                //   jewelryMetadata?.carat_video?.length > 0 && jewelryMetadata?.carat_video?.[0],
-                //   ...(jewelryMetadata?.carat_images?.length > 0 ? jewelryMetadata?.carat_images : Array(5)),
-                //   jewelryMetadata?.carat_video?.length > 0 && jewelryMetadata?.carat_video?.[1],
-                // ]
-                // swiperData?.length>0?...swiperData:...Array(4)]?
-                swiperData?.map((d: any, index: number) => {
-                  const lastIndex =
-                    // [
-                    //   9,
-                    //   jewelryMetadata?.carat_video?.length > 0 && jewelryMetadata?.carat_video?.[0],
-                    //   ...(jewelryMetadata?.carat_images?.length > 0 ? jewelryMetadata?.carat_images : Array(5)),
-                    //   jewelryMetadata?.carat_video?.length > 0 && jewelryMetadata?.carat_video?.[1],
-                    // ]
-                    swiperData?.length - 1;
-                  return (
-                    <SwiperSlide key={'group3179' + index} className="!flex !justify-center bg-[#f8f8f8] !items-center !w-full">
-                      {index == 0 && is360 ? (
-                        <div className="relative h-[512px] 2xl:h-auto w-full xl:h-auto lg:h-auto bg-[#f8f8f8]">
-                          <iframe
-                            key={d}
-                            title="scene"
-                            frameBorder="0"
-                            allowFullScreen={true}
-                            allow="autoplay; fullscreen; xr-spatial-tracking; web-share"
-                            className="w-full border-none"
-                            style={{
-                              aspectRatio: '1 / 1',
-                            }}
-                            src={d}
-                          />
-                          <div className="w-[8%] absolute bottom-2 right-3 z-[19] flex items-center select-none ">
-                            <Image src="/images/viewIcon.svg" alt="360-view" preview={false} className="!w-[100%] select-none" />
-                          </div>
-                        </div>
-                      ) : isVideo && index == 1 ? (
-                        <>
-                          {/* <video autoPlay muted loop className="w-full !h-auto">
-                          <source src={index == 1 ? videoOne : videoTwo} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video> */}
-                          <ProtectedVideo
-                            src={index == 1 ? videoOne : videoTwo}
-                            autoPlay={true}
-                            muted={true}
-                            loop={true}
-                            className="w-full h-full object-cover"
-                          />
-                        </>
-                      ) : isVideo2 && index == lastIndex ? (
-                        <>
-                          {/* <video autoPlay muted loop className="w-full !h-auto">
-                          <source src={index == 1 ? videoOne : videoTwo} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video> */}
-                          <ProtectedVideo
-                            src={index == 1 ? videoOne : videoTwo}
-                            autoPlay={true}
-                            muted={true}
-                            loop={true}
-                            className="w-full h-full object-cover"
-                          />
-                        </>
-                      ) : (
-                        <Image
-                          src={d}
-                          preview={false}
-                          alt="Mask Group"
-                          fallback={'/images/ashclair_pdp_logo_image.svg'}
-                          decoding="async"
-                          style={{
-                            mixBlendMode: 'multiply',
-                          }}
-                          className="h-[500px] 2xl:h-auto w-full mx-auto object-contain xl:h-auto lg:h-auto bg-[#f8f8f8] aspect-square"
-                        />
-                      )}
-                    </SwiperSlide>
-                  );
-                })}
-              </Swiper>
-              <Swiper
-                onSwiper={(value) => setThumbsSwiper(value)}
-                loop={false}
-                spaceBetween={2}
-                slidesPerView={4}
-                freeMode={true}
-                navigation={{
-                  prevEl: null,
-                  nextEl: null,
-                }}
-                watchSlidesProgress={true}
-                modules={[FreeMode, Navigation, Thumbs]}
-                className="mySwiper min-h-[20%] px-2"
-              >
-                {// [
-                //   9,
-                //   jewelryMetadata?.carat_video?.length > 0 && jewelryMetadata?.carat_video?.[0],
-                //   ...(jewelryMetadata?.carat_images?.length > 0 ? jewelryMetadata?.carat_images : Array(5)),
-                //   jewelryMetadata?.carat_video?.length > 0 && jewelryMetadata?.carat_video?.[1],
-                // ]
-                swiperData?.map((d: any, index: number) => {
-                  const lastIndex = swiperData?.length - 1;
-                  return (
-                    <SwiperSlide
-                      key={'group3179' + index}
-                      className={`cursor-pointer transition-all duration-300 border-2  !aspect-square ${activeIndex === index ? ' border-primary p-1' : 'border-transparent p-1.5'}`}
-                    >
-                      {index == 0 && is360 ? (
-                        <div className={`w-full bottom-2 left-2 z-[19] flex items-center select-none ${thumbsSwiper}`}>
-                          <Image
-                            src="/images/viewIcon.svg"
-                            alt="360-view"
-                            preview={false}
-                            className="!w-[100%] px-5 !aspect-square bg-[#f8f8f8] select-none"
-                          />
-                        </div>
-                      ) : isVideo && index == 1 ? (
-                        <>
-                          {/* <video muted className="w-full !h-auto">
-                          <source src={index == 1 ? videoOne : videoTwo} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video> */}
-                          <ProtectedVideo
-                            src={index == 1 ? videoOne : videoTwo}
-                            autoPlay={false}
-                            muted={true}
-                            loop={true}
-                            showPlayIcon={true}
-                            className="w-full h-full object-cover"
-                          />
-                        </>
-                      ) : isVideo2 && index == lastIndex ? (
-                        <>
-                          {/* <video muted className="w-full !h-auto">
-                          <source src={index == 1 ? videoOne : videoTwo} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video> */}
-                          <ProtectedVideo
-                            src={index == 1 ? videoOne : videoTwo}
-                            autoPlay={false}
-                            muted={true}
-                            loop={true}
-                            showPlayIcon={true}
-                            className="w-full h-full object-cover"
-                          />
-                        </>
-                      ) : (
-                        <div className="w-full h-full bg-[#f8f8f8]">
-                          <Image
-                            src={d}
-                            preview={false}
-                            alt="Mask Group"
-                            fallback={'/images/ashclair_pdp_logo_image.svg'}
-                            loading="lazy"
-                            decoding="async"
-                            className="h-[500px] 2xl:h-auto w-full object-contain xl:h-auto lg:h-auto bg-[#f8f8f8] mix-blend-multiply !aspect-square"
-                          />
-                        </div>
-                      )}
-                    </SwiperSlide>
-                  );
-                })}
-              </Swiper>
-            </div>
-          ) : (
-            <div className="col-span-2 hidden sm:block sm:pt-2 w-full">
-              <Skeleton.Node
-                active={true}
-                className="hidden sm:!block"
-                style={{
-                  borderRadius: '0px',
-                  width: '100%',
-                  height: '100%',
-                  aspectRatio: '1 / 1',
-                }}
-              />
-              <div className="grid grid-cols-4 gap-3 mt-3">
-                <Skeleton.Node
-                  active={true}
-                  className="hidden sm:!block"
-                  style={{
-                    borderRadius: '0px',
-                    width: '100%',
-                    height: '100%',
-                    aspectRatio: '1 / 1',
-                  }}
-                />
-                <Skeleton.Node
-                  active={true}
-                  className="hidden sm:!block"
-                  style={{
-                    borderRadius: '0px',
-                    width: '100%',
-                    height: '100%',
-                    aspectRatio: '1 / 1',
-                  }}
-                />
-                <Skeleton.Node
-                  active={true}
-                  className="hidden sm:!block"
-                  style={{
-                    borderRadius: '0px',
-                    width: '100%',
-                    height: '100%',
-                    aspectRatio: '1 / 1',
-                  }}
-                />
-                <Skeleton.Node
-                  active={true}
-                  className="hidden sm:!block"
-                  style={{
-                    borderRadius: '0px',
-                    width: '100%',
-                    height: '100%',
-                    aspectRatio: '1 / 1',
-                  }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
+            <span aria-current="page" className="text-ink">
+              {product?.title ?? ''}
+            </span>
+          </nav>
+        )}
+
         <div
-          ref={cRef}
-          className={`flex w-[32%] sticky pb-5 ${
-            searchParams?.get('id') ? `top-[${topOffset}] md:top-20 sm:top-0 pt-4 lg:pt-0` : `top-[${topOffset}] pt-4`
-          } 2xl:w-1/3 lg:w-1/3 sm:w-full flex-col gap-[24px] md:w-[40%] 2xl:gap-[24px] lg:gap-[20px] md:gap-[10px]`}
-          style={{ top: `${topOffset}` }}
+          className={`grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] items-start gap-[clamp(28px,4.5vw,80px)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:grid-cols-1 md:gap-7 ${
+            isCustomFlow ? 'pt-5' : ''
+          }`}
         >
-          <div className="flex flex-col gap-2 2xl:gap-1 xl:gap-1 lg:gap-[0px] md:gap-[30px] sm:gap-1">
-            <div className="flex flex-col items-start gap-2 2xl:gap-4 lg:gap-4 md:gap-[4px]">
-              <div className="flex flex-col items-start gap-4 md:gap-2 self-stretch">
-                {product?.fullTitle ? (
-                  <Text size="text5xl" className="md:!text-[20px] sm:!text-[18px]">
-                    {product?.fullTitle}
-                  </Text>
-                ) : (
-                  <>
-                    <Skeleton.Input active={true} block={true} />
-                    <Skeleton.Input active={true} block={true} />
-                  </>
-                )}
+          {/* Gallery */}
+          <div className="min-w-0">
+            <PdpGallery media={media} loading={!jewelryMetadata} title={product?.fullTitle ?? 'Product image'} viewport={viewport} />
+          </div>
 
-                {product?.jewelry_id && jewelryMetadata && product?.diamond_certificate !== 0 && (
-                  <div className="flex items-center gap-2">
-                    <Text size="textmd" className="!font-medium text-gray-500">
-                      {`
-                      ${productFilter?.find((el: any) => el.id === jewelryMetadata?.metal_type_id)?.name || ''}
-                      ${productFilter?.find((el: any) => el.id === jewelryMetadata?.metal_color_id)?.name || ''}
-                       ${
-                         (searchParams?.get('id') ? jewelryMetadata?.shape_id : jewelryMetadata?.center_diamond_id)
-                           ? `, ${
-                               productFilter?.find(
-                                 (el: any) => el.id === (searchParams?.get('id') ? jewelryMetadata?.shape_id : jewelryMetadata?.center_diamond_id),
-                               )?.name
-                             }`
-                           : ''
-                       }
-                      | ${product?.diamond_certificate === 1 ? 'GIA' : product?.diamond_certificate === 2 ? 'IGI' : 'Other Certificate'}
-                      `}
-                    </Text>
-                  </div>
-                )}
-
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  {product?.code ? (
-                    <div className="flex items-center justify-between w-full sm:pr-3">
-                      <Text size="textmd">ITEM CODE: {selectedProductObject?.sku_code} </Text>
-                      {user ? (
-                        wId ? (
-                          <FaHeart
-                            className="w-5 h-5 md:w-[24px] md:h-[24px] active:scale-150 active:transition-all active:delay-0 cursor-pointer text-secondary"
-                            onClick={() => {
-                              handleAddToWishlist();
-                            }}
-                          />
-                        ) : (
-                          <FaRegHeart
-                            className="w-5 h-5 md:w-[24px] md:h-[24px] active:scale-50 active:transition-all active:delay-0 cursor-pointer text-secondary"
-                            onClick={() => {
-                              handleAddToWishlist();
-                            }}
-                          />
-                        )
-                      ) : wishlist ? (
-                        <FaHeart
-                          className="w-5 h-5 md:w-[24px] md:h-[24px] active:scale-150 active:transition-all active:delay-0 cursor-pointer select-none text-secondary"
-                          onClick={() => {
-                            setWishlist(!wishlist);
-                            handleAddToWishlist();
-                          }}
-                        />
-                      ) : (
-                        <FaRegHeart
-                          className="w-5 h-5 md:w-[24px] md:h-[24px] active:scale-50 active:transition-all active:delay-0 cursor-pointer select-none text-secondary"
-                          onClick={() => {
-                            setWishlist(!wishlist);
-                            handleAddToWishlist();
-                          }}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <Skeleton.Input active={true} size="small" className="h-[12px]" />
-                    </>
-                  )}
-                  {/* <div className="yotpo bottomLine" data-product-id={product?.code}></div> */}
-                  {/* <div className=" min-h-5 min-w-full"> */}
+          {/* Buying column */}
+          <div ref={cRef} className="sticky grid min-w-0 gap-7 md:static" style={{ top: topOffset || 0 }}>
+            <div className="grid gap-3">
+              {selectedProduct?.subType?.jewelry_type?.name && (
+                <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gilt">{selectedProduct.subType.jewelry_type.name}</span>
+              )}
+              {product?.fullTitle ? (
+                <h1 className="m-0 text-balance font-cormorant text-[clamp(32px,3.2vw,48px)] font-normal leading-[1.04] text-ink">
+                  {product.fullTitle}
+                </h1>
+              ) : (
+                <Skeleton active paragraph={{ rows: 1 }} title />
+              )}
+              {specLine && <p className="m-0 font-cormorant text-[19px] italic leading-snug text-ink-soft">{specLine}</p>}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex min-h-5 items-center gap-3">
                   {process.env.NEXT_PUBLIC_YOTPO_APP_INSTANCE_STAR_ID && <YotpoStarReview selectedProduct={selectedProduct} />}
-                  {/* </div> */}
-                </div>
-              </div>
-              {jewelryMetadata?.selling_price ? (
-                <div className="flex h-fit flex-col gap-1 md:gap-[10px]">
-                  {jewelryMetadata?.discounted_price && (
-                    <Text size="text2xl" className="!font-medium !text-[12px] sale-coupon-text ">
-                      {jewelryMetadata?.discount_type && jewelryMetadata?.discount_type == (2 as any)
-                        ? `${jewelryMetadata?.discount_value}% OFF`
-                        : `${jewelryMetadata?.currency_symbol}${jewelryMetadata?.discount_value} OFF`}
-                    </Text>
+                  {!isCustomFlow && (
+                    <a href="#pdp-reviews" className="border-b border-line text-[12px] text-ink-soft hover:text-ink">
+                      Read reviews
+                    </a>
                   )}
-                  <div className="flex h-fit items-baseline gap-3 md:gap-[10px]">
-                    {jewelryMetadata?.discounted_price && (
-                      <Text size="text5xl" className="!font-medium !font-castoro !text-[26px]">
-                        {formatCurrency(
-                          Math.ceil(
-                            jewelryMetadata?.discounted_price +
-                              (productPrice ? productPrice : 0) +
-                              (is_appraisal ? appraisalData?.price : 0) +
-                              (selectedYear !== null ? selectedYearValue?.price : 0) +
-                              (engravingText.Text != '' && engravingText.Text ? engraving?.data?.engraving_price : 0),
-                          ),
-                        )}
-                      </Text>
-                    )}
-                    <Text
-                      size="text5xl"
-                      className={`!font-castoro ${jewelryMetadata?.discounted_price ? 'line-through text-gray-400 !text-[20px] lg:!text-[16px] md:!text-[18px] sm:!text-[16px]' : '!font-medium '}`}
-                    >
-                      {formatCurrency(
-                        Math.ceil(
-                          jewelryMetadata?.selling_price +
-                            (productPrice ? productPrice : 0) +
-                            (is_appraisal ? appraisalData?.price : 0) +
-                            (selectedYear !== null ? selectedYearValue?.price : 0) +
-                            (engravingText.Text != '' && engravingText.Text ? engraving?.data?.engraving_price : 0),
-                        ),
-                      )}
-                    </Text>
-                  </div>
+                </div>
+                {selectedProductObject?.sku_code && (
+                  <span className="text-[11px] tabular-nums tracking-[0.12em] text-ink-soft">{selectedProductObject.sku_code}</span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              {hasPrice ? (
+                <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
+                  <span className="font-cormorant text-[32px] font-medium leading-none tabular-nums text-ink">{formatCurrency(finalPrice)}</span>
+                  {comparePrice && <s className="font-cormorant text-[20px] tabular-nums text-ink-soft">{formatCurrency(comparePrice)}</s>}
+                  {offLabel && <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gilt">{offLabel}</span>}
                 </div>
               ) : (
-                <>
-                  <Skeleton.Input active={true} size="small" />
-                </>
+                <Skeleton.Input active size="small" />
+              )}
+              {affirmPriceInCents >= 5000 &&
+                (!isCustomFlow || dId) &&
+                (typeof window === 'undefined' || (localStorage.getItem('currency') || 'USD') === 'USD') && (
+                  <p className="affirm-as-low-as m-0 text-[13px] text-ink-soft" data-page-type="product" data-amount={affirmPriceInCents} />
+                )}
+              {product?.description && (
+                <p className="m-0 mt-1 line-clamp-3 text-[14px] leading-[1.7] text-ink-soft">
+                  {product.description}{' '}
+                  <a href="#pdp-details" className="text-ink underline underline-offset-4 hover:text-ink">
+                    Read more
+                  </a>
+                </p>
               )}
             </div>
-            <div className="flex flex-col items-start md:-mt-8 sm:mt-0 gap-[30px] 2xl:gap-[20px] lg:gap-[20px]">
-              <div className="flex flex-col w-full items-start gap-4 md:gap-[10px] lg:gap-[16px]">
-                {!dId && customVariant?.length > 0 ? (
-                  <>
-                    {customVariant?.length > 0 ? (
-                      <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                        <div className="flex items-center justify-between gap-5 self-stretch">
-                          <Text size="textxl" className="!font-light !font-sans uppercase">
-                            Shapes -
-                            <span className="text-[16px] capitalize pl-1">
-                              {`${productFilter?.find((el: any) => el.id === jewelryMetadata?.shape_id)?.name}`}
-                            </span>
-                          </Text>
-                        </div>
-                        <div>
-                          <div className="flex gap-[8px]">
-                            {customVariant?.map((item: any, i: number) => {
-                              return (
-                                <div
-                                  key={i}
-                                  className={`!font-sans flex justify-center items-center ${
-                                    (isSilverMetal ? jewelryMetadata?.shape_id === item?.shape_id : jewelryMetadata?.shape_id === item?.shape_id)
-                                      ? ' border-[#17381d]'
-                                      : 'opacity-70 border-transparent'
-                                  } !font-medium w-[35px] !aspect-square tracking-[1px] cursor-pointer border-b pb-2`}
-                                  onClick={async () => {
-                                    const new_slug = await getSkuSlug(
-                                      selectedProductVariation,
-                                      selectedProductObject?.metal_type_id,
-                                      selectedProductObject?.metal_color_id,
-                                      item?.shape_id,
-                                      selectedProductObject?.carat_id,
-                                      selectedProductObject?.custom_stone_id,
-                                    );
-                                    dispatch(setSelectedShapesData(item?.shape_id));
-                                    changeRouter(
-                                      searchParams?.get('id')
-                                        ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                        : // : `${selectedJewelryType}/${new_slug}`,
-                                          `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                    );
-                                  }}
-                                >
-                                  <Image
-                                    height={30}
-                                    className="object-contain"
-                                    src={`${productFilter?.find((el: any) => el.id === item?.shape_id)?.image?.[0]}`}
-                                    fallback="/images/no_images.svg"
-                                    alt={`${productFilter?.find((el: any) => el.id === item?.shape_id)?.name}`}
-                                    preview={false}
-                                  />
-                                  {/* {`${productFilter?.find(
-                              (el: any) => el.id === item?.shape_id
-                            )?.name
-                              }`} */}
-                                </div>
+
+            <hr className="m-0 h-px border-0 bg-line" />
+
+            {/* Options */}
+            {loadingOptions ? (
+              <>
+                {optionSkeleton}
+                {optionSkeleton}
+              </>
+            ) : (
+              <>
+                {productVariant?.length > 0 && (
+                  <OptionGroup label="Metal" value={findName(jewelryMetadata?.metal_type_id)}>
+                    <div className="flex flex-wrap gap-2">
+                      {productVariant.map((item: any) => (
+                        <ChoiceChip
+                          key={item?.id}
+                          active={jewelryMetadata?.metal_type_id === item?.id}
+                          onClick={() =>
+                            goToSku(
+                              getSkuSlug(
+                                productVariant,
+                                item?.id,
+                                selectedProductObject?.metal_color_id,
+                                selectedProductObject?.shape_id,
+                                selectedProductObject?.carat_id,
+                                selectedProductObject?.custom_stone_id,
+                                selectedProductObject?.center_diamond_id,
+                                selectedProductObject?.accent_diamond_id,
+                                selectedProductObject?.second_accent_diamond_id,
+                                String(selectedProductObject?.premade_carat_weight),
+                                selectedProductObject?.bracelet_length_ids ?? null,
+                                selectedProductObject?.band_width_ids ?? null,
+                              ),
+                            )
+                          }
+                        >
+                          {findName(item?.id)}
+                        </ChoiceChip>
+                      ))}
+                    </div>
+                  </OptionGroup>
+                )}
+
+                <OptionGroup label="Colour" value={selectedMetalColor?.replace('-', ' ')}>
+                  <MetalColorOptions
+                    productFilter={productFilter}
+                    productVariant={productVariant}
+                    selectedJewelryType={selectedJewelryType}
+                    slug={slug}
+                    selectedProductObject={selectedProductObject}
+                    productSKU={productSKU}
+                    selectedProduct={selectedProduct}
+                    goToSku={goToSku}
+                  />
+                </OptionGroup>
+
+                {customVariant?.length > 0 &&
+                  (!dId ? (
+                    <OptionGroup label="Shape" value={findName(jewelryMetadata?.shape_id)}>
+                      <div className="flex flex-wrap gap-2">
+                        {customVariant.map((item: any) => (
+                          <ImageSwatch
+                            key={item?.shape_id}
+                            active={jewelryMetadata?.shape_id === item?.shape_id}
+                            src={productFilter?.find((el: any) => el.id === item?.shape_id)?.image?.[0]}
+                            label={findName(item?.shape_id) ?? 'Shape'}
+                            onClick={() => {
+                              dispatch(setSelectedShapesData(item?.shape_id));
+                              goToSku(
+                                getSkuSlug(
+                                  selectedProductVariation,
+                                  selectedProductObject?.metal_type_id,
+                                  selectedProductObject?.metal_color_id,
+                                  item?.shape_id,
+                                  selectedProductObject?.carat_id,
+                                  selectedProductObject?.custom_stone_id,
+                                ),
                               );
-                            })}
-                          </div>
-                        </div>
+                            }}
+                          />
+                        ))}
                       </div>
-                    ) : (
-                      <>
-                        <Skeleton.Input active={true} size="small" />
-                        <div className="flex gap-3">
-                          <Skeleton.Button active={true} className="!rounded-none" />
-                          <Skeleton.Button active={true} className="!rounded-none" />
-                          <Skeleton.Button active={true} className="!rounded-none" />
-                        </div>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  customVariant?.length > 0 && (
-                    <>
-                      <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                        <div className="flex items-center justify-between gap-5 self-stretch">
-                          <Text size="textxl" className="!font-light !font-sans uppercase">
-                            Shape
-                            {/* -<span className="text-[16px] capitalize pl-1">{selectedDiamondStore?.shape_name}</span> */}
-                          </Text>
-                        </div>
-                        <div className={`!font-sans flex justify-center items-center !font-medium w-[35px] !aspect-square tracking-[1px]`}>
-                          <Tooltip title={selectedDiamondStore?.shape_name}>
-                            <Image
-                              height={30}
-                              className="object-contain"
-                              src={`${productFilter?.find((el: any) => el.name === selectedDiamondStore?.shape_name)?.image?.[0]}`}
-                              alt={`${productFilter?.find((el: any) => el.name === selectedDiamondStore?.shape_name)?.name}`}
-                              preview={false}
-                            />
-                          </Tooltip>
-                        </div>
+                    </OptionGroup>
+                  ) : (
+                    <OptionGroup label="Shape" value={selectedDiamondStore?.shape_name}>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ImageSwatch
+                          active
+                          src={productFilter?.find((el: any) => el.name === selectedDiamondStore?.shape_name)?.image?.[0]}
+                          label={selectedDiamondStore?.shape_name ?? 'Shape'}
+                        />
+                        {selectedDiamondStore?.carats && (
+                          <span className="border border-line px-3.5 py-2.5 text-[13px] tabular-nums text-ink">{selectedDiamondStore.carats} ct</span>
+                        )}
                       </div>
-                    </>
-                  )
+                    </OptionGroup>
+                  ))}
+
+                {!dId && customVariant?.length > 0 && diamondColorData?.length > 0 && (
+                  <OptionGroup label="Diamond colour" value={findName(jewelryMetadata?.custom_stone_id)}>
+                    <div className="flex flex-wrap gap-2">
+                      {diamondColorData.map((item: any) => (
+                        <ImageSwatch
+                          key={item?.id}
+                          active={jewelryMetadata?.custom_stone_id === item?.id}
+                          src={item?.image}
+                          label={findName(item?.id) ?? 'Diamond colour'}
+                          onClick={() =>
+                            goToSku(
+                              getSkuSlug(
+                                selectedProductVariation,
+                                selectedProductObject?.metal_type_id,
+                                selectedProductObject?.metal_color_id,
+                                selectedProductObject?.shape_id,
+                                selectedProductObject?.carat_id,
+                                item?.id,
+                              ),
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  </OptionGroup>
                 )}
-                {!dId && customVariant?.length > 0
-                  ? caratsData?.length > 0 && (
-                      <div className="hidden mt-2 flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                        <div className="flex items-center">
-                          <Text size="textxl" className="!font-light !font-sans uppercase ">
-                            Carats
-                          </Text>
-                          <span className="text-[16px] flex justify-center items-center ml-2 border border-gray-400 px-2 py-0.5 !min-w-[45px]">
-                            {`${parseFloat(productFilter?.find((el: any) => el.id === selectedProductObject?.carat_id)?.name)}`}
-                          </span>
-                        </div>
-                        <div className="w-full px-2">
-                          {caratsData.length < 4 ? (
-                            <div className="flex gap-[10px] -mx-2">
-                              {caratsData?.map((item: any, i: number) => {
-                                return (
-                                  <Button
-                                    key={i}
-                                    className={` !font-sans !px-1.5 flex justify-center items-center ${
-                                      jewelryMetadata?.carat_id === item?.carat_id
-                                        ? '!bg-[#818d64] border-none !text-white'
-                                        : 'border !border-[#818d64]'
-                                    } !font-medium !aspect-square tracking-[1px] cursor-pointer`}
-                                    onClick={async () => {
-                                      const new_slug = await getSkuSlug(
-                                        selectedProductVariation,
-                                        selectedProductObject?.metal_type_id,
-                                        selectedProductObject?.metal_color_id,
-                                        selectedProductObject?.shape_id,
-                                        item?.carat_id,
-                                        selectedProductObject?.custom_stone_id,
-                                      );
-                                      setSelectedCarat(i);
-                                      dispatch(setSelectedCaratsData([caratsData?.[i]?.carat_id, caratsData?.[i]?.carat_id]));
-                                      changeRouter(
-                                        searchParams?.get('id')
-                                          ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                          : // : `${selectedJewelryType}/${new_slug}`,
-                                            `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                      );
-                                    }}
-                                  >
-                                    <span>{`${productFilter?.find((el: any) => el.id === item?.carat_id)?.name}`}</span>
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <Slider
-                              aria-label="Carat Slider"
-                              min={0}
-                              className="diamond-slider"
-                              value={caratsData?.findIndex((el: any) => el.carat_id == selectedProductObject?.carat_id) ?? selectedCarat}
-                              max={caratsData?.length - 1}
-                              onChange={(_: any, value: any) => {
-                                const selectCarat = customVariant?.find((el: any) => el.shape_id == jewelryMetadata?.shape_id)?.carats?.[value];
-                                const caratSlug = selectCarat?.colors?.find((el: any) => el.id == jewelryMetadata?.custom_stone_id)?.sku_slug;
-                                setSelectedCarat(value);
-                                dispatch(setSelectedCaratsData([caratsData?.[value]?.carat_id, caratsData?.[value]?.carat_id]));
-                                changeRouter(
-                                  searchParams?.get('id')
-                                    ? `custom-jewelry?type=2&state=s&id=${caratSlug ?? selectCarat?.sku_slug}${dId ? `&did=${dId}` : ''}`
-                                    : // : `${selectedJewelryType}/${caratSlug ?? selectCarat?.sku_slug}`,
-                                      // : `${selectedJewelryType}/${new_slug}`,
-                                      `${selectedJewelryType}/premade?slug=${caratSlug ?? selectCarat?.sku_slug}`,
-                                );
-                              }}
-                              marks={productFilter
-                                ?.filter((mark: any) => caratsData?.map((el: any) => el.carat_id)?.includes(mark.id))
-                                ?.sort((a, b) => parseFloat(a.name) - parseFloat(b.name))
-                                ?.map((mark: any, i: number) => ({ value: Number(i), label: parseFloat(mark?.name).toString() }))}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    )
-                  : customVariant?.length > 0 && (
-                      <>
-                        <div className="flex mt-2 flex-col items-start gap-4 md:gap-[10px] self-stretch relative">
-                          <div className="flex items-center justify-between gap-5 self-stretch">
-                            <Text size="textxl" className="!font-light !font-sans uppercase">
-                              Carat
-                            </Text>
-                          </div>
-                          <div>
-                            <span className={`!font-sans !px-1.5 border !border-[#cacaca] !font-medium !aspect-square tracking-[1px] `}>
-                              {selectedDiamondStore?.carats}
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
+
+                {selectedProductObject?.center_diamond_id && centerStoneVariant?.length > 0 && (
+                  <OptionGroup label="Stone" value={findName(jewelryMetadata?.center_diamond_id)}>
+                    <div className="flex flex-wrap gap-2">
+                      {centerStoneVariant.map((item: any, i: number) => (
+                        <ImageSwatch
+                          key={`${item?.color?.id}-${i}`}
+                          round
+                          active={item?.color?.id === jewelryMetadata?.center_diamond_id}
+                          src={productFilter?.find((el: any) => el.id == item?.color?.id)?.image?.[0]}
+                          label={findName(item?.color?.id) ?? 'Stone'}
+                          onClick={() =>
+                            goToSku(
+                              getSkuSlug(
+                                productVariant,
+                                selectedProductObject?.metal_type_id,
+                                selectedProductObject?.metal_color_id,
+                                selectedProductObject?.shape_id,
+                                selectedProductObject?.carat_id,
+                                selectedProductObject?.custom_stone_id,
+                                item?.color?.id,
+                                selectedProductObject?.accent_diamond_id,
+                                selectedProductObject?.second_accent_diamond_id,
+                                String(selectedProductObject?.premade_carat_weight),
+                                selectedProductObject?.bracelet_length_ids ?? null,
+                                selectedProductObject?.band_width_ids ?? null,
+                              ),
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  </OptionGroup>
+                )}
+
+                {selectedProductObject?.accent_diamond_id && accentOneStoneVariant?.length > 0 && (
+                  <OptionGroup label="Accent stone" value={findName(jewelryMetadata?.accent_diamond_id)}>
+                    <div className="flex flex-wrap gap-2">
+                      {accentOneStoneVariant.map((item: any, i: number) => (
+                        <ImageSwatch
+                          key={`${item?.color?.id}-${i}`}
+                          round
+                          active={
+                            jewelryMetadata?.accent_diamond_id === item?.color?.id ||
+                            findName(jewelryMetadata?.accent_diamond_id) == findName(item?.color?.id)
+                          }
+                          src={productFilter?.find((el: any) => el.id == item?.color?.id)?.image?.[0]}
+                          label={findName(item?.color?.id) ?? 'Accent stone'}
+                          onClick={() =>
+                            goToSku(
+                              getSkuSlug(
+                                productVariant,
+                                selectedProductObject?.metal_type_id,
+                                selectedProductObject?.metal_color_id,
+                                selectedProductObject?.shape_id,
+                                selectedProductObject?.carat_id,
+                                selectedProductObject?.custom_stone_id,
+                                selectedProductObject?.center_diamond_id,
+                                item?.color?.id,
+                                selectedProductObject?.second_accent_diamond_id,
+                                String(selectedProductObject?.premade_carat_weight),
+                                selectedProductObject?.bracelet_length_ids ?? null,
+                                selectedProductObject?.band_width_ids ?? null,
+                              ),
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  </OptionGroup>
+                )}
+
+                {selectedProductObject?.second_accent_diamond_id && accentTwoStoneVariant?.length > 0 && (
+                  <OptionGroup label="Second accent stone" value={findName(jewelryMetadata?.second_accent_diamond_id)}>
+                    <div className="flex flex-wrap gap-2">
+                      {accentTwoStoneVariant.map((item: any, i: number) => (
+                        <ImageSwatch
+                          key={`${item?.color?.id}-${i}`}
+                          round
+                          active={
+                            jewelryMetadata?.second_accent_diamond_id === item?.color?.id ||
+                            findName(jewelryMetadata?.second_accent_diamond_id) == findName(item?.color?.id)
+                          }
+                          src={productFilter?.find((el: any) => el.id == item?.color?.id)?.image?.[0]}
+                          label={findName(item?.color?.id) ?? 'Accent stone'}
+                          onClick={() =>
+                            goToSku(
+                              getSkuSlug(
+                                productVariant,
+                                selectedProductObject?.metal_type_id,
+                                selectedProductObject?.metal_color_id,
+                                selectedProductObject?.shape_id,
+                                selectedProductObject?.carat_id,
+                                selectedProductObject?.custom_stone_id,
+                                selectedProductObject?.center_diamond_id,
+                                selectedProductObject?.accent_diamond_id,
+                                item?.color?.id,
+                                String(selectedProductObject?.premade_carat_weight),
+                                selectedProductObject?.bracelet_length_ids ?? null,
+                                selectedProductObject?.band_width_ids ?? null,
+                              ),
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  </OptionGroup>
+                )}
+
                 {preMadeCarats?.length > 0 && (
-                  <>
-                    <div className="flex mt-2 flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                      <div className="flex items-center justify-between gap-5 self-stretch">
-                        <Text size="textxl" className="!font-light !font-sans uppercase">
-                          Carats
-                        </Text>
-                      </div>
-
-                      <div className="flex gap-[10px] flex-wrap">
-                        {preMadeCarats
-                          ?.sort((a: any, b: any) => a - b)
-                          ?.map((item: any, i: number) => {
-                            return (
-                              <Button
-                                key={i}
-                                className={` !font-sans !px-1.5 flex justify-center items-center ${
-                                  jewelryMetadata?.premade_carat_weight == item
-                                    ? '!bg-secondary !border-none !text-white'
-                                    : 'border !border-secondary'
-                                } !font-medium !aspect-square sm:!aspect-auto  sm:!h-[30px] tracking-[1px] cursor-pointer`}
-                                onClick={async () => {
-                                  const new_slug = await getSkuSlug(
-                                    selectedProductVariation,
-                                    selectedProductObject?.metal_type_id,
-                                    selectedProductObject?.metal_color_id,
-                                    selectedProductObject?.shape_id,
-                                    selectedProductObject?.carat_id,
-                                    selectedProductObject?.custom_stone_id,
-                                    selectedProductObject?.center_diamond_id,
-                                    selectedProductObject?.accent_diamond_id,
-                                    selectedProductObject?.second_accent_diamond_id,
-                                    String(item),
-                                    selectedProductObject?.bracelet_length_ids ?? null,
-                                    selectedProductObject?.band_width_ids ?? null,
-                                  );
-
-                                  changeRouter(
-                                    searchParams?.get('id')
-                                      ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                      : // : `${selectedJewelryType}/${new_slug}`,
-                                        `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                  );
-                                }}
-                              >
-                                <span className="sm:min-w-[28px]">{item}</span>
-                              </Button>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  </>
-                )}
-                {preMadeBraceletLength?.length > 0 && (
-                  <>
-                    <div className="flex mt-2 flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                      <div className="flex items-center justify-between gap-5 self-stretch">
-                        <Text size="textxl" className="!font-light !font-sans">
-                          LENGTH - INCH
-                        </Text>
-                      </div>
-
-                      <div className="flex gap-[10px] flex-wrap">
-                        {preMadeBraceletLength
-                          // ?.sort((a: any, b: any) => a - b)
-                          ?.map((item: any, i: number) => {
-                            return (
-                              <Button
-                                key={i}
-                                className={` !font-sans !px-1.5 flex justify-center items-center ${
-                                  jewelryMetadata?.bracelet_length_ids == item?.id
-                                    ? '!bg-secondary !border-none !text-white'
-                                    : 'border !border-secondary'
-                                } !font-medium !aspect-square sm:!aspect-auto  sm:!h-[30px] tracking-[1px] cursor-pointer`}
-                                onClick={async () => {
-                                  const new_slug = await getSkuSlug(
-                                    selectedProductVariation,
-                                    selectedProductObject?.metal_type_id,
-                                    selectedProductObject?.metal_color_id,
-                                    selectedProductObject?.shape_id,
-                                    selectedProductObject?.carat_id,
-                                    selectedProductObject?.custom_stone_id,
-                                    selectedProductObject?.center_diamond_id,
-                                    selectedProductObject?.accent_diamond_id,
-                                    selectedProductObject?.second_accent_diamond_id,
-                                    selectedProductObject?.premade_carat_weight ?? null,
-                                    String(item.id),
-                                  );
-
-                                  changeRouter(
-                                    searchParams?.get('id')
-                                      ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                      : `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                  );
-                                }}
-                              >
-                                <span className="sm:min-w-[28px]">{`${productFilter?.find((el: any) => el.id === item?.id)?.name}`}</span>
-                              </Button>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* band width */}
-                {preMadeBandWidth?.length > 0 && (
-                  <>
-                    <div className="flex mt-2 flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                      <div className="flex items-center justify-between gap-5 self-stretch">
-                        <Text size="textxl" className="!font-light !font-sans">
-                          BAND WIDTH - mm
-                        </Text>
-                      </div>
-
-                      <div className="flex gap-[10px] flex-wrap">
-                        {preMadeBandWidth
-                          // ?.sort((a: any, b: any) => a - b)
-                          ?.map((item: any, i: number) => {
-                            return (
-                              <Button
-                                key={i}
-                                className={` !font-sans !px-1.5 flex justify-center items-center ${
-                                  jewelryMetadata?.band_width_ids == item?.id ? '!bg-secondary !border-none !text-white' : 'border !border-secondary'
-                                } !font-medium !aspect-square sm:!aspect-auto  sm:!h-[30px] tracking-[1px] cursor-pointer`}
-                                onClick={async () => {
-                                  const new_slug = await getSkuSlug(
-                                    selectedProductVariation,
-                                    selectedProductObject?.metal_type_id,
-                                    selectedProductObject?.metal_color_id,
-                                    selectedProductObject?.shape_id,
-                                    selectedProductObject?.carat_id,
-                                    selectedProductObject?.custom_stone_id,
-                                    selectedProductObject?.center_diamond_id,
-                                    selectedProductObject?.accent_diamond_id,
-                                    selectedProductObject?.second_accent_diamond_id,
-                                    selectedProductObject?.premade_carat_weight ?? null,
-                                    selectedProductObject?.premade_bracelet_length ?? null,
-                                    String(item.id),
-                                  );
-
-                                  changeRouter(
-                                    searchParams?.get('id')
-                                      ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                      : `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                  );
-                                }}
-                              >
-                                <span className="sm:min-w-[28px]">{`${productFilter?.find((el: any) => el.id === item?.id)?.name}`}</span>
-                              </Button>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  </>
-                )}
-                {!dId && customVariant?.length > 0
-                  ? diamondColorData?.length > 0 && (
-                      <div className="flex mt-2 flex-col items-start gap-5 md:gap-[10px] self-stretch relative">
-                        <div className="flex items-center justify-between gap-5 self-stretch">
-                          <Text size="textxl" className="!font-light !font-sans uppercase">
-                            Diamond Color -
-                            <span className="text-[18px] capitalize pl-1">
-                              {`${productFilter?.find((el: any) => el.id === jewelryMetadata?.custom_stone_id)?.name}`}
-                            </span>
-                          </Text>
-                        </div>
-                        <div className="flex gap-[8px]">
-                          {diamondColorData?.map((item: any, i: number) => {
-                            return (
-                              <div
-                                key={i}
-                                className={`!font-sans flex justify-center items-center ${
-                                  (isSilverMetal ? jewelryMetadata?.custom_stone_id === item?.id : jewelryMetadata?.custom_stone_id === item?.id)
-                                    ? 'opacity-100 border-[#17381d]'
-                                    : 'opacity-70 border-transparent'
-                                } !font-medium w-[40px] !aspect-square tracking-[1px] cursor-pointer border-b pb-1`}
-                                onClick={async () => {
-                                  const new_slug = await getSkuSlug(
-                                    selectedProductVariation,
-                                    selectedProductObject?.metal_type_id,
-                                    selectedProductObject?.metal_color_id,
-                                    selectedProductObject?.shape_id,
-                                    selectedProductObject?.carat_id,
-                                    item?.id,
-                                  );
-                                  changeRouter(
-                                    searchParams?.get('id')
-                                      ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                      : // : `${selectedJewelryType}/${new_slug}`,
-                                        `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                  );
-                                }}
-                              >
-                                <Image
-                                  height={30}
-                                  src={item?.image}
-                                  fallback="/images/no_images.svg"
-                                  alt={`${productFilter?.find((el: any) => el.id === item?.custom_stone_id)?.name}`}
-                                  preview={false}
-                                />
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )
-                  : customVariant?.length > 0 && (
-                      <>
-                        {/* <div className="flex mt-2 flex-col items-start gap-4 md:gap-[10px] self-stretch relative">
-                        <div className="flex items-center justify-between gap-5 self-stretch">
-                          <Text size="textxl" className="!font-light !font-sans uppercase">
-                            Diamond Color
-                            -<span className="text-[16px] capitalize pl-1">{selectedDiamondStore?.carats}</span>
-                          </Text>
-                        </div>
-                        <div>
-                          <span className={`!font-sans !px-1.5 border !border-[#cacaca] !font-medium !aspect-square tracking-[1px] `}>
-                            {selectedDiamondStore?.carats}
-                          </span>
-                        </div>
-                      </div> */}
-                      </>
-                    )}
-                {product?.jewelry_id ? (
-                  <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                    <div className="flex items-center justify-between gap-5 self-stretch">
-                      <Text size="textxl" className="!font-light !font-sans">
-                        METAL
-                      </Text>
-                    </div>
-                    <div>
-                      <div className="flex gap-[10px]">
-                        {productVariant?.map((item: any, i: number) => {
-                          return (
-                            <Button
-                              key={i}
-                              className={`!font-sans !px-1.5 ${
-                                (isSilverMetal ? jewelryMetadata?.metal_type_id === item?.id : jewelryMetadata?.metal_type_id === item?.id)
-                                  ? '!bg-secondary !border-none !text-white'
-                                  : 'border !border-secondary'
-                              } !font-medium !aspect-square sm:!aspect-auto sm:!h-[30px] tracking-[1px] cursor-pointer`}
-                              onClick={async () => {
-                                const new_slug = await getSkuSlug(
-                                  productVariant,
-                                  item?.id,
+                  <OptionGroup
+                    label="Carat weight"
+                    value={jewelryMetadata?.premade_carat_weight ? `${jewelryMetadata.premade_carat_weight} ct` : undefined}
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      {[...preMadeCarats]
+                        .sort((a: any, b: any) => a - b)
+                        .map((item: any) => (
+                          <ChoiceChip
+                            key={item}
+                            active={jewelryMetadata?.premade_carat_weight == item}
+                            onClick={() =>
+                              goToSku(
+                                getSkuSlug(
+                                  selectedProductVariation,
+                                  selectedProductObject?.metal_type_id,
                                   selectedProductObject?.metal_color_id,
                                   selectedProductObject?.shape_id,
                                   selectedProductObject?.carat_id,
@@ -2257,577 +1671,220 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
                                   selectedProductObject?.center_diamond_id,
                                   selectedProductObject?.accent_diamond_id,
                                   selectedProductObject?.second_accent_diamond_id,
-                                  String(selectedProductObject?.premade_carat_weight),
+                                  String(item),
                                   selectedProductObject?.bracelet_length_ids ?? null,
                                   selectedProductObject?.band_width_ids ?? null,
-                                );
-                                changeRouter(
-                                  searchParams?.get('id')
-                                    ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                    : // : `${selectedJewelryType}/${new_slug}`,
-                                      `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                );
-                              }}
-                            >
-                              {`${productFilter?.find((el: any) => el.id === item?.id)?.name}`}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <Skeleton.Input active={true} size="small" />
-                    <div className="flex gap-3">
-                      <Skeleton.Button active={true} className="!rounded-none" />
-                      <Skeleton.Button active={true} className="!rounded-none" />
-                      <Skeleton.Button active={true} className="!rounded-none" />
-                    </div>
-                  </>
-                )}
-                {product?.jewelry_id ? (
-                  <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                    <div className="flex items-center justify-between gap-[10px] self-stretch">
-                      <Text size="textxl" className="!font-light !font-sans">
-                        METAL COLOR <span className="!font-light !font-sans">- {selectedMetalColor?.replace('-', ' ')}</span>
-                      </Text>
-                    </div>
-
-                    <MetalColorOptions
-                      productFilter={productFilter}
-                      productVariant={productVariant}
-                      selectedMetalType={selectedMetalType}
-                      selectedJewelryType={selectedJewelryType}
-                      slug={slug}
-                      selectedProductObject={selectedProductObject}
-                      sId={searchParams?.get('id')}
-                      dId={dId}
-                      selectedMetalColor={selectedMetalColor}
-                      productSKU={productSKU}
-                      selectedProduct={selectedProduct}
-                      changeRouter={changeRouter}
-                    />
-                  </div>
-                ) : (
-                  <>
-                    <Skeleton.Input active={true} size="small" />
-                    <div className="flex gap-3">
-                      <Skeleton.Button active={true} className="!rounded-none" />
-                      <Skeleton.Button active={true} className="!rounded-none" />
-                      <Skeleton.Button active={true} className="!rounded-none" />
-                    </div>
-                  </>
-                )}
-                {selectedProductObject?.center_diamond_id ? (
-                  product?.jewelry_id ? (
-                    <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                      <div className="flex items-center justify-between gap-5 self-stretch">
-                        {jewelryMetadata?.center_diamond_id && (
-                          <Text size="textxl" className="!font-light !font-sans uppercase">
-                            STONE COLOR
-                          </Text>
-                        )}
-                      </div>
-                      <div className="flex flex-wrap w-full gap-[5px]">
-                        {centerStoneVariant &&
-                          // _.uniqBy(centerStoneVariant, (el: any) => el.color?.name)
-                          centerStoneVariant?.map((item: any, i: number) => {
-                            return (
-                              <div
-                                key={i}
-                                className={`!font-sans flex gap-1 flex-col justify-center items-center !px-1 border-[1.5px] rounded-full ${
-                                  item?.color?.id === jewelryMetadata?.center_diamond_id ? 'border-[#17381d]' : 'border-transparent'
-                                } !font-medium !aspect-square tracking-[1px] cursor-pointer`}
-                                onClick={async () => {
-                                  const new_slug = await getSkuSlug(
-                                    productVariant,
-                                    selectedProductObject?.metal_type_id,
-                                    selectedProductObject?.metal_color_id,
-                                    selectedProductObject?.shape_id,
-                                    selectedProductObject?.carat_id,
-                                    selectedProductObject?.custom_stone_id,
-                                    item?.color?.id,
-                                    selectedProductObject?.accent_diamond_id,
-                                    selectedProductObject?.second_accent_diamond_id,
-                                    String(selectedProductObject?.premade_carat_weight),
-                                    selectedProductObject?.bracelet_length_ids ?? null,
-                                    selectedProductObject?.band_width_ids ?? null,
-                                  );
-                                  changeRouter(
-                                    searchParams?.get('id')
-                                      ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                      : `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                  );
-                                }}
-                              >
-                                <Tooltip title={productFilter?.find((el: any) => el.id === item?.color?.id)?.name}>
-                                  <Image
-                                    src={`${productFilter?.find((el: any) => el.id == item?.color?.id)?.image?.[0]}`}
-                                    fallback={'/images/no_images.svg'}
-                                    alt={`${item?.name}-img`}
-                                    width={30}
-                                    height={30}
-                                    preview={false}
-                                    className="h-[70px] w-[70px] object-cover"
-                                  />
-                                </Tooltip>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <Skeleton.Input active={true} size="small" />
-                      <div className="flex gap-3">
-                        <Skeleton.Node active={true} className="max-w-[70px] max-h-[70px] !rounded-none" />
-                      </div>
-                    </>
-                  )
-                ) : null}
-
-                {selectedProductObject?.accent_diamond_id ? (
-                  product?.jewelry_id ? (
-                    <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                      <div className="flex items-center justify-between gap-5 self-stretch">
-                        {jewelryMetadata?.accent_diamond_id && (
-                          <Text size="textxl" className="!font-light !font-sans uppercase">
-                            Accent Stone
-                          </Text>
-                        )}
-                      </div>
-                      <div>
-                        <div className="grid lg:grid-cols-3 grid-cols-6 sm:grid-cols-4 gap-[5px]">
-                          {accentOneStoneVariant &&
-                            // _.uniqBy(accentOneStoneVariant, (el: any) => el.color?.name)
-                            accentOneStoneVariant?.map((item: any, i: number) => {
-                              return (
-                                <div
-                                  key={i}
-                                  className={`!font-sans flex gap-1 flex-col justify-center items-center !px-1 border-[1.5px] rounded-full ${
-                                    (isSilverMetal
-                                      ? jewelryMetadata?.accent_diamond_id === item?.color?.id
-                                      : jewelryMetadata?.accent_diamond_id === item?.color?.id) ||
-                                    productFilter?.find((el: any) => el.id == jewelryMetadata.accent_diamond_id)?.name ==
-                                      productFilter?.find((el: any) => el.id == item?.color?.id)?.name
-                                      ? 'border-[#17381d]'
-                                      : 'border-transparent'
-                                  } !font-medium !aspect-square tracking-[1px] cursor-pointer`}
-                                  onClick={async () => {
-                                    const new_slug = await getSkuSlug(
-                                      productVariant,
-                                      selectedProductObject?.metal_type_id,
-                                      selectedProductObject?.metal_color_id,
-                                      selectedProductObject?.shape_id,
-                                      selectedProductObject?.carat_id,
-                                      selectedProductObject?.custom_stone_id,
-                                      selectedProductObject?.center_diamond_id,
-                                      item?.color?.id,
-                                      selectedProductObject?.second_accent_diamond_id,
-                                      String(selectedProductObject?.premade_carat_weight),
-                                      selectedProductObject?.bracelet_length_ids ?? null,
-                                      selectedProductObject?.band_width_ids ?? null,
-                                    );
-                                    changeRouter(
-                                      searchParams?.get('id')
-                                        ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                        : `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                    );
-                                  }}
-                                >
-                                  <Tooltip title={productFilter?.find((el: any) => el.id === item?.color?.id)?.name}>
-                                    <Image
-                                      src={`${productFilter?.find((el: any) => el.id == item?.color?.id)?.image?.[0]}`}
-                                      alt={`${i}-img`}
-                                      width={30}
-                                      height={30}
-                                      preview={false}
-                                      className="h-[70px] w-[70px] object-cover"
-                                    />
-                                  </Tooltip>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <Skeleton.Input active={true} size="small" />
-                      <div className="flex gap-3">
-                        <Skeleton.Node active={true} className="max-w-[70px] max-h-[70px] !rounded-none" />
-                      </div>
-                    </>
-                  )
-                ) : null}
-                {selectedProductObject?.second_accent_diamond_id ? (
-                  product?.jewelry_id ? (
-                    <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                      <div className="flex items-center justify-between gap-5 self-stretch">
-                        {jewelryMetadata?.second_accent_diamond_id && (
-                          <Text size="textxl" className="!font-light !font-sans uppercase">
-                            Accent Stone 2
-                          </Text>
-                        )}
-                      </div>
-                      <div>
-                        <div className="grid lg:grid-cols-3 grid-cols-6 sm:grid-cols-4 gap-[5px]">
-                          {accentTwoStoneVariant &&
-                            // _.uniqBy(accentTwoStoneVariant, (el: any) => el.color?.name)
-                            accentTwoStoneVariant?.map((item: any, i: number) => {
-                              return (
-                                <div
-                                  key={i}
-                                  className={`!font-sans gap-1 flex flex-col justify-center items-center !px-1 border-[1.5px] rounded-full ${
-                                    (isSilverMetal
-                                      ? jewelryMetadata?.second_accent_diamond_id === item?.color?.id
-                                      : jewelryMetadata?.second_accent_diamond_id === item?.color?.id) ||
-                                    productFilter?.find((el: any) => el.id == jewelryMetadata.second_accent_diamond_id)?.name ==
-                                      productFilter?.find((el: any) => el.id == item?.color?.id)?.name
-                                      ? 'border-[#17381d]'
-                                      : 'border-transparent'
-                                  } !font-medium !aspect-square tracking-[1px] cursor-pointer`}
-                                  onClick={async () => {
-                                    const new_slug = await getSkuSlug(
-                                      productVariant,
-                                      selectedProductObject?.metal_type_id,
-                                      selectedProductObject?.metal_color_id,
-                                      selectedProductObject?.shape_id,
-                                      selectedProductObject?.carat_id,
-                                      selectedProductObject?.custom_stone_id,
-                                      selectedProductObject?.center_diamond_id,
-                                      selectedProductObject?.accent_diamond_id,
-                                      item?.color?.id,
-                                      String(selectedProductObject?.premade_carat_weight),
-                                      selectedProductObject?.bracelet_length_ids ?? null,
-                                      selectedProductObject?.band_width_ids ?? null,
-                                    );
-                                    changeRouter(
-                                      searchParams?.get('id')
-                                        ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                                        : // : `${selectedJewelryType}/${new_slug}`,
-                                          `${selectedJewelryType}/premade?slug=${new_slug}`,
-                                    );
-                                  }}
-                                >
-                                  <Tooltip title={productFilter?.find((el: any) => el.id === item?.color?.id)?.name}>
-                                    <Image
-                                      src={`${productFilter?.find((el: any) => el.id == item?.color?.id)?.image?.[0]}`}
-                                      alt={`${i}-img`}
-                                      width={30}
-                                      height={30}
-                                      preview={false}
-                                      className="h-[70px] w-[70px] object-cover"
-                                    />
-                                  </Tooltip>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <Skeleton.Input active={true} size="small" />
-                      <div className="flex gap-3">
-                        <Skeleton.Node active={true} className="max-w-[70px] max-h-[70px]" />
-                      </div>
-                    </>
-                  )
-                ) : null}
-
-                {product?.jewelry_id ? (
-                  <div className="hidden flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                    <div className="flex items-center justify-between gap-5 self-stretch">
-                      <Text size="textxl" className="!font-light !font-sans">
-                        CARAT WEIGHT
-                      </Text>
-                    </div>
-                    <div className="w-full">
-                      <div className="flex flex-col gap-1.5 self-stretch">
-                        <div className="flex flex-wrap gap-[10px]">
-                          {productFilter
-                            ?.filter((obj) => productVariant?.carat_id?.includes(obj.id))
-                            ?.map((item: any, i: number) => {
-                              return (
-                                <div
-                                  key={i}
-                                  className={`!font-sans flex items-center justify-center p-2 w-10 ${
-                                    productSKU?.diamondCarat == item?.code ? 'bg-[#818d64] border-none text-white' : 'border border-[#cacaca]'
-                                  } !font-medium !aspect-square cursor-pointer`}
-                                >
-                                  {`${item?.name}`}
-                                </div>
-                              );
-                            })}
-                          {[1, 1.5, 2, 2.5, 3]?.map((item: any, i: number) => {
-                            return (
-                              <div
-                                key={i}
-                                className={`!font-sans flex items-center justify-center p-2 w-10 ${
-                                  productSKU?.diamondCarat == item?.code ? 'bg-[#818d64] border-none text-white' : 'border border-[#cacaca]'
-                                } !font-medium !aspect-square cursor-pointer`}
-                              >
-                                {`${item}`}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <Skeleton.Input active={true} size="small" />
-                    <Skeleton.Input active={true} size="small" block />
-                  </>
-                )}
-                {product?.jewelry_id ? (
-                  IsRingSizeType?.includes(selectedProduct?.subType?.jewelry_type?.name) ? (
-                    <div className="flex flex-col items-start gap-[14px] md:gap-[10px] self-stretch relative">
-                      <div className="flex items-center justify-between gap-5 self-stretch">
-                        <Text size="textxl" className="!font-light !font-sans">
-                          RING SIZE
-                        </Text>
-                      </div>
-
-                      <div className="w-full">
-                        <div className="flex gap-[10px] self-stretch">
-                          <Select
-                            // showSearch
-                            className={`!w-[150px] ${errorMessage ? '!outline !outline-red-500' : ''}`}
-                            placeholder="Select a Ring Size"
-                            defaultValue={ringSizeMaster?.[0]?.value}
-                            value={
-                              searchParams?.get('id')
-                                ? selectedRingSize
-                                  ? selectedRingSize
-                                  : null
-                                : !selectedRingSizeRedux
-                                  ? null
-                                  : selectedRingSizeRedux
+                                ),
+                              )
                             }
-                            onChange={(value: number | string) => {
-                              setSelectedSize(value);
-                              if (searchParams?.get('id')) {
-                                dispatch(setSelectedRingSize(value));
-                              } else {
-                                dispatch(setSelectedRingSizeRedux(value));
-                              }
-                              dispatch(setSelectedRingSizeId(ringSizeMasterData?.find((el: any) => el?.name == value)?.id));
-                              if (value !== 0) {
-                                setCustomRingSize(''); // Clear custom size if not "Other Size"
-                                setErrorMessage('');
-                              }
-                            }}
-                            // filterOption={(input, option) => ((option?.label) ?? '').toLowerCase().includes(input.toLowerCase())}
-                            // filterOption={(input, option) => {
-                            //   // Extract both name and rate from the label
-                            //   const labelText = option?.label ? option.label.props.children.join(' ') : ''; // Combining both name and rate
-                            //   console.log(labelText.toString().toLowerCase().includes(input.toLowerCase()));
-
-                            //   return labelText.toString().toLowerCase().includes(input.toLowerCase());
-                            // }}
-                            options={ringSizeMaster}
-                          />
-                          {selectedSize === 0 && (
-                            <div className="relative">
-                              <Input
-                                maxLength={5}
-                                value={customRingSize}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                  if (searchParams?.get('id')) {
-                                    dispatch(setSelectedRingSize(e.target.value));
-                                  }
-                                  setCustomRingSize(e.target.value);
-                                  setErrorMessage('');
-                                }}
-                                placeholder="Size Eg. 4.25"
-                                className={`!w-[150px] ${errorMessage ? '!border !border-red-500' : ''}`}
-                              />
-                              {/* Show error message if validation fails */}
-                              {errorMessage && (
-                                <Text className="!text-[10px] text-nowrap absolute" style={{ color: 'red', marginTop: '8px' }}>
-                                  {errorMessage}
-                                </Text>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        {errorMessage && (
-                          <div className="relative">
-                            <Text className="!text-[10px] text-nowrap absolute" style={{ color: 'red', marginTop: '8px' }}>
-                              {errorMessage}
-                            </Text>
-                          </div>
-                        )}
-                      </div>
+                          >
+                            {item}
+                          </ChoiceChip>
+                        ))}
                     </div>
-                  ) : (
-                    ''
-                  )
-                ) : (
-                  <>
-                    <Skeleton.Input active={true} size="small" />
-                    <Skeleton.Button active={true} block />
-                  </>
+                  </OptionGroup>
                 )}
-              </div>
-            </div>
-          </div>
-          {!searchParams?.get('id') && (
-            <>
-              {selectedProduct?.is_engraving ? <Engraving setEngravingText={setEngravingText} engravingText={engravingText} /> : null}
-              {productDetailsSection}
-              {/* Expandable Box */}
-              {product?.jewelry_id ? (
-                <>
-                  <div className=" border p-4">
-                    <div
-                      className="!cursor-pointer font-medium !text-[#707070] flex items-center justify-between"
-                      onClick={() => setIsExpanded(!isExpanded)}
-                    >
-                      <Text size="textxl" className="!font-light  !cursor-pointer !font-sans">
-                        APPRAISAL & WARRANTY
-                      </Text>
-                      {isExpanded ? (
-                        <FiMinus className="h-[18px] w-[18px] cursor-pointer" />
-                      ) : (
-                        <FiPlus className="h-[18px] w-[18px] cursor-pointer" />
+
+                {preMadeBraceletLength?.length > 0 && (
+                  <OptionGroup label="Length" value="inches">
+                    <div className="flex flex-wrap gap-2">
+                      {preMadeBraceletLength.map((item: any) => (
+                        <ChoiceChip
+                          key={item?.id}
+                          active={jewelryMetadata?.bracelet_length_ids == item?.id}
+                          onClick={() =>
+                            goToSku(
+                              getSkuSlug(
+                                selectedProductVariation,
+                                selectedProductObject?.metal_type_id,
+                                selectedProductObject?.metal_color_id,
+                                selectedProductObject?.shape_id,
+                                selectedProductObject?.carat_id,
+                                selectedProductObject?.custom_stone_id,
+                                selectedProductObject?.center_diamond_id,
+                                selectedProductObject?.accent_diamond_id,
+                                selectedProductObject?.second_accent_diamond_id,
+                                selectedProductObject?.premade_carat_weight ?? null,
+                                String(item.id),
+                              ),
+                            )
+                          }
+                        >
+                          {findName(item?.id)}
+                        </ChoiceChip>
+                      ))}
+                    </div>
+                  </OptionGroup>
+                )}
+
+                {preMadeBandWidth?.length > 0 && (
+                  <OptionGroup label="Band width" value="mm">
+                    <div className="flex flex-wrap gap-2">
+                      {preMadeBandWidth.map((item: any) => (
+                        <ChoiceChip
+                          key={item?.id}
+                          active={jewelryMetadata?.band_width_ids == item?.id}
+                          onClick={() =>
+                            goToSku(
+                              getSkuSlug(
+                                selectedProductVariation,
+                                selectedProductObject?.metal_type_id,
+                                selectedProductObject?.metal_color_id,
+                                selectedProductObject?.shape_id,
+                                selectedProductObject?.carat_id,
+                                selectedProductObject?.custom_stone_id,
+                                selectedProductObject?.center_diamond_id,
+                                selectedProductObject?.accent_diamond_id,
+                                selectedProductObject?.second_accent_diamond_id,
+                                selectedProductObject?.premade_carat_weight ?? null,
+                                selectedProductObject?.premade_bracelet_length ?? null,
+                                String(item.id),
+                              ),
+                            )
+                          }
+                        >
+                          {findName(item?.id)}
+                        </ChoiceChip>
+                      ))}
+                    </div>
+                  </OptionGroup>
+                )}
+
+                {isRingSizeProduct && (
+                  <OptionGroup label="Ring size">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:grid-cols-1">
+                      <Select
+                        id="pdp-ring-size"
+                        status={errorMessage ? 'error' : undefined}
+                        placeholder="Select a ring size"
+                        value={isCustomFlow ? (selectedRingSize ? selectedRingSize : null) : !selectedRingSizeRedux ? null : selectedRingSizeRedux}
+                        onChange={(value: number | string) => {
+                          setSelectedSize(value);
+                          if (isCustomFlow) {
+                            dispatch(setSelectedRingSize(value));
+                          } else {
+                            dispatch(setSelectedRingSizeRedux(value));
+                          }
+                          dispatch(setSelectedRingSizeId(ringSizeMasterData?.find((el: any) => el?.name == value)?.id));
+                          if (value !== 0) {
+                            setCustomRingSize(''); // Clear custom size if not "Other Size"
+                            setErrorMessage('');
+                          }
+                        }}
+                        options={ringSizeMaster}
+                        className="w-full"
+                      />
+                      {selectedSize === 0 && (
+                        <Input
+                          id="pdp-custom-ring-size"
+                          maxLength={5}
+                          value={customRingSize}
+                          status={errorMessage ? 'error' : undefined}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            if (isCustomFlow) {
+                              dispatch(setSelectedRingSize(e.target.value));
+                            }
+                            setCustomRingSize(e.target.value);
+                            setErrorMessage('');
+                          }}
+                          placeholder="Your size, e.g. 4.25"
+                          className="!w-[160px] sm:!w-full"
+                        />
                       )}
                     </div>
-                    <div
-                      className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-                    >
-                      <div className="mt-4 flex flex-col gap-2 !text-[#707070]">
-                        <Checkbox checked={isChecked} onChange={handleCheckboxChange} className="mb-2">
-                          <Text className="!font-light !font-sans text-lg">{warrantyData?.warrantyName}</Text>
-                        </Checkbox>
-
-                        {isChecked && (
-                          <Radio.Group onChange={handleRadioChange} value={selectedYear}>
-                            <div className="grid grid-cols-2 gap-2 ml-1">
-                              {warrantyData?.yearPriceList?.map((item: any) => (
-                                <Radio key={item?.year} value={item?.year} className="col-span-1" checked={item?.year === selectedYear}>
-                                  {item?.year} Year (+ ${item?.price})
-                                </Radio>
-                              ))}
-                            </div>
-                          </Radio.Group>
-                        )}
-                        <Checkbox onChange={handleAppraisalChange} checked={is_appraisal}>
-                          <Text className="!font-light !font-sans text-lg">{`${appraisalData?.appraisalName} (+ $${appraisalData?.price})`}</Text>
-                        </Checkbox>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Skeleton.Input active={true} size="small" />
-                </>
-              )}
-
-              <div className="flex flex-col gap-3 md:gap-[1px]">
-                {product?.estimated_delivery_days || jewelryMetadata?.handling_dates?.length >= 0 ? (
-                  selectedJewelryType == 'engagement-rings' || selectedJewelryType == 'wedding-bands' ? (
-                    <>
-                      {jewelryMetadata?.handling_dates && jewelryMetadata?.handling_dates?.length !== 0 && (
-                        <Text size="textmd" className="!text-[#707070] flex gap-2 items-center">
-                          <span className="flex items-center gap-2">
-                            <span>
-                              {' '}
-                              <BsBoxSeam className="h-5 w-5" />{' '}
-                            </span>{' '}
-                            Usually ships within{' '}
-                            {jewelryMetadata?.handling_dates?.find((el: any) => el.ring_size_id == selectedRingSizeId)?.shipping_date ??
-                              jewelryMetadata?.handling_dates?.[0]?.shipping_date}{' '}
-                            to{' '}
-                            {(jewelryMetadata?.handling_dates?.find((el: any) => el.ring_size_id == selectedRingSizeId)?.shipping_date ??
-                              jewelryMetadata?.handling_dates?.[0]?.shipping_date) + 1}{' '}
-                            days
-                          </span>
-                        </Text>
-                      )}
-                      <Text size="textmd" className="!text-[#707070] flex gap-2 items-center">
-                        <span>
-                          {' '}
-                          <PiTruck className="h-5 w-5" />
-                        </span>{' '}
-                        Estimated Delivery Date:{' '}
-                        {jewelryMetadata?.handling_dates?.findIndex((el: any) => el.ring_size_id == selectedRingSizeId) >= 0
-                          ? jewelryMetadata?.handling_dates?.find((el: any) => el.ring_size_id == selectedRingSizeId)?.estimation_date
-                          : (jewelryMetadata?.handling_dates?.[0]?.estimation_date ??
-                            dayjs().add(product?.estimated_delivery_days, 'day').format('MMMM DD, YYYY'))}
-                      </Text>
-                    </>
-                  ) : (
-                    <>
-                      <Text size="textmd" className="!text-[#707070] flex gap-2 items-center">
-                        {jewelryMetadata?.handling_dates && jewelryMetadata?.handling_dates?.length !== 0 && (
-                          <span className="flex items-center gap-2">
-                            <span>
-                              {' '}
-                              <BsBoxSeam className="h-5 w-5" />{' '}
-                            </span>{' '}
-                            Usually ships within {jewelryMetadata?.handling_dates?.[0]?.shipping_date} to{' '}
-                            {jewelryMetadata?.handling_dates?.[0]?.shipping_date + 1} days
-                          </span>
-                        )}
-                      </Text>
-                      <Text size="textmd" className="!text-[#707070] flex gap-2 items-center">
-                        <span>
-                          {' '}
-                          <PiTruck className="h-5 w-5" />
-                        </span>{' '}
-                        Estimated Delivery Date:{' '}
-                        {jewelryMetadata?.handling_dates?.length > 0
-                          ? jewelryMetadata?.handling_dates?.[0]?.estimation_date
-                          : dayjs().add(product?.estimated_delivery_days, 'day').format('MMMM DD, YYYY')}
-                      </Text>
-                    </>
-                  )
-                ) : (
-                  <>
-                    <Skeleton.Input active={true} block={true} size="small" />
-                  </>
+                    {errorMessage && (
+                      <p role="alert" className="m-0 text-[12px] text-danger">
+                        {errorMessage}
+                      </p>
+                    )}
+                  </OptionGroup>
                 )}
-              </div>
-            </>
-          )}
-
-          {affirmPriceInCents >= 5000 &&
-            (!searchParams?.get('id') || dId) &&
-            (typeof window === 'undefined' || (localStorage.getItem('currency') || 'USD') === 'USD') && (
-              <p className="affirm-as-low-as mt-2" data-page-type="product" data-amount={affirmPriceInCents} />
+              </>
             )}
 
-          {searchParams?.get('id') ? productDetailsSection : null}
+            {!isCustomFlow && selectedProduct?.is_engraving ? (
+              <PdpEngraving setEngravingText={setEngravingText} engravingText={engravingText} />
+            ) : null}
 
-          <div className="flex flex-col gap-2 md:gap-[1px]">
-            {product?.jewelry_id ? (
-              <>
-                {!searchParams?.get('id') ? (
-                  <div className="flex items-center justify-between gap-2">
+            {!isCustomFlow && product?.jewelry_id && (warrantyData?.warrantyName || appraisalData?.appraisalName) && (
+              <OptionGroup label="Protect your piece">
+                <div className="grid gap-3 border border-line p-4">
+                  {warrantyData?.warrantyName && (
+                    <Checkbox checked={isChecked} onChange={handleCheckboxChange}>
+                      <span className="text-[13px] text-ink-soft">{warrantyData.warrantyName}</span>
+                    </Checkbox>
+                  )}
+                  {isChecked && (
+                    <Radio.Group onChange={handleRadioChange} value={selectedYear} className="!ml-6 grid grid-cols-2 gap-2 sm:grid-cols-1">
+                      {warrantyData?.yearPriceList?.map((item: any) => (
+                        <Radio key={item?.year} value={item?.year}>
+                          <span className="text-[13px] tabular-nums text-ink-soft">
+                            {item?.year} year{item?.year > 1 ? 's' : ''} (+{formatCurrency(item?.price)})
+                          </span>
+                        </Radio>
+                      ))}
+                    </Radio.Group>
+                  )}
+                  {appraisalData?.appraisalName && (
+                    <Checkbox onChange={handleAppraisalChange} checked={is_appraisal}>
+                      <span className="text-[13px] text-ink-soft">
+                        {appraisalData.appraisalName} (+{formatCurrency(appraisalData?.price)})
+                      </span>
+                    </Checkbox>
+                  )}
+                </div>
+              </OptionGroup>
+            )}
+
+            {/* Actions */}
+            <div ref={ctaRef} className="grid gap-2.5">
+              {product?.jewelry_id ? (
+                !isCustomFlow ? (
+                  <>
                     <Button
-                      type="default"
-                      className="w-full !text-text_w !bg-secondary lg:text-[18px] sm:px-4 uppercase tracking-[1px] mt-1 border-2 "
+                      type="primary"
+                      block
                       loading={loading}
                       onClick={handleAddtocart}
                       disabled={count < 1}
+                      className="!h-14 !border-ink !bg-ink !text-[11px] !uppercase !tracking-[0.22em] !text-paper hover:!border-ink-hover hover:!bg-ink-hover"
                     >
-                      Continue
+                      {buyLabel}
+                      {hasPrice ? ` · ${formatCurrency(finalPrice)}` : ''}
                     </Button>
-                    <Button
-                      type="default"
-                      className="w-full !bg-text_w !text-secondary lg:text-[18px] sm:px-4 uppercase tracking-[1px] mt-1 border-2 "
-                      // onClick={handleAddtocart}
+                    <div className="grid grid-cols-[minmax(0,1fr)_56px] gap-2.5">
+                      <Link
+                        href="/virtual-appointment"
+                        className="inline-flex h-14 items-center justify-center gap-3 border border-ink bg-transparent text-[11px] font-medium uppercase tracking-[0.2em] text-ink transition-colors duration-300 hover:bg-ink hover:text-paper hover:text-paper"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4 fill-none stroke-current stroke-[1.2]">
+                          <path d="M3 6.5h13v11H3zM16 10.5l5-3v9l-5-3z" />
+                        </svg>
+                        Try it on over video
+                      </Link>
+                      <button
+                        type="button"
+                        aria-pressed={isWishlisted}
+                        aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+                        onClick={toggleWishlist}
+                        className="grid h-14 w-14 place-items-center border border-ink text-ink transition-colors hover:bg-ink hover:text-paper"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden
+                          className={`h-5 w-5 stroke-current stroke-[1.2] ${isWishlisted ? 'fill-ink' : 'fill-none'}`}
+                        >
+                          <path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z" />
+                        </svg>
+                      </button>
+                    </div>
+                    <button
+                      type="button"
                       onClick={() => setOpenCustomRequest(true)}
-                      disabled={count < 1}
+                      className="justify-self-start border-b border-line pb-0.5 text-[12px] text-ink-soft transition-colors hover:border-ink hover:text-ink"
                     >
-                      Custom Request
-                    </Button>
+                      Want something different? Request a custom version
+                    </button>
                     <CustomRequestForm
                       open={openCustomRequest}
                       onClose={() => setOpenCustomRequest(false)}
@@ -2838,196 +1895,177 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
                         sku_code: selectedProductObject?.sku_code,
                       }}
                     />
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-5 md:pt-3">
-                    <Button
-                      onClick={() => {
-                        if (!selectedRingSize && (selectedJewelryType == 'engagement-rings' || selectedJewelryType == 'wedding-bands')) {
-                          setErrorMessage('Please enter a valid ring size!');
-                          return;
-                        }
-                        if (selectionRoute === 1) {
-                          if (selectedSettingStore === null) {
-                            router.push(`custom-jewelry?type=1&state=s&id=${slug}`);
-                          } else {
-                            router.push(`custom-jewelry?type=1&state=c&id=${slug}&did=${dId}`);
-                          }
-                        } else if (selectionRoute === 2) {
-                          if (selectedDiamondStore === null) {
-                            router.push(`custom-jewelry?type=2&state=d&id=${slug}`);
-                          } else {
-                            router.push(`custom-jewelry?type=2&state=c&id=${slug}&did=${dId}`);
-                          }
-                        }
-                      }}
-                      className=" self-stretch !text-text_w !bg-secondary w-full !h-[45px] tracking-[1.50px] 2xl:text-[16px] xl:w-full xl:text-[16px] lg:w-full lg:text-[14px] lg:!h-[37px]"
-                    >
-                      {selectionRoute === 1
-                        ? selectedSettingStore === null
-                          ? 'SELECT THIS DIAMOND '
-                          : 'COMPLETE SELECTION'
-                        : selectionRoute == 2
-                          ? selectedDiamondStore === null
-                            ? 'SELECT THIS SETTING'
-                            : 'COMPLETE SELECTION'
-                          : null}
-                    </Button>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <Skeleton.Button active={true} block={true} size="large" />
-              </>
-            )}
-          </div>
-          <div className="flex flex-col gap-[14px] 2xl:gap-4 lg:gap-4 md:gap-[10px]">
-            {product?.description !== null && product?.description?.length > 0 && (
-              <div className="flex flex-col items-start   self-stretch">
-                {product?.description ? (
-                  <Text size="textlg" className="!font-extralight !font-sans">
-                    {showFullDescription ? product?.description : product?.description?.split(' ').slice(0, 15).join(' ')}
-                    {showFullDescription ? (
-                      <span onClick={() => setShowFullDescription(false)} className="cursor-pointer underline pl-2">
-                        Read less
-                      </span>
-                    ) : (
-                      product?.description?.split(' ').length > 15 && (
-                        <>
-                          ...
-                          <span onClick={() => setShowFullDescription(true)} className="cursor-pointer underline">
-                            Read More
-                          </span>
-                        </>
-                      )
-                    )}
-                  </Text>
-                ) : (
-                  <>
-                    <Skeleton.Input active={true} size="small" block />
-                    <Skeleton.Input active={true} size="small" block />
-                    <Skeleton.Input active={true} size="small" block />
                   </>
-                )}
+                ) : (
+                  <Button
+                    type="primary"
+                    block
+                    onClick={() => {
+                      if (!selectedRingSize && isSizedRing) {
+                        setErrorMessage('Please enter a valid ring size!');
+                        return;
+                      }
+                      if (selectionRoute === 1) {
+                        if (selectedSettingStore === null) {
+                          router.push(`custom-jewelry?type=1&state=s&id=${slug}`);
+                        } else {
+                          router.push(`custom-jewelry?type=1&state=c&id=${slug}&did=${dId}`);
+                        }
+                      } else if (selectionRoute === 2) {
+                        if (selectedDiamondStore === null) {
+                          router.push(`custom-jewelry?type=2&state=d&id=${slug}`);
+                        } else {
+                          router.push(`custom-jewelry?type=2&state=c&id=${slug}&did=${dId}`);
+                        }
+                      }
+                    }}
+                    className="!h-14 !border-ink !bg-ink !text-[11px] !uppercase !tracking-[0.22em] !text-paper hover:!border-ink-hover hover:!bg-ink-hover"
+                  >
+                    {selectionRoute === 1
+                      ? selectedSettingStore === null
+                        ? 'Select this diamond'
+                        : 'Complete selection'
+                      : selectionRoute == 2
+                        ? selectedDiamondStore === null
+                          ? 'Select this setting'
+                          : 'Complete selection'
+                        : null}
+                  </Button>
+                )
+              ) : (
+                <Skeleton.Button active block size="large" className="!h-14" />
+              )}
+            </div>
+
+            {!isCustomFlow && product?.jewelry_id && (
+              <div className="grid gap-3 bg-stone/60 px-5 py-[18px] text-[13px] text-ink-soft">
+                <div className="flex items-start gap-3.5">
+                  <svg viewBox="0 0 24 24" aria-hidden className="mt-0.5 h-5 w-5 flex-none fill-none stroke-gilt stroke-[1.2]">
+                    <path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.2v3.3h-7" />
+                    <circle cx="7" cy="17.5" r="1.8" />
+                    <circle cx="17" cy="17.5" r="1.8" />
+                  </svg>
+                  <div className="grid gap-0.5">
+                    <strong className="font-medium text-ink">Estimated delivery: {estimatedDelivery}</strong>
+                    {shipsWithin != null && (
+                      <span>
+                        Usually ships within {shipsWithin} to {shipsWithin + 1} days.
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-start gap-3.5">
+                  <svg viewBox="0 0 24 24" aria-hidden className="mt-0.5 h-5 w-5 flex-none fill-none stroke-gilt stroke-[1.2]">
+                    <path d="M8 7L4 11l4 4M4 11h11a5 5 0 010 10h-3" />
+                  </svg>
+                  <span>
+                    Free shipping and returns.{' '}
+                    <Link href="/returns-shipping" className="text-ink underline underline-offset-4 hover:text-ink">
+                      See the policy
+                    </Link>
+                  </span>
+                </div>
               </div>
             )}
-            {product?.jewelry_id ? (
-              <Text size="textxl" className="!font-thin !font-sans hidden">
-                <Link href="/shipping-returns">SHIPPING & RETURNS</Link>
-              </Text>
-            ) : (
-              <>
-                <Skeleton.Input active={true} block={false} size="large" />
-              </>
-            )}
-            {product?.jewelry_id ? (
-              <div className="hidden items-center justify-between px-5 py-3 md:px-3  bg-[#fafafa] ">
-                <Text
-                  size="textmd"
-                  className="!font-thin sm:!font-normal text-center whitespace-nowrap tracking-[1px] !font-sans uppercase text-[#494949] "
-                >
-                  Delivery
-                </Text>
-                <div className="w-[1px] !pl-[1px] h-4 bg-[#494949]" />
-                <Text
-                  size="textmd"
-                  className="!font-thin sm:!font-normal text-center whitespace-nowrap tracking-[1px] !font-sans uppercase text-[#494949] "
-                >
-                  RETURN Policy
-                </Text>
-                <div className="w-[1px] h-4 !pl-[1px] bg-[#494949]" />
-                <Text
-                  size="textmd"
-                  className="!font-thin sm:!font-normal  text-center whitespace-nowrap tracking-[1px] !font-sans uppercase text-[#494949] "
-                >
-                  Exchange
-                </Text>
-              </div>
-            ) : (
-              <>
-                <Skeleton.Input active={true} block={true} size="large" />
-              </>
+
+            {!isCustomFlow && product?.jewelry_id && <PdpAssurance />}
+
+            {!isCustomFlow && quickPicks.length > 0 && (
+              <OptionGroup
+                label="You may also like"
+                aside={
+                  <a
+                    href="#pdp-suggestions"
+                    className="border-b border-ink pb-0.5 text-[10.5px] font-medium uppercase tracking-[0.16em] text-ink hover:text-ink"
+                  >
+                    See all
+                  </a>
+                }
+              >
+                <ul className="m-0 grid list-none border-t border-line p-0">
+                  {quickPicks.map((p: any) => (
+                    <li key={p?.sku_master_id ?? p?.jewelry_id} className="border-b border-line">
+                      <Link
+                        href={p?.is_customizable ? `/custom-jewelry?type=2&state=s&id=${p?.slug}` : `/${p?.slug}`}
+                        className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3.5 py-2.5 text-inherit hover:text-inherit"
+                      >
+                        <span className="block h-14 w-14 bg-stone">
+                          <img src={p?.productImage} alt="" loading="lazy" className="h-full w-full object-contain mix-blend-multiply" />
+                        </span>
+                        <span className="grid min-w-0">
+                          <b className="truncate font-cormorant text-[17px] font-medium leading-tight text-ink">{p?.productName}</b>
+                          <span className="text-[12px] tabular-nums text-ink-soft">{formatCurrency(p?.discounted_price ?? p?.productPrice)}</span>
+                        </span>
+                        <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4 fill-none stroke-ink stroke-[1.2]">
+                          <path d="M9.5 6l6 6-6 6" />
+                        </svg>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </OptionGroup>
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <PdpReviews />
+      <PdpSuggestions recentlyViewed={recentlyViewed} />
+      <PdpDetails image={jewelryMetadata?.carat_images?.[1] ?? jewelryMetadata?.carat_images?.[0]} deliveryNote={deliveryNote} />
+      <PdpAtelier />
+    </ConfigProvider>
   );
 };
 
 export default PDPPage;
 
-function MetalColorOptions({
-  productFilter,
-  productVariant,
-  selectedJewelryType,
-  slug,
-  sId,
-  dId,
-  selectedProductObject,
-  productSKU,
-  selectedProduct,
-  changeRouter,
-}: any) {
+function MetalColorOptions({ productFilter, productVariant, slug, selectedProductObject, productSKU, selectedProduct, goToSku }: any) {
   const selectedMetal = productVariant?.find(
     (item: any) => item?.id === selectedProduct?.jewelry_sku?.find((el: any) => el.sku_slug == slug)?.metal_type_id,
   );
-  const selectedJewelryMetalType: any = productFilter?.filter((color: any) =>
-    selectedMetal?.metal_color_id?.map((el: any) => el?.id).includes(color?.id),
-  );
-  const metalColor: any = selectedMetal?.metal_color_id?.map((el: any) => ({
-    id: el.id,
-    sku_slug: el.sku_slug,
-  }));
-  return (
-    <div className="flex gap-[10px]">
-      {selectedProduct?.jewelry_id ? (
-        metalColor?.map((color: any, index: number) => {
-          const newObj = selectedJewelryMetalType?.find((el: any) => el?.id === color?.id);
+  const metalColors: any[] = selectedMetal?.metal_color_id ?? [];
 
-          return (
-            <div key={index} className={`${productSKU?.metalColor === newObj?.code ? ' border-b border-[#18381d] ' : ''}`}>
-              <Image
-                src={newObj?.image?.[0]}
-                height={40}
-                preview={false}
-                width={40}
-                fallback="/images/no_images.svg"
-                onClick={async () => {
-                  const new_slug = await getSkuSlug(
-                    productVariant,
-                    selectedProductObject?.metal_type_id,
-                    color?.id,
-                    selectedProductObject?.shape_id,
-                    selectedProductObject?.carat_id,
-                    selectedProductObject?.custom_stone_id,
-                    selectedProductObject?.center_diamond_id,
-                    selectedProductObject?.accent_diamond_id,
-                    selectedProductObject?.second_accent_diamond_id,
-                    String(selectedProductObject?.premade_carat_weight),
-                    selectedProductObject?.bracelet_length_ids ?? null,
-                    selectedProductObject?.band_width_ids ?? null,
-                  );
-                  changeRouter(
-                    sId
-                      ? `custom-jewelry?type=2&state=s&id=${new_slug}${dId ? `&did=${dId}` : ''}`
-                      : `${selectedJewelryType}/premade?slug=${new_slug}`,
-                  );
-                }}
-                alt="image"
-                className={`${productSKU?.metalColor === newObj?.code ? '' : 'opacity-70'} cursor-pointer aspect-square`}
-              />
-            </div>
-          );
-        })
-      ) : (
-        <div className="flex gap-3">
-          <Skeleton.Button active={true} size="small" />
-          <Skeleton.Button active={true} size="small" />
-          <Skeleton.Button active={true} size="small" />
-        </div>
-      )}
+  if (!selectedProduct?.jewelry_id) {
+    return (
+      <div className="flex gap-3">
+        <Skeleton.Avatar active />
+        <Skeleton.Avatar active />
+        <Skeleton.Avatar active />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2.5">
+      {metalColors.map((color: any) => {
+        const master = productFilter?.find((el: any) => el?.id === color?.id);
+        return (
+          <MetalSwatch
+            key={color?.id}
+            active={productSKU?.metalColor === master?.code}
+            tone={metalToneFor(productFilter, color?.id)}
+            label={master?.name ?? 'Metal colour'}
+            onClick={() =>
+              goToSku(
+                getSkuSlug(
+                  productVariant,
+                  selectedProductObject?.metal_type_id,
+                  color?.id,
+                  selectedProductObject?.shape_id,
+                  selectedProductObject?.carat_id,
+                  selectedProductObject?.custom_stone_id,
+                  selectedProductObject?.center_diamond_id,
+                  selectedProductObject?.accent_diamond_id,
+                  selectedProductObject?.second_accent_diamond_id,
+                  String(selectedProductObject?.premade_carat_weight),
+                  selectedProductObject?.bracelet_length_ids ?? null,
+                  selectedProductObject?.band_width_ids ?? null,
+                ),
+              )
+            }
+          />
+        );
+      })}
     </div>
   );
 }

@@ -2,13 +2,9 @@
 
 import React, { useEffect } from 'react';
 
-import WhyAllorya from '@/components/WhyAllorya';
 import { YotpoReviewsRefresh } from '@/hook/useYotpo';
-import { YouMayAlsoLike } from '@/page';
-import InspiredByCommunity from '@/page/InspiredByCommunity';
 
 import PDPPage from './PDPPage';
-import YotpoReiew from './yotpoReiew';
 
 export default function ProductPageSpecificProductPage({ selectionRoute }: { selectionRoute?: any }) {
   // useEffect(() => {
@@ -70,19 +66,10 @@ export default function ProductPageSpecificProductPage({ selectionRoute }: { sel
   useEffect(() => {
     YotpoReviewsRefresh();
   }, []);
+  // Reviews, suggestions and details are sections of PDPPage, so its sticky section bar spans them all.
   return (
-    <div className="w-full bg-[#ffffff]">
-      <div className=" flex flex-col  items-center  lg:mt-[10px] md:mt-0 lg:gap-[60px] md:gap-[58px] sm:gap-0 sm:mt-0">
-        <PDPPage selectionRoute={selectionRoute} />
-        <div className="flex flex-col mt-10 gap-[76px] self-stretch lg:gap-[76px] md:gap-[57px] sm:gap-3">
-          <WhyAllorya />
-          <YouMayAlsoLike />
-
-          <YotpoReiew />
-
-          <InspiredByCommunity />
-        </div>
-      </div>
+    <div className="w-full bg-paper">
+      <PDPPage selectionRoute={selectionRoute} />
     </div>
   );
 }

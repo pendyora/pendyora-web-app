@@ -18,6 +18,7 @@ module.exports = {
   line: { DEFAULT: '#DDD8D0', strong: '#B9B2A7' }, // hairlines and control borders
   gilt: { DEFAULT: '#A2845A', soft: '#D9C7A7' }, // champagne accent, deepened for legibility
   noir: { DEFAULT: '#0F0E0C', on: '#F3EEE6' }, // dark editorial tiles and text on them
+  danger: '#A23B2E', // form validation messages
   metal: {
     yellow: { light: '#F6E3A6', mid: '#D8B25A', deep: '#B88E35' },
     white: { light: '#FAFAF8', mid: '#D7D6D2', deep: '#AFAEAA' },

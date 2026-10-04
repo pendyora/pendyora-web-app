@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en" data-accent="harbor">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pendyora Fine Jewelry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap">
+<style>
+/* Premium refresh: white page, cool-grey tiles, near-black type, ONE brand accent (peacock or navy).
+   Layout: title row → category row → sticky toolbar → filter rail + 3-col grid (4-col when filters hidden).
+   Promo tiles are card-sized and pinned to the left or right grid edge, whatever the column count. */
+:root{
+  color-scheme: light;
+  --page:#FFFFFF; --tile:#F3F3F2; --tile-2:#EAEAE8;
+  --ink:#111111; --ink-2:#5F6368; --ink-3:#8A8D91;
+  --line:#E6E6E6; --line-2:#CFCFCF;
+  /* Harbor: deep navy + sea teal (default) */
+  --accent:#1B2B3F; --accent-2:#2F7378; --accent-ink:#EEF2F6; --accent-soft:#EDF4F4;
+  --gold-y:linear-gradient(135deg,#F6E3A6,#D8B25A 50%,#B88E35);
+  --gold-w:linear-gradient(135deg,#FAFAF8,#D7D6D2 50%,#AFAEAA);
+  --gold-r:linear-gradient(135deg,#F7D4C2,#DCA28A 50%,#BF7E66);
+  --display:"Cormorant Garamond", Garamond, "Times New Roman", serif;
+  --ui:"Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --gutter:clamp(16px,3.2vw,48px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+/* Atlantic: the Navy/Teal/Sky palette shared by the client */
+html[data-accent="atlantic"]{ --accent:#2F4156; --accent-2:#4E7486; --accent-ink:#F5EFEB; --accent-soft:#EEF3F7; }
+/* Midnight: near-black navy + cool teal, the most "evening" option */
+html[data-accent="midnight"]{ --accent:#121C2B; --accent-2:#3A8A8C; --accent-ink:#E9EEF3; --accent-soft:#EDF5F5; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.55 var(--ui);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+img{display:block;max-width:100%}
+:focus-visible{outline:1.5px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1440px;margin-inline:auto;padding-inline:var(--gutter)}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Mockup chrome */
+.review{background:#202124;color:#E8EAED;font-size:11.5px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;padding:7px var(--gutter)}
+.review b{letter-spacing:.14em;text-transform:uppercase;font-weight:600;font-size:10.5px;color:#9AA0A6;margin-right:4px}
+.review button{padding:4px 12px;border:1px solid #5F6368;border-radius:999px}
+.review button[aria-pressed="true"]{background:#E8EAED;color:#202124;border-color:#E8EAED}
+
+
+/* Palette panel (mockup only) */
+.palette{background:#F8F9FA;border-bottom:1px solid var(--line);padding:16px var(--gutter)}
+.palette .wrap{padding:0;display:grid;gap:12px}
+.palette h2{margin:0;font:600 10.5px/1 var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.palette h2 b{color:var(--ink);font-weight:600}
+.palette h2 span{text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px}
+.chipsP{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.pc{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center;font-size:12px;line-height:1.35}
+.pc i{width:36px;height:36px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.pc b{display:block;font-weight:600;font-size:12px}
+.pc code{font:11px ui-monospace,Consolas,monospace;color:var(--ink-2)}
+.pc span{display:block;color:var(--ink-3);font-size:11px}
+@media (max-width:1024px){.chipsP{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:550px){.chipsP{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Announcement */
+.announce{background:var(--accent);color:var(--accent-ink);text-align:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:10px var(--gutter);font-weight:500}
+.announce u{text-underline-offset:3px}
+
+/* Header */
+.hdr{position:sticky;top:0;z-index:30;background:var(--page);border-bottom:1px solid var(--line)}
+.hdr .wrap{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:32px;height:72px}
+.mark{font-family:var(--display);font-weight:500;font-size:26px;letter-spacing:.32em}
+.nav{display:flex;justify-content:center;gap:clamp(16px,2.4vw,36px)}
+.nav a{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);padding-block:26px;border-bottom:1.5px solid transparent}
+.nav a[aria-current]{border-color:var(--ink)}
+.tools{display:flex;align-items:center;gap:6px}
+.search{display:flex;align-items:center;gap:10px;height:40px;min-width:200px;padding:0 14px;border:1px solid var(--line-2);color:var(--ink-2);font-size:13px;margin-right:8px}
+.tool{position:relative;display:grid;place-items:center;width:40px;height:40px}
+.count{position:absolute;top:3px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--accent-2);color:#fff;font-size:9.5px;font-weight:600;display:grid;place-items:center;padding-inline:4px}
+
+/* Title row */
+.crumbs{display:flex;gap:8px;font-size:12px;color:var(--ink-2);padding-top:28px}
+.crumbs span[aria-hidden]{color:var(--line-2)}
+.title{display:flex;align-items:baseline;gap:14px;margin:14px 0 6px}
+h1{margin:0;font-family:var(--display);font-weight:500;font-size:clamp(38px,4vw,54px);line-height:1;letter-spacing:-.01em}
+.title small{font-size:13px;color:var(--ink-2)}
+.intro{margin:0;max-width:62ch;color:var(--ink-2);font-size:14.5px}
+.intro a{color:var(--accent-2);text-decoration:underline;text-underline-offset:3px}
+
+/* Category row */
+.cats{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:26px 0 30px}
+.cat{flex:none;width:132px;display:grid;gap:10px;text-align:center}
+.cat span:first-child{aspect-ratio:1;background:var(--tile);overflow:hidden;border-bottom:2px solid transparent;transition:border-color .2s}
+.cat img{width:100%;height:100%;object-fit:cover;transition:transform 1s var(--ease)}
+.cat:hover img{transform:scale(1.04)}
+.cat b{font-weight:500;font-size:13px}
+.cat:hover span:first-child,.cat[aria-current] span:first-child{border-color:var(--ink)}
+.cat[aria-current] b{font-weight:600}
+
+/* Toolbar */
+.bar{position:sticky;top:72px;z-index:20;background:var(--page);border-block:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:14px;height:56px}
+.toggle{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:500}
+.toggle .n{min-width:18px;height:18px;border-radius:9px;background:var(--ink);color:#fff;font-size:10px;display:grid;place-items:center;padding-inline:5px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;background:var(--tile);font-size:12.5px}
+.chip button{font-size:14px;line-height:1;color:var(--ink-2)}
+.clear{font-size:12.5px;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.bar .right{display:flex;align-items:center;gap:18px;margin-left:auto;font-size:13px;color:var(--ink-2);white-space:nowrap}
+.sort{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
+
+/* Body */
+.body{display:grid;grid-template-columns:240px minmax(0,1fr);gap:40px;padding-top:28px;padding-bottom:64px}
+.body.no-rail{grid-template-columns:minmax(0,1fr)}
+.body.no-rail .rail{display:none}
+
+/* Filter rail */
+.rail{position:sticky;top:156px;align-self:start;max-height:calc(100vh - 176px);overflow:auto;scrollbar-width:thin;padding-right:6px}
+.fgroup{border-bottom:1px solid var(--line);padding-block:16px}
+.fgroup summary{list-style:none;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:500;font-size:14px}
+.fgroup summary::-webkit-details-marker{display:none}
+.fgroup summary::after{content:"+";font-weight:300;font-size:18px;color:var(--ink-2)}
+.fgroup[open] summary::after{content:"–"}
+.fgroup ul{list-style:none;margin:14px 0 2px;padding:0;display:grid;gap:11px}
+.fgroup label{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2);cursor:pointer}
+.fgroup label em{margin-left:auto;font-style:normal;font-size:12px;color:var(--ink-3)}
+.fgroup input{appearance:none;width:16px;height:16px;border:1px solid var(--line-2);margin:0;display:grid;place-items:center;cursor:pointer}
+.fgroup input:checked{background:var(--ink);border-color:var(--ink)}
+.fgroup input:checked::after{content:"";width:8px;height:4px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.fgroup label:has(input:checked){color:var(--ink)}
+.sw{width:16px;height:16px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.sizes{display:grid !important;grid-template-columns:repeat(5,1fr);gap:6px !important}
+.sizes button{height:34px;border:1px solid var(--line-2);font-size:12.5px}
+.sizes button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.help{margin-top:22px;background:var(--accent-soft);padding:18px}
+.help b{display:block;font-family:var(--display);font-weight:500;font-size:20px;margin-bottom:4px}
+.help p{margin:0 0 10px;font-size:13px;color:var(--ink-2)}
+.help a{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2);border-bottom:1px solid currentColor}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-flow:row dense;gap:40px 16px}
+.body.no-rail .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.edge-left{grid-column:1 / 2}
+.edge-right{grid-column:-2 / -1}
+
+/* Product card */
+.card{min-width:0;display:grid;gap:12px;align-content:start}
+.frame{position:relative}
+.media{position:relative;display:block;aspect-ratio:4/5;background:var(--tile);overflow:hidden}
+.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s var(--ease),transform 1.2s var(--ease)}
+.media img.alt{opacity:0}
+.card:hover .media img.alt{opacity:1}
+.card:hover .media img{transform:scale(1.025)}
+.badge{position:absolute;top:12px;left:12px;z-index:1;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+.badge.sale{color:var(--accent-2)}
+.heart{position:absolute;top:6px;right:6px;z-index:1;width:36px;height:36px;display:grid;place-items:center;color:var(--ink)}
+.heart[aria-pressed="true"] svg{fill:var(--accent-2);stroke:var(--accent-2)}
+.quick{position:absolute;left:12px;right:12px;bottom:12px;z-index:1;height:42px;background:rgba(255,255,255,.94);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:all .3s var(--ease)}
+.card:hover .quick,.card:focus-within .quick{opacity:1;transform:none}
+.info{display:grid;gap:3px}
+.name{font-size:15px;font-weight:500;line-height:1.35}
+.meta{font-size:13px;color:var(--ink-2)}
+.price{font-size:14px;font-variant-numeric:tabular-nums;margin-top:2px}
+.price s{color:var(--ink-3);margin-left:6px}
+.swatches{display:flex;align-items:center;gap:8px;margin-top:6px}
+.swatches button{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);outline-offset:2px}
+.swatches button[aria-pressed="true"]{outline:1px solid var(--ink)}
+.swatches span{font-size:12px;color:var(--ink-2)}
+
+/* Promo tiles (card-sized) */
+.promo{min-width:0;display:grid;gap:12px;align-content:start}
+.promo .media img{transition:transform 1.4s var(--ease)}
+.promo:hover .media img{transform:scale(1.03)}
+.promo .eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-2)}
+.promo .ttl{font-family:var(--display);font-size:24px;font-weight:500;line-height:1.1}
+.promo .lnk{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid currentColor;justify-self:start;margin-top:4px}
+.promo.solid .media{background:var(--accent);color:var(--accent-ink);display:grid;align-content:end;padding:28px}
+.promo.solid .media::before{content:"";position:absolute;inset:14px;border:1px solid var(--accent-2)}
+.promo.solid .eyebrow{color:var(--accent-ink);opacity:.8}
+.promo.solid .big{position:relative;font-family:var(--display);font-size:clamp(30px,2.6vw,40px);line-height:1.05;margin:10px 0 18px}
+.promo.solid .big em{font-style:italic}
+.promo.solid .btn{position:relative;justify-self:start;height:42px;padding:0 20px;display:inline-flex;align-items:center;background:var(--accent-2);color:#fff;font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+
+/* Load more */
+.more{display:grid;justify-items:center;gap:14px;margin-top:56px;font-size:13px;color:var(--ink-2)}
+.more progress{appearance:none;width:220px;height:2px;border:0;background:var(--line)}
+.more progress::-webkit-progress-bar{background:var(--line)}
+.more progress::-webkit-progress-value{background:var(--ink)}
+.more progress::-moz-progress-bar{background:var(--ink)}
+.more button{height:48px;padding:0 36px;border:1px solid var(--ink);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.more button:hover{background:var(--ink);color:#fff}
+
+/* Trust band + footer */
+.trust{background:var(--accent);color:var(--accent-ink)}
+.trust .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding-block:36px}
+.trust div{display:flex;gap:14px;align-items:flex-start}
+.trust .icon{color:var(--accent-2);filter:brightness(1.6)}
+.trust b{display:block;font-family:var(--display);font-weight:500;font-size:19px;color:#fff}
+.trust span{font-size:13px;opacity:.8}
+.foot{padding:28px var(--gutter);text-align:center;font-size:12px;color:var(--ink-2);border-top:1px solid var(--line)}
+
+/* Mobile filter button */
+.mfilter{display:none}
+
+/* Responsive (repo screens are max-width: lg ≤1024, md ≤769, sm ≤550) */
+@media (max-width:1280px){ .search span{display:none} .search{min-width:0} }
+@media (max-width:1024px){
+  .nav{display:none}
+  .hdr .wrap{grid-template-columns:auto 1fr auto}
+  .body,.body.no-rail{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .grid,.body.no-rail .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .toggle{display:none} .mfilter{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:1px solid var(--ink);font-size:13px;font-weight:500}
+  .bar{top:72px}
+  .trust .wrap{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:769px){
+  .grid,.body.no-rail .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 10px}
+  .chips{display:none}
+  .quick{display:none}
+  .name{font-size:14px}
+  .promo .ttl{font-size:20px}
+  .promo.solid .media{padding:18px}
+  .search{border:0;padding:0;width:40px;justify-content:center;margin:0}
+  .hdr .wrap{height:60px}
+  .bar{top:60px}
+}
+@media (max-width:550px){ .trust .wrap{grid-template-columns:1fr} .cat{width:84px} .mark{font-size:20px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+
+<div class="review" role="region" aria-label="Mockup controls">
+  <b>Mockup</b>
+  Accent:
+  <button type="button" data-accent="harbor" aria-pressed="true">Harbor · navy #1B2B3F + teal #2F7378</button>
+  <button type="button" data-accent="atlantic" aria-pressed="false">Atlantic · #2F4156 + #4E7486</button>
+  <button type="button" data-accent="midnight" aria-pressed="false">Midnight · #121C2B + #3A8A8C</button>
+</div>
+
+<section class="palette" aria-label="Colour palette">
+  <div class="wrap">
+    <h2>Palette · <b id="palName">Harbor</b><span id="palNote"></span></h2>
+    <div class="chipsP" id="palChips"></div>
+  </div>
+</section>
+
+<div class="announce">Free insured shipping on every order · <u>Book a virtual appointment</u></div>
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="mark" href="#">PENDYORA</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#">Engagement</a><a href="#">Wedding</a><a href="#" aria-current="page">Jewelry</a><a href="#">Gifts</a><a href="#">Education</a>
+    </nav>
+    <div class="tools">
+      <a class="search" href="#"><svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>Search</span></a>
+      <a class="tool" href="#" aria-label="Account"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></a>
+      <a class="tool" href="#" aria-label="Wishlist, 2 pieces"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg><span class="count">2</span></a>
+      <a class="tool" href="#" aria-label="Bag, 1 piece"><svg class="icon" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="count">1</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span aria-hidden="true">/</span><span>Fine Jewelry</span></nav>
+    <div class="title"><h1>Fine Jewelry</h1><small id="countTop">128 pieces</small></div>
+    <p class="intro">Rings, earrings, necklaces and bracelets in solid gold, set with certified diamonds and gemstones. <a href="#">How we make them</a></p>
+    <nav class="cats" aria-label="Categories" id="cats"></nav>
+  </section>
+
+  <div class="bar">
+    <div class="wrap">
+      <button class="toggle" id="railToggle" aria-expanded="true" aria-controls="rail">
+        <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        <span id="railLabel">Hide filters</span><span class="n" id="filterCount">2</span>
+      </button>
+      <button class="mfilter">Filters · 2</button>
+      <div class="chips" id="chips">
+        <span class="chip">Yellow gold <button aria-label="Remove Yellow gold">×</button></span>
+        <span class="chip">Diamond <button aria-label="Remove Diamond">×</button></span>
+        <button class="clear">Clear all</button>
+      </div>
+      <div class="right">
+        <span>128 pieces</span>
+        <button class="sort">Sort: Featured <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="m6 9.5 6 6 6-6"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap body" id="body">
+    <aside class="rail" id="rail" aria-label="Filters">
+      <details class="fgroup" open><summary>Metal</summary><ul>
+        <li><label><input type="checkbox" checked><i class="sw" style="background:var(--gold-y)"></i>Yellow gold<em>64</em></label></li>
+        <li><label><input type="checkbox"><i class="sw" style="background:var(--gold-w)"></i>White gold<em>58</em></label></li>
+        <li><label><input type="checkbox"><i class="sw" style="background:var(--gold-r)"></i>Rose gold<em>22</em></label></li>
+        <li><label><input type="checkbox"><i class="sw" style="background:linear-gradient(135deg,#F1F2F3,#BFC2C6 50%,#84888D)"></i>Sterling silver<em>31</em></label></li>
+      </ul></details>
+      <details class="fgroup" open><summary>Stone</summary><ul>
+        <li><label><input type="checkbox" checked>Diamond<em>81</em></label></li>
+        <li><label><input type="checkbox">Lab-grown diamond<em>47</em></label></li>
+        <li><label><input type="checkbox">Sapphire<em>12</em></label></li>
+        <li><label><input type="checkbox">Pearl<em>9</em></label></li>
+        <li><label><input type="checkbox">No stone<em>26</em></label></li>
+      </ul></details>
+      <details class="fgroup" open><summary>Price</summary><ul>
+        <li><label><input type="checkbox">Under $500<em>38</em></label></li>
+        <li><label><input type="checkbox">$500 – $1,000<em>41</em></label></li>
+        <li><label><input type="checkbox">$1,000 – $2,500<em>33</em></label></li>
+        <li><label><input type="checkbox">Over $2,500<em>16</em></label></li>
+      </ul></details>
+      <details class="fgroup"><summary>Ring size</summary><ul class="sizes">
+        <li><button aria-pressed="false">4</button></li><li><button aria-pressed="false">5</button></li><li><button aria-pressed="true">6</button></li><li><button aria-pressed="false">7</button></li><li><button aria-pressed="false">8</button></li>
+      </ul></details>
+      <details class="fgroup"><summary>Style</summary><ul>
+        <li><label><input type="checkbox">Solitaire</label></li><li><label><input type="checkbox">Halo</label></li><li><label><input type="checkbox">Everyday</label></li><li><label><input type="checkbox">Statement</label></li>
+      </ul></details>
+      <details class="fgroup"><summary>Availability</summary><ul>
+        <li><label><input type="checkbox">Ready to ship<em>74</em></label></li><li><label><input type="checkbox">Made to order<em>54</em></label></li>
+      </ul></details>
+      <div class="help"><b>Not sure of the size?</b><p>Order a free ring sizer, or get sized by a specialist over video.</p><a href="#">Book an appointment</a></div>
+    </aside>
+
+    <div>
+      <div class="grid" id="grid" aria-label="Products"></div>
+      <div class="more">
+        <span>Showing 24 of 128</span>
+        <progress max="128" value="24"></progress>
+        <button type="button">Load more</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="trust" aria-label="Our promise">
+    <div class="wrap">
+      <div><svg class="icon" viewBox="0 0 24 24"><path d="M6.5 4h11l3.5 5-9 11L3 9zM3 9h18"/></svg><p style="margin:0"><b>Certified stones</b><span>Every diamond graded and documented.</span></p></div>
+      <div><svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg><p style="margin:0"><b>30-day returns</b><span>Free, insured and easy.</span></p></div>
+      <div><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6z"/></svg><p style="margin:0"><b>Lifetime warranty</b><span>Repairs and cleaning, always.</span></p></div>
+      <div><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><p style="margin:0"><b>Secure checkout</b><span>Pay in full or in 4 with Affirm.</span></p></div>
+    </div>
+  </section>
+  <footer class="foot">© 2026 Pendyora · Mockup: design-mockups/plp-v3</footer>
+</main>
+
+<script>
+(() => {
+  const IMG = n => `img/${n}.jpg`;
+  const SW = { yellow: 'var(--gold-y)', white: 'var(--gold-w)', rose: 'var(--gold-r)' };
+  const METAL = { yellow: 'Yellow gold', white: 'White gold', rose: 'Rose gold' };
+
+  const BASE = [
+    { name: 'Aurelia Solitaire Ring', k: '18K', price: 1850, badge: 'Bestseller', metals: { yellow: 'p-ring-yellow', white: 'p-ring-white', rose: 'p-ring-rose' }, alt: 'm-hand-thin' },
+    { name: 'Lumen Pavé Hoops', k: '18K', price: 690, badge: 'New', metals: { yellow: 'p-pave-circle', white: 'p-pave-circle' }, alt: 'm-ear-pearl' },
+    { name: 'Solenne Pendant', k: '18K', price: 540, metals: { white: 'p-pendant', yellow: 'p-pendant' }, alt: 'm-neck-layers' },
+    { name: 'Perle Chain Bracelet', k: '14K', price: 320, metals: { white: 'p-pearl-bracelet', yellow: 'p-pearl-bracelet' }, alt: 'm-hand-white' },
+    { name: 'Cascade Halo Ring', k: '18K', price: 2400, metals: { white: 'p-halo' }, alt: 'm-bw-hand' },
+    { name: 'Mira Mini Hoops', k: '14K', price: 180, badge: 'Bestseller', metals: { yellow: 'p-mini-hoops', white: 'p-mini-hoops', rose: 'p-mini-hoops' }, alt: 'm-bw-ear' },
+    { name: 'Céleste Sapphire Ring', k: '18K', price: 1280, badge: 'New', metals: { white: 'p-sapphire-silk', yellow: 'p-sapphire-silk' }, alt: 'm-hand-sepia' },
+    { name: 'Ondine Twist Huggies', k: '18K', price: 240, metals: { yellow: 'p-gold-hoops' }, alt: 'm-hands-stack' },
+    { name: 'Galet Pavé Hoops', k: '18K', price: 860, metals: { yellow: 'p-pebble-hoops', white: 'p-pebble-hoops' }, alt: 'm-ear-pearl' },
+    { name: 'Larme Teardrop Earrings', k: '18K', price: 720, badge: 'New', metals: { rose: 'p-teardrop', yellow: 'p-teardrop', white: 'p-teardrop' } },
+    { name: 'Atelier Stacking Set', k: '14K', price: 460, metals: { yellow: 'p-ring-stack' }, alt: 'm-hand-satin' },
+    { name: 'Duo Sapphire Ring', k: '18K', price: 1120, compare: 1320, metals: { white: 'p-sapphire-pedestal' }, alt: 'm-hands-hold' },
+    { name: 'Étoile Four-Claw Solitaire', k: '18K', price: 3150, metals: { white: 'p-solitaire-shadow', yellow: 'p-solitaire-shadow' }, alt: 'm-hand-sepia' },
+    { name: 'Eternity Band', k: '18K', price: 1690, metals: { white: 'p-eternity-macro', yellow: 'p-eternity-macro', rose: 'p-eternity-macro' }, alt: 'm-bw-hand' },
+    { name: 'Riviera Layered Chains', k: '18K', price: 380, metals: { yellow: 'm-neck-layers' }, alt: 'm-hands-stack' },
+    { name: 'Brillante Stud Earrings', k: '18K', price: 1450, metals: { white: 'p-loose-diamond', yellow: 'p-loose-diamond' }, alt: 'm-bw-ear' },
+  ];
+  const PRODUCTS = [...BASE, ...BASE.slice(0, 8)]; // 24 on the first page
+
+  // Card-sized promos: one after every 8 products, alternating left / right grid edge.
+  const PROMOS = [
+    { kind: 'photo', img: 'promo-neck', eyebrow: 'The Golden Hour edit', ttl: 'Layered, light, worn every day', lnk: 'Shop the edit' },
+    { kind: 'solid', eyebrow: 'Lab-grown diamonds', big: 'Brilliant.<br><em>Certified.</em><br>Yours.', btn: 'Explore' },
+    { kind: 'photo', img: 'promo-chain', eyebrow: 'New collection', ttl: 'Riviera chains in solid gold', lnk: 'Discover' },
+  ];
+
+  const fmt = n => '$' + n.toLocaleString('en-US');
+  const heart = '<svg class="icon" viewBox="0 0 24 24" style="width:19px;height:19px"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg>';
+
+  function card(p, i) {
+    const metals = Object.keys(p.metals);
+    const first = metals[0];
+    const shown = metals.slice(0, 4);
+    return `<article class="card" data-i="${i}">
+      <div class="frame">
+        <a class="media" href="#" aria-label="${p.name}">
+          <img class="main" src="${IMG(p.metals[first])}" alt="${p.name} in ${METAL[first]}" loading="lazy">
+          ${p.alt ? `<img class="alt" src="${IMG(p.alt)}" alt="" loading="lazy">` : ''}
+        </a>
+        ${p.compare ? `<span class="badge sale">Save ${fmt(p.compare - p.price)}</span>` : p.badge ? `<span class="badge">${p.badge}</span>` : ''}
+        <button class="heart" aria-label="Save ${p.name}" aria-pressed="false">${heart}</button>
+        <button class="quick">Quick add</button>
+      </div>
+      <div class="info">
+        <a class="name" href="#">${p.name}</a>
+        <span class="meta" data-metal>${p.k} ${METAL[first]}</span>
+        <span class="price">${fmt(p.price)}${p.compare ? `<s>${fmt(p.compare)}</s>` : ''}</span>
+        ${metals.length > 1 ? `<div class="swatches">${shown.map((m, k) => `<button aria-label="${METAL[m]}" aria-pressed="${k === 0}" data-m="${m}" style="background:${SW[m]}"></button>`).join('')}${metals.length > 4 ? `<span>+${metals.length - 4}</span>` : ''}</div>` : ''}
+      </div>
+    </article>`;
+  }
+
+  function promo(pr, n) {
+    const edge = n % 2 === 0 ? 'edge-left' : 'edge-right';
+    if (pr.kind === 'solid') {
+      return `<a class="promo solid ${edge}" href="#"><div class="media"><span class="eyebrow">${pr.eyebrow}</span><p class="big">${pr.big}</p><span class="btn">${pr.btn}</span></div></a>`;
+    }
+    return `<a class="promo ${edge}" href="#"><div class="media"><img src="${IMG(pr.img)}" alt="" loading="lazy"></div>
+      <div class="info"><span class="eyebrow">${pr.eyebrow}</span><span class="ttl">${pr.ttl}</span><span class="lnk">${pr.lnk}</span></div></a>`;
+  }
+
+  const grid = document.getElementById('grid');
+  let html = '';
+  PRODUCTS.forEach((p, i) => {
+    html += card(p, i);
+    if ((i + 1) % 8 === 0) { const n = (i + 1) / 8 - 1; html += promo(PROMOS[n % PROMOS.length], n); }
+  });
+  grid.innerHTML = html;
+
+  // Card interactions
+  grid.addEventListener('click', (e) => {
+    const h = e.target.closest('.heart');
+    if (h) { h.setAttribute('aria-pressed', h.getAttribute('aria-pressed') !== 'true'); return; }
+    const s = e.target.closest('.swatches button');
+    if (s) {
+      const c = s.closest('.card'), p = PRODUCTS[c.dataset.i], m = s.dataset.m;
+      c.querySelectorAll('.swatches button').forEach(b => b.setAttribute('aria-pressed', b === s));
+      c.querySelector('img.main').src = IMG(p.metals[m]);
+      c.querySelector('[data-metal]').textContent = `${p.k} ${METAL[m]}`;
+    }
+    if (e.target.closest('a[href="#"]')) e.preventDefault();
+  });
+
+  // Categories
+  const CATS = [['All', 'm-hand-thin'], ['Rings', 'p-ring-yellow'], ['Earrings', 'p-pave-circle'], ['Necklaces', 'p-pendant'], ['Bracelets', 'p-pearl-bracelet'], ['Bridal', 'p-halo'], ['Gemstones', 'p-sapphire-silk'], ['Stacking', 'p-ring-stack'], ['Men', 'p-eternity-macro']];
+  document.getElementById('cats').innerHTML = CATS.map(([t, i], k) => `<a class="cat" href="#" ${k === 0 ? 'aria-current="page"' : ''}><span><img src="${IMG(i)}" alt="" loading="lazy"></span><b>${t}</b></a>`).join('');
+
+  // Hide / show filters: grid goes 3 → 4 columns; promos stay on their edge.
+  const body = document.getElementById('body'), tg = document.getElementById('railToggle');
+  tg.addEventListener('click', () => {
+    const hidden = body.classList.toggle('no-rail');
+    tg.setAttribute('aria-expanded', String(!hidden));
+    document.getElementById('railLabel').textContent = hidden ? 'Show filters' : 'Hide filters';
+  });
+
+  // Ring sizes
+  document.querySelectorAll('.sizes button').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true')));
+
+
+  // Palette panel: reads the live CSS variables so it always matches the selected option.
+  const PAL_NOTES = { harbor: 'Deep navy + sea teal. Recommended.', atlantic: 'From the shared Navy / Teal / Sky palette. Softer.', midnight: 'Near-black navy + bright teal. Most evening.' };
+  const PAL = [
+    ['--page', 'Page', 'Backgrounds'], ['--tile', 'Tile', 'Product image ground'], ['--ink', 'Ink', 'Text, buttons'],
+    ['--ink-2', 'Ink soft', 'Secondary text'], ['--accent', 'Navy', 'Brand: bars, promo, footer'],
+    ['--accent-2', 'Teal', 'Accent: badges, links, counts'], ['--accent-soft', 'Mist', 'Soft panels'],
+  ];
+  function renderPalette() {
+    const cs = getComputedStyle(document.documentElement), key = document.documentElement.dataset.accent;
+    document.getElementById('palName').textContent = key.charAt(0).toUpperCase() + key.slice(1);
+    document.getElementById('palNote').textContent = PAL_NOTES[key];
+    document.getElementById('palChips').innerHTML = PAL.map(([v, n, u]) => {
+      const hex = cs.getPropertyValue(v).trim().toUpperCase();
+      return `<div class="pc"><i style="background:${hex}"></i><div><b>${n}</b><code>${hex}</code><span>${u}</span></div></div>`;
+    }).join('');
+  }
+  renderPalette();
+
+  // Accent switch
+  document.querySelectorAll('.review [data-accent]').forEach(b => b.addEventListener('click', () => {
+    document.documentElement.dataset.accent = b.dataset.accent;
+    document.querySelectorAll('.review [data-accent]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderPalette();
+  }));
+})();
+</script>
+</body>
+</html>

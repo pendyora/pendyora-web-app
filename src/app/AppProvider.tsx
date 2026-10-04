@@ -15,10 +15,14 @@ import useYotpo from '@/hook/useYotpo';
 import store from '@/store';
 import { trackPageView } from '@/utils/metaPixel';
 
+const AUTH_ROUTES = ['/login', '/createanaccount', '/forgotpassword', '/forgot-password'];
+
 const AppProviderData = ({ children, initialHeaderMegaData, initialPromoData }: any) => {
   const pathname = usePathname();
   const isFirstMount = useRef(true);
   const isHomepage = pathname === '/';
+  // Sign-in / sign-up / password screens render their own reduced header and footer (components/Auth/AuthShell).
+  const isAuthPage = AUTH_ROUTES.includes(pathname ?? '');
 
   useEffect(() => {
     if (isFirstMount.current) {
@@ -114,13 +118,15 @@ const AppProviderData = ({ children, initialHeaderMegaData, initialPromoData }: 
           >
             <AppProvider>
               <div className="relative">
-                <Header
-                  className={
-                    isHomepage ? 'bg-transparent fixed top-0 left-0 right-0' : 'bg-transparent sticky top-0 [[data-header-static]_&]:!relative' // pages can opt out via useStaticHeader()
-                  }
-                  headerMetaData={initialHeaderMegaData}
-                  promoStripData={initialPromoData}
-                />
+                {!isAuthPage && (
+                  <Header
+                    className={
+                      isHomepage ? 'bg-transparent fixed top-0 left-0 right-0' : 'bg-transparent sticky top-0 [[data-header-static]_&]:!relative' // pages can opt out via useStaticHeader()
+                    }
+                    headerMetaData={initialHeaderMegaData}
+                    promoStripData={initialPromoData}
+                  />
+                )}
                 <Suspense
                   fallback={
                     <div className="flex justify-center items-center h-[80vh] bg-ivory">
@@ -132,7 +138,7 @@ const AppProviderData = ({ children, initialHeaderMegaData, initialPromoData }: 
                 >
                   {children}
                 </Suspense>
-                <Footer className="overflow-x-hidden" />
+                {!isAuthPage && <Footer className="overflow-x-hidden" />}
               </div>
             </AppProvider>
           </ConfigProvider>

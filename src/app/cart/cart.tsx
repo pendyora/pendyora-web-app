@@ -1,15 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
-import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Button, Input } from 'antd';
+import { Button, ConfigProvider, Drawer, Input } from 'antd';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LuLoader, LuShoppingBag } from 'react-icons/lu';
+import { LuGem, LuLoader, LuLock, LuMessageSquare, LuMonitor, LuRotateCcw, LuShieldCheck, LuTag, LuTruck } from 'react-icons/lu';
 
-import { Text } from '@/components';
-import CartProductDetails from '@/components/CartProductDetails';
-import OrderSummary from '@/components/OrderSummary';
+import OrderSummary, { useCurrencyCode, useOrderTotals } from '@/components/OrderSummary';
 import { apiUpdateCountCartProduct } from '@/services/cartService';
 import { useAppDispatch, useAppSelector } from '@/store';
 import {
@@ -20,23 +18,39 @@ import {
   setCartProducts,
   verifyCoupon,
 } from '@/store/slices/Cart/cartSlice';
+import { formatCurrency } from '@/utils/common';
 
+import CartItem from './CartItem';
+import CheckoutSteps from '../checkout/CheckoutSteps';
+import { checkoutTheme, GUTTER, PRIMARY_BTN } from '../checkout/checkoutTheme';
 import OurBestSellers from '../homepage/OurBestSellers';
+
+const ASSURANCES = [
+  { icon: LuGem, title: 'Certified diamonds', text: 'Lab-grown and ethically mined, certified at origin.' },
+  { icon: LuShieldCheck, title: 'Secure payment', text: 'Card details are encrypted and never stored.' },
+  { icon: LuTruck, title: 'Worldwide shipping', text: 'Complimentary shipping on every order.' },
+  { icon: LuRotateCcw, title: '30-day returns', text: 'Refund or exchange within 30 days of shipment.' },
+];
+const PAYMENT_MARKS = ['VISA', 'MASTERCARD', 'AMEX', 'DISCOVER', 'PAYPAL', 'AFFIRM · US'];
 
 const Cart = () => {
   const route = useRouter();
+  const dispatch = useAppDispatch();
   const { user, token } = useAppSelector((state) => state.auth.auth);
   const { cartProducts, loading, couponData } = useAppSelector((state) => state?.cart);
   const [reload, setReload] = useState(false);
   const [loader, setLoader] = useState(true);
-  const [promoCode, setPromoCode] = useState<string>('');
+  // The applied promo code. Starts from any code already verified this session.
+  const [promoCode, setPromoCode] = useState<string>(couponData?.coupon_code ?? '');
+  const [codeInput, setCodeInput] = useState('');
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [isChecked, setIsChecked] = useState(false);
-  const [showMessagingTermsError, setShowMessagingTermsError] = useState(false);
-  const messagingTermsSectionRef = useRef<HTMLDivElement>(null);
+  const [applying, setApplying] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [smsOptIn, setSmsOptIn] = useState(false);
   const [cartListFromLocalStorage, setCartListFromLocalStorage] = useState([]);
   const getSkuId = (item: any) => item?.sku_master_id ?? item?.sku_master;
   const getRingSizeKey = (item: any) => item?.ring_size_id ?? item?.ringSizePricingDetails?.id ?? null;
+  const currency = useCurrencyCode();
 
   useEffect(() => {
     const cartData = localStorage.getItem('cartItems');
@@ -68,10 +82,9 @@ const Cart = () => {
     }
     return product;
   });
+  const totals = useOrderTotals(updatedCartProducts ?? [], promoCode);
 
-  const dispatch = useAppDispatch();
   const addToCartTracked = useRef(false);
-
   useEffect(() => {
     if (!addToCartTracked.current && cartProducts?.length > 0) {
       addToCartTracked.current = true;
@@ -91,52 +104,53 @@ const Cart = () => {
     }
   }, [cartProducts]);
 
-  const handleUser = () => {
-    // return !token ? `/login?callbackUrl=${'checkout'}` : '/checkout';
-    return '/checkout';
+  const UpdateCartAPI = async () => {
+    if (user) {
+      await apiUpdateCountCartProduct(updatedCartProducts);
+    }
   };
 
   const handleCheckout = async () => {
-    if (!isChecked) {
-      setShowMessagingTermsError(true);
-      setTimeout(() => {
-        messagingTermsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-      }, 0);
-      return;
-    }
-    setShowMessagingTermsError(false);
     if (token) {
       await UpdateCartAPI();
     }
-    route.push(handleUser());
+    route.push('/checkout');
   };
+
   const handleApplyCoupon = async () => {
-    if (!promoCode.trim()) {
-      setErrorMessage('Promo code cannot be empty.');
+    const code = codeInput.trim();
+    if (!code) {
+      setErrorMessage('Enter a code to apply it.');
       return;
     }
-
+    setApplying(true);
     try {
-      const couponData = {
-        coupon_code: promoCode,
-        ...(!user ? { updatedCartProducts } : {}),
-      };
-      const res = await dispatch(verifyCoupon(couponData));
-
+      const res = await dispatch(verifyCoupon({ coupon_code: code, ...(!user ? { updatedCartProducts } : {}) }));
       if (res.payload?.status === 200) {
         setErrorMessage('');
+        setPromoCode(code);
+        setCodeInput('');
+        setDrawerOpen(false);
       } else {
-        setErrorMessage(res.payload?.response?.data?.message || 'Invalid promo code');
+        setErrorMessage(res.payload?.response?.data?.message || `We couldn't find “${code}”. Check the spelling and try again.`);
       }
     } catch (error) {
       console.error('Error verifying coupon:', error);
       setErrorMessage('Something went wrong. Please try again.');
+    } finally {
+      setApplying(false);
     }
   };
+
+  const removeCoupon = () => {
+    setPromoCode('');
+    setErrorMessage('');
+    dispatch(clearCouponData());
+  };
+
   const handleLocalCartProducts = () => {
     const cartData = localStorage.getItem('cartItems');
     const cartList = cartData ? JSON.parse(cartData) : [];
-
     if (cartList?.length > 0) {
       dispatch(fetchLocalCartProductsList({ data: cartList }));
     }
@@ -169,18 +183,16 @@ const Cart = () => {
   const handleCount = useCallback(
     async (values: any) => {
       if (cartProducts && cartProducts.length > 0) {
-        // Update the count for the product in Redux
-        const updatedCartProducts = cartProducts.map((item: any) => {
+        const nextProducts = cartProducts.map((item: any) => {
           if (item?.ringSizePricingDetails?.id) {
             // For rings, match both sku_master_id and ring_size_id
             return item.sku_master_id === values.sku_master_id && item.ringSizePricingDetails?.id === values.ring_size_id
               ? { ...item, count: values.count }
               : item;
           }
-          // For other jewelry, match only sku_master_id
           return item.sku_master_id === values.sku_master_id ? { ...item, count: values.count } : item;
         });
-        dispatch(setCartProducts(updatedCartProducts));
+        dispatch(setCartProducts(nextProducts));
         if (!user) {
           const cartData = localStorage.getItem('cartItems');
           const cartList = cartData ? JSON.parse(cartData) : [];
@@ -188,210 +200,280 @@ const Cart = () => {
             const localSku = getSkuId(item);
             const localRing = getRingSizeKey(item);
             if (localRing) {
-              // For rings, match both sku and ring-size key
               return localSku === values.sku_master_id && localRing === values.ring_size_id ? { ...item, count: values.count } : item;
             }
-            // For other jewelry, match only sku key
             return localSku === values.sku_master_id ? { ...item, count: values.count } : item;
           });
           localStorage.setItem('cartItems', JSON.stringify(updatedCartList));
         }
-      } else {
-        // Handle empty cart scenario
-        if (token) {
-          // If user is logged in, you might want to fetch the cart again
-        } else {
-          // If user is not logged in, ensure local storage is empty
-          localStorage.setItem('cartItems', JSON.stringify([]));
-        }
+      } else if (!token) {
+        localStorage.setItem('cartItems', JSON.stringify([]));
       }
     },
     [user, cartProducts, dispatch],
   );
-  const UpdateCartAPI = async () => {
-    if (user) {
-      await apiUpdateCountCartProduct(updatedCartProducts);
-    }
-  };
 
-  useEffect(() => {
-    if (!promoCode.trim()) {
-      setErrorMessage('');
-      dispatch(clearCouponData()); // Reset coupon data if input is cleared
-    }
-  }, [promoCode]);
+  const pieceCount = updatedCartProducts?.reduce((s: number, p: any) => s + (Number(p?.count) || 1), 0) ?? 0;
+  const hasItems = !loader && !loading && cartProducts?.length > 0;
+  const isEmpty = !loader && !loading && cartProducts?.length == 0;
+
   return (
-    <div className="container-xs flex flex-col justify-center border-b border-solid border-gray-800_01 py-14 md:py-5 sm:py-4">
-      <div className="mx-auto relative mb-[18px] sm:flex-col flex w-full items-start justify-center gap-8 md:gap-[10px] 2xl:px-[160px] xl:px-28 lg:px-20 md:px-5 sm:px-4">
-        {!loader && (
-          <div className="flex flex-1 sm:w-full flex-col items-start gap-8 sm:gap-4">
-            {cartProducts?.length > 0 && (
-              <Text as="p" size="text5xl" className="font-normal uppercase text-black-900">
-                Shopping cart
-              </Text>
-            )}
-
-            <div className="flex flex-col gap-[32px] self-stretch sm:gap-3">
-              <Suspense fallback={<div>Loading feed...</div>}>
-                {updatedCartProducts &&
-                  updatedCartProducts?.map((d: any, index: number) => (
-                    <CartProductDetails
-                      productDetails={d}
-                      {...d}
-                      index={index}
-                      key={'cartList' + index}
-                      handleCount={handleCount}
-                      handleRemoveProducts={handleRemoveProducts}
-                    />
-                  ))}
-              </Suspense>
-            </div>
-          </div>
-        )}
-        {!loader && (
-          <div className="flex w-[38%] sticky top-5 sm:w-full flex-col gap-[30px] md:gap-[10px] md:w-[50%] lg:w-[45%]">
-            <div>
-              {updatedCartProducts?.length > 0 ? <OrderSummary cartProducts={updatedCartProducts} promoCode={promoCode} /> : null}
-              {cartProducts?.length > 0 && (
-                <div className="flex-col bg-gray-50 px-[30px] md:px-[20px] pt-3 pb-6 md:pt-2 md:pb-4 sm:p-4 sm:pt-2 sm:px-3">
-                  <div className="flex flex-1 flex-col gap-3">
-                    <div className="flex items-center justify-between gap-5 py-1 md:py-0">
-                      <Text
-                        as="p"
-                        size="textxl"
-                        className="text-[20px] font-normal uppercase tracking-[0px] text-black-900 lg:text-[18px] md:text-[16px]"
-                      >
-                        have a Promocode?
-                      </Text>
-                    </div>
-
-                    <div className="flex justify-center items-center gap-3 lg:flex-col">
-                      <Input
-                        name="Promo Input"
-                        placeholder={`Enter promo code`}
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value)}
-                        type="text"
-                        className="flex flex-grow items-center justify-center bg-white-a700 capitalize lg:w-full"
-                      />
-                      <Button
-                        type="default"
-                        name="Apply Button"
-                        onClick={handleApplyCoupon}
-                        className="!bg-secondary !text-text_w w-fit sm:w-full md:w-full lg:w-full !h-[37px] tracking-[1.50px] 2xl:text-[16px] xl:text-[16px] lg:text-[14px] lg:!h-[37px] uppercase"
-                      >
-                        Apply
-                      </Button>
-                    </div>
-                    {promoCode && promoCode == couponData?.coupon_code && (
-                      <div className="text-green-600">
-                        <p>
-                          {couponData?.coupon_description
-                            ? couponData?.coupon_description
-                            : `You Saved ${couponData?.discount_type == 2 ? `${couponData?.discount_value}%` : `$${couponData?.discount_value} `}!`}
-                        </p>
-                      </div>
-                    )}
-                    {errorMessage && (
-                      <div className="text-red-600">
-                        <p>{errorMessage ? errorMessage : ``}</p>{' '}
-                      </div>
-                    )}
-                  </div>
-                </div>
+    <ConfigProvider theme={checkoutTheme}>
+      <div className={`bg-paper font-libre text-[14px] leading-[1.55] text-ink antialiased ${GUTTER} ${hasItems ? 'sm:pb-24' : ''}`}>
+        {/* Title row */}
+        <div className="flex flex-wrap items-end justify-between gap-6 pb-[30px] pt-10 sm:pb-5 sm:pt-6">
+          <div>
+            <nav aria-label="Breadcrumb" className="mb-4 flex gap-2.5 text-[11px] uppercase tracking-[0.14em] text-ink-soft">
+              <Link href="/" className="text-ink-soft hover:text-ink">
+                Home
+              </Link>
+              <span aria-hidden className="text-line">
+                /
+              </span>
+              <span aria-current="page">Bag</span>
+            </nav>
+            <h1 className="m-0 font-cormorant text-[clamp(44px,5.6vw,80px)] font-normal leading-[0.92] tracking-[-0.01em]">
+              Your <em className="italic text-gilt">Bag</em>
+              {hasItems && (
+                <small className="ml-2.5 align-super font-libre text-[12px] uppercase not-italic tracking-[0.14em] text-ink-soft">
+                  {pieceCount} {pieceCount === 1 ? 'piece' : 'pieces'}
+                </small>
               )}
-
-              {cartProducts?.length > 0 ? (
-                <div className="px-5 sm:px-3 pb-5 bg-gray-50">
-                  {/* <Link href={handleUser()} className="w-full"> */}
-                  <Button
-                    disabled={loading}
-                    type="default"
-                    loading={loading}
-                    name="Checkout Button"
-                    className="w-full !text-text_w !bg-secondary disabled:!bg-primary/50 !h-[45px] tracking-[1.50px] 2xl:text-[16px] xl:text-[16px] lg:text-[14px] lg:!h-[37px] uppercase"
-                    onClick={handleCheckout}
-                  >
-                    checkout
-                  </Button>
-                  {/* </Link> */}
-                </div>
-              ) : null}
-              {cartProducts?.length > 0 && (
-                <div ref={messagingTermsSectionRef} className="scroll-mt-24 sm:scroll-mt-20" id="cart-messaging-terms-section">
-                  <div className={'p-5 flex items-start gap-[10px] !cursor-pointer'}>
-                    <input
-                      className={`!text-secondary`}
-                      type="checkbox"
-                      id="checkoutCondition"
-                      checked={isChecked}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        if (checked) {
-                          setShowMessagingTermsError(false);
-                        }
-                        setIsChecked(checked);
-                      }}
-                    />
-                    <label htmlFor="checkoutCondition" className="!text-[12px] !font-sans font-extralight tracking-[1.80px] sm:!text-[12px]">
-                      By checking this box, you agree to receive automated personalized text messages (e.g. cart reminders, shipping updates, and
-                      tracking info) from ASHCLAIR. Reply HELP for help and STOP to cancel.{' '}
-                      <Link className="underline !cursor-pointer" href="/terms-and-conditions">
-                        View Terms & Privacy
-                      </Link>
-                      .
-                    </label>
-                  </div>
-                  {showMessagingTermsError && !isChecked && (
-                    <p className="px-5 pb-5 -mt-3 text-red-600 text-[12px]" role="alert">
-                      Please confirm the messaging terms to continue.
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+            </h1>
           </div>
-        )}
-      </div>
-      {(loading || loader) && (
-        <div className="flex flex-col items-center gap-[60px] min-h-[50vh] justify-center">
-          <div className="w-full flex justify-center items-center">
-            <LuLoader className="h-10 w-10 animate-spin text-primary" />
-          </div>
+          {hasItems && <CheckoutSteps current="bag" />}
         </div>
-      )}
-      {!loader && !loading && cartProducts?.length == 0 && (
-        // <div className="flex flex-col items-center gap-[60px] min-h-[50vh] justify-center">Cart is Empty !!</div>
-        <>
-          <div className="w-full mx-auto text-center mb-16">
-            {/* <div className="relative h-48 w-48 mx-auto mb-5">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div>
-                  <LuShoppingBag
-                    className="h-24 w-24 text-gray-500/50"
-                    strokeWidth={1.5}
-                    // onMouseEnter={() => setIsHovering(true)}
-                    // onMouseLeave={() => setIsHovering(false)}
+
+        {(loading || loader) && (
+          <div className="flex min-h-[50vh] items-center justify-center">
+            <LuLoader className="h-10 w-10 animate-spin text-ink" />
+          </div>
+        )}
+
+        {hasItems && (
+          <div className="grid grid-cols-[minmax(0,1fr)_minmax(320px,410px)] items-start gap-[clamp(28px,4vw,64px)] pb-20 lg:grid-cols-1">
+            <section aria-label="Pieces in your bag">
+              {!user && (
+                <div className="flex flex-wrap items-center justify-between gap-4 border-y border-line py-3.5 text-[13px] text-ink-soft">
+                  <span>
+                    <Link href="/login?callbackUrl=cart" className="text-ink underline underline-offset-[3px]">
+                      Sign in
+                    </Link>{' '}
+                    to save your bag across devices.
+                  </span>
+                  <span className="tabular-nums">Prices in {currency}</span>
+                </div>
+              )}
+              <ul className="m-0 list-none p-0">
+                {updatedCartProducts?.map((d: any, index: number) => (
+                  <CartItem
+                    key={`${d?.id ?? d?.sku_master_id}-${index}`}
+                    index={index}
+                    productDetails={d}
+                    handleCount={handleCount}
+                    handleRemoveProducts={handleRemoveProducts}
                   />
+                ))}
+              </ul>
+
+              <div className="mt-7 grid gap-3 border border-line px-6 py-[22px]">
+                <h3 className="m-0 flex items-center gap-2.5 font-cormorant text-[22px] font-medium">
+                  <LuMessageSquare className="h-5 w-5" aria-hidden />
+                  Need advice?
+                </h3>
+                <p className="m-0 text-[13px] text-ink-soft">Our jewelry specialists can help with sizing, stones and delivery to your country.</p>
+                <div className="flex flex-wrap gap-x-6 gap-y-2.5 text-[13px]">
+                  <Link href="/virtual-appointment" className="flex items-center gap-2.5 text-ink hover:text-gilt">
+                    <LuMonitor className="h-[18px] w-[18px]" aria-hidden />
+                    Book a virtual appointment
+                  </Link>
+                  <Link href="/contactpage" className="flex items-center gap-2.5 text-ink hover:text-gilt">
+                    <LuMessageSquare className="h-[18px] w-[18px]" aria-hidden />
+                    Contact a specialist
+                  </Link>
                 </div>
               </div>
-            </div> */}
-
-            <div className="mb-8 ">
-              <h1 className="text-3xl font-serif font-medium mb-3 text-gray-800">Your Cart is Empty</h1>
-              <p className="text-[14px] font-notosans mb-8 max-w-sm mx-auto text-gray-500">
-                It seems you haven't added any precious jewelry to your collection yet. Discover our exquisite pieces and find something that speaks
-                to you.
+              <p className="mb-0 mt-[22px]">
+                <Link href="/all" className="text-[11px] uppercase tracking-[0.12em] text-ink-soft underline underline-offset-4 hover:text-ink">
+                  ← Continue shopping
+                </Link>
               </p>
-            </div>
-            {/* Product Suggestions Section */}
-            <div>
-              <OurBestSellers />
-            </div>
+            </section>
+
+            <aside aria-label="Order summary" className="sticky top-6 grid border border-line bg-paper lg:static">
+              <div className="grid gap-[18px] px-7 py-[26px] sm:px-5">
+                <h2 className="m-0 font-cormorant text-[30px] font-normal leading-none">Order summary</h2>
+                {totals.couponCode ? (
+                  <div className="flex items-center justify-between gap-3 bg-stone px-3.5 py-3">
+                    <div className="flex items-center gap-2.5 text-[12px] font-semibold tracking-[0.14em]">
+                      <LuTag className="h-[15px] w-[15px] text-gilt" aria-hidden />
+                      <div>
+                        {totals.couponCode}
+                        {couponData?.coupon_description && (
+                          <small className="mt-0.5 block text-[12px] font-normal tracking-normal text-ink-soft">
+                            {couponData.coupon_description}
+                          </small>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      className="text-[11px] uppercase tracking-[0.12em] text-ink-soft underline underline-offset-4 hover:text-ink"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setDrawerOpen(true)}
+                    className="flex w-full items-center gap-2.5 border border-dashed border-line-strong px-4 py-3.5 text-left text-[12px] uppercase tracking-[0.12em] transition-colors hover:border-ink"
+                  >
+                    <LuTag className="h-4 w-4" aria-hidden />
+                    Add a promo code
+                  </button>
+                )}
+                <OrderSummary cartProducts={updatedCartProducts} promoCode={promoCode} />
+                <Button type="default" loading={loading} disabled={loading} onClick={handleCheckout} className={`${PRIMARY_BTN} !h-[52px] w-full`}>
+                  <LuLock className="h-[15px] w-[15px]" aria-hidden /> Secure checkout
+                </Button>
+                <label className="flex cursor-pointer items-start gap-2.5 text-[11.5px] leading-[1.5] text-ink-soft">
+                  <input
+                    type="checkbox"
+                    checked={smsOptIn}
+                    onChange={(e) => setSmsOptIn(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 flex-none rounded-none border-line-strong text-ink focus:ring-ink"
+                  />
+                  <span>
+                    Text me order and delivery updates from Pendyora. Optional. Message rates may apply; reply STOP to opt out.{' '}
+                    <Link href="/terms-and-conditions" className="underline">
+                      Terms &amp; Privacy
+                    </Link>
+                  </span>
+                </label>
+              </div>
+              <div className="grid gap-3 border-t border-line bg-stone/45 px-7 py-5 sm:px-5">
+                {ASSURANCES.map(({ icon: Icon, title, text }) => (
+                  <div key={title} className="grid grid-cols-[20px_1fr] items-start gap-3 text-[12.5px]">
+                    <Icon className="h-[18px] w-[18px] text-gilt" aria-hidden />
+                    <p className="m-0">
+                      <b className="block font-medium text-ink">{title}</b>
+                      <span className="text-ink-soft">{text}</span>
+                    </p>
+                  </div>
+                ))}
+                <div className="flex flex-wrap gap-1.5 pt-1" aria-label="Accepted payment methods">
+                  {PAYMENT_MARKS.map((m) => (
+                    <span key={m} className="border border-line bg-paper px-[7px] py-1 text-[9.5px] font-semibold tracking-[0.08em] text-ink-soft">
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </aside>
           </div>
-        </>
-      )}
-    </div>
+        )}
+
+        {isEmpty && (
+          <>
+            <div className="grid justify-items-center gap-3.5 pb-16 pt-6 text-center">
+              <h2 className="m-0 font-cormorant text-[clamp(40px,5vw,64px)] font-normal leading-none">
+                Your bag is <em className="italic text-gilt">empty</em>
+              </h2>
+              <p className="m-0 max-w-[46ch] text-ink-soft">
+                Nothing here yet. Start with our newest pieces, or ask a specialist to help you choose.
+              </p>
+              <div className="mt-2.5 flex flex-wrap justify-center gap-2.5">
+                <Link
+                  href="/new-arrivals"
+                  className="inline-flex h-12 items-center bg-ink px-8 text-[11px] uppercase tracking-[0.18em] text-paper hover:bg-ink-hover hover:text-paper"
+                >
+                  Shop new arrivals
+                </Link>
+                <Link
+                  href="/virtual-appointment"
+                  className="inline-flex h-12 items-center border border-ink px-7 text-[11px] uppercase tracking-[0.18em] text-ink hover:bg-ink hover:text-paper"
+                >
+                  Book a virtual appointment
+                </Link>
+              </div>
+            </div>
+            <OurBestSellers />
+          </>
+        )}
+
+        {/* Mobile total + checkout */}
+        {hasItems && (
+          <div className="fixed inset-x-0 bottom-0 z-30 hidden items-center justify-between gap-3.5 border-t border-line bg-paper px-4 pb-[calc(12px+env(safe-area-inset-bottom,0px))] pt-3 sm:flex">
+            <div className="grid leading-tight">
+              <small className="text-[10.5px] uppercase tracking-[0.14em] text-ink-soft">Total</small>
+              <strong className="font-cormorant text-[24px] font-medium tabular-nums">{formatCurrency(totals.total)}</strong>
+            </div>
+            <Button type="default" onClick={handleCheckout} disabled={loading} className={PRIMARY_BTN}>
+              Checkout
+            </Button>
+          </div>
+        )}
+
+        <Drawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          placement="right"
+          width="min(460px, 100vw)"
+          closeIcon={null}
+          title={<span className="font-cormorant text-[26px] font-medium text-ink">Promo codes</span>}
+          extra={
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(false)}
+              className="bg-ink px-3.5 py-2 text-[10.5px] uppercase tracking-[0.18em] text-paper"
+            >
+              Close
+            </button>
+          }
+          classNames={{ header: '!border-line !px-7 !py-[22px] sm:!px-[18px]', body: '!px-7 !py-6 sm:!px-[18px]' }}
+        >
+          <form
+            noValidate
+            className="grid gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleApplyCoupon();
+            }}
+          >
+            <label htmlFor="promo-code" className="sr-only">
+              Promo code
+            </label>
+            <div className="flex">
+              <Input
+                id="promo-code"
+                autoComplete="off"
+                value={codeInput}
+                onChange={(e) => {
+                  setCodeInput(e.target.value);
+                  if (errorMessage) {
+                    setErrorMessage('');
+                  }
+                }}
+                placeholder="Enter a promo code"
+                status={errorMessage ? 'error' : undefined}
+                className="!border-r-0 uppercase tracking-[0.12em] placeholder:normal-case placeholder:tracking-normal"
+              />
+              <Button htmlType="submit" loading={applying} className={`${PRIMARY_BTN} !px-6`}>
+                Apply
+              </Button>
+            </div>
+            {errorMessage && (
+              <p role="alert" className="m-0 text-[12.5px] text-danger">
+                {errorMessage}
+              </p>
+            )}
+            <p className="m-0 text-[12px] text-ink-soft">One promo code per order.</p>
+          </form>
+        </Drawer>
+      </div>
+    </ConfigProvider>
   );
 };
 

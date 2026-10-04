@@ -19,10 +19,12 @@ module.exports = {
   gilt: { DEFAULT: '#A2845A', soft: '#D9C7A7' }, // champagne accent, deepened for legibility
   noir: { DEFAULT: '#0F0E0C', on: '#F3EEE6' }, // dark editorial tiles and text on them
   danger: '#A23B2E', // form validation messages
+  ok: '#4E6B4A', // success states (password strength, confirmations)
   metal: {
     yellow: { light: '#F6E3A6', mid: '#D8B25A', deep: '#B88E35' },
     white: { light: '#FAFAF8', mid: '#D7D6D2', deep: '#AFAEAA' },
     rose: { light: '#F7D4C2', mid: '#DCA28A', deep: '#BF7E66' },
     black: { light: '#6B6763', mid: '#2C2A27', deep: '#121110' },
+    platinum: { light: '#F1F2F3', mid: '#BFC2C6', deep: '#84888D' },
   },
 };

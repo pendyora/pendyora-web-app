@@ -25,9 +25,19 @@ module.exports = {
           from: { backgroundPosition: '120% 0' },
           to: { backgroundPosition: '-120% 0' },
         },
+        rise: {
+          from: { opacity: '0', transform: 'translateY(6px)' },
+          to: { opacity: '1', transform: 'none' },
+        },
+        progress: {
+          from: { width: '0%' },
+          to: { width: '100%' },
+        },
       },
       animation: {
         shimmer: 'shimmer 1.2s linear infinite',
+        progress: 'progress 6s linear forwards',
+        rise: 'rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both',
       },
 
       boxShadow: {},

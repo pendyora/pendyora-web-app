@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, Dispatch } from 'react';
 
 import { Button, Form, Input, Select } from 'antd';
 
-import { CheckBox, Text } from '@/components';
+import { CheckBox } from '@/components';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { fetchAddDeliveryAddress, fetchCities, fetchCountries, fetchEditDeliveryAddress, fetchStates } from '@/store/slices/Address/addressSlice';
 import { getUpdateUser } from '@/store/slices/auth/authSlice';
@@ -12,6 +12,8 @@ import { formatAddressDisplayLine } from '@/utils/common';
 import { formatMobile, getMobileRule, unmaskMobile } from '@/utils/mobileValidation';
 
 import AddressDetalis from './AddressDetalis';
+import { PRIMARY_BTN } from './checkoutTheme';
+import SectionTitle from './SectionTitle';
 
 type Props = {
   formState?: boolean;
@@ -327,7 +329,7 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
   };
 
   return (
-    <div className="flex flex-col items-end gap-[38px] self-stretch">
+    <div className="flex w-full flex-col items-stretch gap-6 self-stretch">
       {!isActive && !isEditOpen ? (
         sourceAddress ? (
           <AddressDetalis
@@ -347,9 +349,7 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
             onEditClick={handleEditDelivery}
           />
         ) : (
-          <Text as="p" size="text5xl" className="text-black font-normal uppercase opacity-30 lg:text-[34px]  md:!text-[20px]">
-            delivery address
-          </Text>
+          <SectionTitle muted>Delivery address</SectionTitle>
         )
       ) : sourceAddress && !loading && !isEditOpen ? (
         <AddressDetalis
@@ -370,11 +370,7 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
         />
       ) : (
         <>
-          <div className="flex flex-col items-start gap-4 self-stretch">
-            <Text as="p" size="text5xl" className="text-black font-normal uppercase md:-mb-5 lg:text-[22px] sm:text-[32px] md:!text-[20px]">
-              delivery address
-            </Text>
-          </div>
+          <SectionTitle>Delivery address</SectionTitle>
           {billingAddress ? (
             <div className="w-full self-stretch">
               <CheckBox
@@ -382,9 +378,9 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                 checked={isSameAsBilling}
                 onChange={(e: any) => handleAsBillingAddress(e)}
                 size="xs"
-                label="Same as Billing address."
+                label="Same as billing address"
                 id="delivery-same-as-billing"
-                className="w-full justify-start gap-[22px] text-left 2xl:text-[14px] text-[18px] !font-sans font-extralight leading-[26px] tracking-[1.80px] text-[#757575] sm:gap-3 sm:text-[14px] sm:tracking-[0.8px]"
+                className="w-full justify-start gap-3 text-left text-[13.5px] text-ink"
               />
             </div>
           ) : null}
@@ -395,21 +391,21 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
             className="flex flex-col self-stretch sm:[&_.ant-form-item]:!mb-4 sm:[&_.ant-form-item-label]:!pb-1"
           >
             <div className={isSameAsBilling ? 'hidden' : ''}>
-              <div className="grid gap-8 grid-cols-2 md:gap-4 sm:grid-cols-1 sm:gap-3">
+              <div className="grid grid-cols-2 gap-x-4 sm:grid-cols-1">
                 <Form.Item name="firstName" label="First name" rules={[{ required: true, message: 'Please enter your first name!' }]}>
-                  <Input placeholder="First Name Enter" disabled={isSameAsBilling} />
+                  <Input disabled={isSameAsBilling} />
                 </Form.Item>
                 <Form.Item name="lastName" label="Last name" rules={[{ required: true, message: 'Please enter your last name!' }]}>
-                  <Input placeholder="Last Name Enter" disabled={isSameAsBilling} />
+                  <Input disabled={isSameAsBilling} />
                 </Form.Item>
               </div>
-              <Form.Item name="address1" label="Address 1" rules={[{ required: true, message: 'Please enter your address!' }]}>
-                <Input placeholder="Address 1 Enter" disabled={isSameAsBilling} />
+              <Form.Item name="address1" label="Address" rules={[{ required: true, message: 'Please enter your address!' }]}>
+                <Input placeholder="Street and house number" disabled={isSameAsBilling} />
               </Form.Item>
-              <Form.Item name="address2" label="Address 2">
-                <Input placeholder="Address 2 Enter" disabled={isSameAsBilling} />
+              <Form.Item name="address2" label="Apartment, suite, building (optional)">
+                <Input disabled={isSameAsBilling} />
               </Form.Item>
-              <div className="grid gap-8 grid-cols-2 md:gap-4 sm:grid-cols-1 sm:gap-3">
+              <div className="grid grid-cols-2 gap-x-4 sm:grid-cols-1">
                 <Form.Item name="country" label="Country" rules={[{ required: true, message: 'Please select your country!' }]}>
                   <Select
                     showSearch
@@ -419,11 +415,11 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                     }))}
                     filterOption={(input, option: any) => option?.label?.toLowerCase()?.includes(input.toLowerCase())}
                     onChange={handleCountryChange}
-                    placeholder="Select Country"
+                    placeholder="Select"
                     disabled={isSameAsBilling}
                   />
                 </Form.Item>
-                <Form.Item name="state" label="State/Territory" rules={[{ required: true, message: 'Please select your state!' }]}>
+                <Form.Item name="state" label="State / region" rules={[{ required: true, message: 'Please select your state!' }]}>
                   <Select
                     showSearch
                     options={states?.map((option: any) => ({
@@ -431,13 +427,13 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                       value: option.id,
                     }))}
                     filterOption={(input, option: any) => option?.label?.toLowerCase()?.includes(input.toLowerCase())}
-                    placeholder="Select State"
+                    placeholder="Select"
                     onChange={handleStateChange}
                     disabled={isSameAsBilling}
                   />
                 </Form.Item>
               </div>
-              <div className="grid gap-8 grid-cols-2 md:gap-4 sm:grid-cols-1 sm:gap-3">
+              <div className="grid grid-cols-2 gap-x-4 sm:grid-cols-1">
                 <Form.Item name="city" label="City">
                   <Select
                     showSearch
@@ -446,14 +442,13 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                       value: option.id,
                     }))}
                     filterOption={(input, option: any) => option?.label?.toLowerCase()?.includes(input.toLowerCase())}
-                    placeholder="Select City"
+                    placeholder="Select"
                     onChange={() => form.setFieldsValue({ zipCode: '' })}
                     disabled={isSameAsBilling}
                   />
                 </Form.Item>
-                <Form.Item name="zipCode" label="Zip Code" rules={[{ required: true, message: 'Please enter your zip code!' }]}>
+                <Form.Item name="zipCode" label="ZIP / postal code" rules={[{ required: true, message: 'Please enter your zip code!' }]}>
                   <Input
-                    placeholder="ZipCode Enter"
                     inputMode="numeric"
                     onKeyPress={(event) => {
                       if (!/[0-9]/.test(event.key)) {
@@ -465,7 +460,7 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                   />
                 </Form.Item>
               </div>
-              <div className="grid gap-8 grid-cols-2 md:gap-4 sm:grid-cols-1 sm:gap-3">
+              <div className="grid grid-cols-2 gap-x-4 sm:grid-cols-1">
                 <Form.Item
                   name="email"
                   label="Email"
@@ -477,11 +472,11 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                     },
                   ]}
                 >
-                  <Input placeholder="Email Enter" disabled={isSameAsBilling} />
+                  <Input disabled={isSameAsBilling} />
                 </Form.Item>
-                <Form.Item label="Mobile Number" required className="!mb-0">
+                <Form.Item label="Phone" required className="!mb-0">
                   <div className="flex gap-2 items-stretch">
-                    <div className="flex items-center gap-1 border border-gray-300 rounded-md px-0 bg-white w-[72px] !h-[40px] shrink-0 overflow-hidden">
+                    <div className="flex items-center gap-1 border border-line px-0 bg-paper w-[88px] !h-12 shrink-0 overflow-hidden">
                       {selectedCountry?.flag && (
                         <img src={selectedCountry.flag} alt={selectedCountry.name} className="w-4 h-3 object-cover rounded-sm" />
                       )}
@@ -493,7 +488,7 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                             const digitsOnly = e.target.value.replace(/\D/g, '');
                             form.setFieldsValue({ countryCode: digitsOnly });
                           }}
-                          prefix={selectedCountry ? <span className="text-black/70 text-xs leading-none">+</span> : null}
+                          prefix={selectedCountry ? <span className="text-ink-soft text-xs leading-none">+</span> : null}
                           className="!border-none !shadow-none !text-xs !h-full !px-2"
                           disabled={isSameAsBilling}
                         />
@@ -533,10 +528,10 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                       }}
                     >
                       <Input
-                        placeholder="Enter Mobile Number"
+                        placeholder="Phone number"
                         type="text"
                         inputMode="numeric"
-                        className="!h-[40px]"
+                        className="!h-12"
                         maxLength={getMobileRule(form.getFieldValue('countryCode'))?.maxLength}
                         disabled={isSameAsBilling}
                       />
@@ -551,9 +546,9 @@ const DeliveryAddress = ({ formState, setShipping, setIsEditDeliveryAddress, set
                   type="default"
                   htmlType="submit"
                   loading={loading}
-                  className="!text-text_w !bg-secondary min-w-[130px] max-w-[360px] w-full px-6 md:!h-[35px] flex flex-row items-center justify-center text-center uppercase tracking-[2.00px] sm:w-full sm:min-w-0"
+                  className={`${PRIMARY_BTN} min-w-[130px] max-w-[360px] w-full sm:max-w-none`}
                 >
-                  {' Continue '}
+                  Continue to payment
                 </Button>
               </div>
             </Form.Item>

@@ -21,11 +21,9 @@ import {
   otherPriceData,
 } from '@/store/slices/Master/masterSlice';
 
-import HeaderViewDynamic from './components/HeaderViewDynamic';
 import OfferModel from './components/OfferModel';
-import PromotionalStrip from './components/promotionalStrip';
-import HeaderMobileView from './HeaderMobileView';
-import HeaderTopPart from './HeaderTopPart';
+import AnnouncementBar from './mega/AnnouncementBar';
+import SiteHeader from './mega/SiteHeader';
 
 let timeout: ReturnType<typeof setTimeout> | null;
 let currentValue: string;
@@ -35,7 +33,6 @@ const Header: React.FC<HeaderProps> = ({ className, headerMetaData, promoStripDa
   const dispatch = useAppDispatch();
   const headerRef = useRef<HTMLElement>(null);
   const { user } = useAppSelector((state) => state.auth.auth);
-  const [isFocused, setIsFocused] = useState(false);
   const [currency, setCurrency] = useState<any>('');
   const [refresh, setRefresh] = useState<any>(false);
   const [currencyOption, setCurrencyOption] = useState<any>([]);
@@ -140,8 +137,6 @@ const Header: React.FC<HeaderProps> = ({ className, headerMetaData, promoStripDa
     handleOfferModel();
   }, []);
 
-  const headerClass = 'tracking-[2.00px]  font-sans text-center font-thin xl:text-base lg:text-sm md:text-[12px] leading-normal pb-[14px] sm:pb-0';
-
   const [data, setData] = useState<any>([]);
   const [value, setValue] = useState<string>('');
 
@@ -187,58 +182,21 @@ const Header: React.FC<HeaderProps> = ({ className, headerMetaData, promoStripDa
     dispatch(clearSelectedProduct());
     dispatch(setSelectedSettingStore(null));
   };
-  const handleFocus = () => {
-    setIsFocused(true); // Show search input on focus
-  };
-
   const handleBlur = () => {
     setValue('');
     setData([]);
     setSearchLoading(false);
-    setIsFocused(false); // Hide search input when focus is lost
   };
 
-  return (
-    <header ref={headerRef} className={`${className} flex flex-col z-[51] overflow-x-clip overflow-y-visible`}>
-      <PromotionalStrip data={promoStripData} />
+  const currencyProps = { currency, currencyOption, setCurrency, setRefresh, tone: 'dark' as const };
 
-      <div className="flex flex-col items-center self-stretch lg:hidden">
-        <div className="w-full">
-          <HeaderTopPart
-            isFocused={isFocused}
-            handleFocus={handleFocus}
-            handleSearch={handleSearch}
-            handleChange={handleChange}
-            currencyOption={currencyOption}
-            currency={currency}
-            setCurrency={setCurrency}
-            handleBlur={handleBlur}
-            data={data}
-            value={value}
-            setRefresh={setRefresh}
-            searchLoading={searchLoading}
-            headerMetaData={headerMetaData}
-          />
-        </div>
-        {/* <div className="flex justify-center self-stretch bg-text_w pt-[14px] border-b 2xl:px-[80px] xl:px-28 lg:px-20 md:px-5">
-          <div className="container-xs flex justify-center">
-            <HeaderViewDynamic headerData={headerMetaData} />
-          </div>
-        </div> */}
-      </div>
-      <HeaderMobileView
-        header={headerClass}
-        currency={currency}
-        value={value}
-        currencyOption={currencyOption}
-        setCurrency={setCurrency}
-        setRefresh={setRefresh}
-        jewelryData={data}
-        handleSearch={handleSearch}
-        handleChange={handleChange}
-        handleBlur={handleBlur}
-        megaHeader={headerMetaData}
-        searchLoading={searchLoading}
+  return (
+    <header ref={headerRef} className={`${className} z-[51] flex flex-col overflow-x-clip overflow-y-visible`}>
+      <AnnouncementBar promoStripData={promoStripData} currencyProps={currencyProps} />
+      <SiteHeader
+        headerMetaData={headerMetaData}
+        currencyProps={currencyProps}
+        search={{ value, results: data, loading: searchLoading, onSearch: handleSearch, onPick: handleChange, onReset: handleBlur }}
       />
       {OfferModelOpen == 'false' && <OfferModel />}
     </header>

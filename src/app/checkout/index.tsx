@@ -2,16 +2,14 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Image } from 'antd';
+import { ConfigProvider } from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { LuLoader } from 'react-icons/lu';
+import { LuLoader, LuLock } from 'react-icons/lu';
 
-import ProductName from '@/components/CartProductDetails/ProductName';
-import OrderSummary from '@/components/OrderSummary';
 import { apiCancelAffirmOrder } from '@/services/affirmService';
-import store, { setSelectedAppraisal, setSelectedEngraving, setSelectedWarranty, useAppDispatch, useAppSelector } from '@/store';
+import store, { useAppDispatch, useAppSelector } from '@/store';
 import { fetchCountries, setBillingAddress, setDeliveryAddress } from '@/store/slices/Address/addressSlice';
 import { clearAuthState, getUpdateUser } from '@/store/slices/auth/authSlice';
 import {
@@ -22,16 +20,17 @@ import {
   setGuestDetails,
 } from '@/store/slices/Cart/cartSlice';
 import { fetchPlaceOrder, setGuestUserOrderDetails } from '@/store/slices/Order/orderSlice';
-import { formatCurrency } from '@/utils/common';
 import { trackAddPaymentInfo, trackInitiateCheckout } from '@/utils/metaPixel';
 
 import BillingAddress from './BillingAddress';
 import CheckoutPromoCode from './CheckoutPromoCode';
+import CheckoutSteps from './CheckoutSteps';
+import CheckoutSummary from './CheckoutSummary';
+import { checkoutTheme, FORM_LABELS, GUTTER } from './checkoutTheme';
 import DeliveryAddress from './DeliveryAddress';
 import Payment from './Payment';
+import SectionTitle from './SectionTitle';
 import SignIn from './SignIn';
-import Stepper from './Stepper';
-import { Text } from '../../components/Text';
 
 export default function CheckOutPage() {
   const [currentStep, setCurrentStep] = useState<number>(0); // 0 SignIn, 1 Billing, 2 Delivery, 3 Payment (includes promo)
@@ -46,12 +45,10 @@ export default function CheckOutPage() {
   const [, setPayment] = useState(false);
   const { cartProducts, checkoutDetails, guestDetails } = useAppSelector((state) => state?.cart);
   const { user } = useAppSelector((state) => state.auth.auth);
-  const master = useAppSelector((state) => state.master.data);
   const [shippingDates, setShippingDates] = useState<any>([]);
   const [paymentError, setPaymentError] = useState<any>(null);
   const [cartListFromLocalStorage, setCartListFromLocalStorage] = useState([]);
   const [accountPassword, setAccountPassword] = useState<string | null>(null);
-  const { appraisalData, engraving }: any = useAppSelector((state) => state?.master);
 
   const billingStepBeforeEditRef = useRef<number | null>(null);
 
@@ -475,350 +472,141 @@ export default function CheckOutPage() {
     }
   }, [cartReady, cartProducts?.length, isPlacingOrder, router]);
 
+  const onPayment = currentStep >= 3;
+
   return !cartReady || (!isPlacingOrder && (!cartProducts || cartProducts.length === 0)) ? (
-    <div className="w-full flex justify-center items-center min-h-[80vh] bg-white-a700">
-      <LuLoader className="h-10 w-10 animate-spin" />
+    <div className="flex min-h-[80vh] w-full items-center justify-center bg-paper">
+      <LuLoader className="h-10 w-10 animate-spin text-ink" />
     </div>
-  ) : cartProducts?.length !== 0 || isPlacingOrder ? (
-    <div className="bg-white-a700 w-full overflow-x-hidden">
-      <div className="container-xs border-gray-800_01 flex justify-center border-b border-solid py-[60px] md:py-5 sm:py-4 overflow-x-hidden">
-        <div className="mx-auto mb-5 flex w-full sm:flex-col max-w-[1440px] items-start justify-center gap-8 md:gap-[20px] sm:gap-0 xl:px-28 lg:px-20 md:px-5 sm:px-3 overflow-x-hidden">
-          <div className="flex w-[50%] sm:!w-full lg:w-[65%] flex-col md:!w-[50%] gap-5  sm:gap-3">
-            <div className="container-xs flex justify-start ">
-              <Stepper currentStep={currentStep} />
-            </div>
-            <div className="flex flex-col py-5 sm:pb-0 gap-6 sm:gap-[10px] md:gap-[20px]">
+  ) : (
+    <ConfigProvider theme={checkoutTheme}>
+      <div className={`w-full overflow-x-hidden bg-paper font-libre text-[14px] leading-[1.55] text-ink antialiased ${GUTTER} ${FORM_LABELS}`}>
+        <div className="flex flex-wrap items-end justify-between gap-6 pb-[30px] pt-10 sm:pb-5 sm:pt-6">
+          <div>
+            <nav aria-label="Breadcrumb" className="mb-4 flex gap-2.5 text-[11px] uppercase tracking-[0.14em] text-ink-soft">
+              <Link href="/" className="text-ink-soft hover:text-ink">
+                Home
+              </Link>
+              <span aria-hidden className="text-line">
+                /
+              </span>
+              <Link href="/cart" className="text-ink-soft hover:text-ink">
+                Bag
+              </Link>
+              <span aria-hidden className="text-line">
+                /
+              </span>
+              <span aria-current="page">{onPayment ? 'Payment' : 'Delivery'}</span>
+            </nav>
+            <h1 className="m-0 font-cormorant text-[clamp(44px,5.6vw,80px)] font-normal leading-[0.92] tracking-[-0.01em]">
+              {onPayment ? (
+                <em className="italic text-gilt">Payment</em>
+              ) : (
+                <>
+                  Delivery <em className="italic text-gilt">details</em>
+                </>
+              )}
+            </h1>
+          </div>
+          <CheckoutSteps current={onPayment ? 'payment' : 'delivery'} />
+        </div>
+
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(320px,410px)] items-start gap-[clamp(28px,4vw,64px)] pb-20 md:grid-cols-1 md:gap-6">
+          <div className="min-w-0 md:order-2">
+            <section className="pb-[30px]">
               <SignIn
                 isDeliveryAddress={isDeliveryAddress}
                 setIsDeliveryAddress={setIsDeliveryAddress}
                 setCurrentStep={setCurrentStep}
                 onContactContinue={openBillingSection}
               />
-              <div className="bg-gray-400 h-px" />
+            </section>
 
-              <div id="checkout-billing-section">
-                {currentStep >= 1 ? (
-                  <BillingAddress
-                    setPayment={setPayment}
-                    setBillingAddress={setBillingAddressData}
-                    setCurrentStep={setCurrentStep}
-                    onAccountPasswordChange={setAccountPassword}
-                    isActive={currentStep === 1}
-                    onBillingEditStart={() => {
-                      billingStepBeforeEditRef.current = currentStep;
-                    }}
-                    onBillingEditCancel={() => {
-                      if (billingStepBeforeEditRef.current != null) {
-                        setCurrentStep(billingStepBeforeEditRef.current);
-                        billingStepBeforeEditRef.current = null;
-                      }
-                    }}
-                    onBillingSaveSuccess={() => {
+            <section id="checkout-billing-section" className="border-t border-line py-[26px]">
+              {currentStep >= 1 ? (
+                <BillingAddress
+                  setPayment={setPayment}
+                  setBillingAddress={setBillingAddressData}
+                  setCurrentStep={setCurrentStep}
+                  onAccountPasswordChange={setAccountPassword}
+                  isActive={currentStep === 1}
+                  onBillingEditStart={() => {
+                    billingStepBeforeEditRef.current = currentStep;
+                  }}
+                  onBillingEditCancel={() => {
+                    if (billingStepBeforeEditRef.current != null) {
+                      setCurrentStep(billingStepBeforeEditRef.current);
                       billingStepBeforeEditRef.current = null;
-                    }}
+                    }
+                  }}
+                  onBillingSaveSuccess={() => {
+                    billingStepBeforeEditRef.current = null;
+                  }}
+                />
+              ) : (
+                <SectionTitle muted>Billing address</SectionTitle>
+              )}
+            </section>
+
+            <section id="checkout-delivery-section" className="border-t border-line py-[26px]">
+              {currentStep >= 2 ? (
+                <DeliveryAddress setShipping={setShipping} setCurrentStep={setCurrentStep} isActive={currentStep === 2} />
+              ) : (
+                <SectionTitle muted>Delivery address</SectionTitle>
+              )}
+            </section>
+
+            <section id="checkout-payment-section" className="border-t border-line pt-[26px]">
+              {onPayment ? (
+                <div className="grid gap-6 sm:gap-4">
+                  <SectionTitle
+                    action={
+                      <p className="m-0 flex items-center gap-2 text-[12px] text-ink-soft">
+                        <LuLock className="h-3.5 w-3.5 text-gilt" aria-hidden />
+                        Encrypted and processed securely. We never store your card number.
+                      </p>
+                    }
+                  >
+                    Payment
+                  </SectionTitle>
+
+                  <CheckoutPromoCode guestCartProducts={updatedCartProducts} />
+
+                  <Payment
+                    handlePlaceOrder={handlePlaceOrder}
+                    error={paymentError}
+                    cartProducts={productsToDisplay}
+                    deliveryAddressId={updatedDeliveryAddress?.id}
+                    billingAddressId={updatedbillingAddress?.id}
+                    couponCode={couponData?.coupon_code}
+                    isGuest={Boolean(user?.is_guest || guestDetails?.token)}
+                    shippingDates={{ start: shippingDates?.[0], end: shippingDates?.[1] }}
+                    guestCartData={productsToDisplay}
+                    setIsPlacingOrder={setIsPlacingOrder}
                   />
-                ) : (
-                  <Text as="p" size="text5xl" className="text-black-900_7f font-normal uppercase opacity-30 lg:text-[34px] md:!text-[20px]">
-                    billing address
-                  </Text>
-                )}
-              </div>
-
-              <div className="bg-gray-400 h-px " />
-              <div id="checkout-delivery-section">
-                {currentStep >= 2 ? (
-                  <DeliveryAddress setShipping={setShipping} setCurrentStep={setCurrentStep} isActive={currentStep === 2} />
-                ) : (
-                  <Text as="p" size="text5xl" className="text-black font-normal uppercase opacity-30 lg:text-[34px]  md:!text-[20px]">
-                    delivery address
-                  </Text>
-                )}
-              </div>
-
-              <div className="bg-gray-400 h-px " />
-
-              <div id="checkout-payment-section">
-                {currentStep >= 3 ? (
-                  <div className="flex flex-col gap-6 sm:gap-4">
-                    <Text as="p" size="text5xl" className="text-black font-normal uppercase lg:text-[22px] md:!text-[20px]">
-                      payment
-                    </Text>
-
-                    <CheckoutPromoCode guestCartProducts={updatedCartProducts} />
-
-                    <div className="bg-gray-400 h-px" />
-
-                    <Payment
-                      handlePlaceOrder={handlePlaceOrder}
-                      error={paymentError}
-                      cartProducts={productsToDisplay}
-                      deliveryAddressId={updatedDeliveryAddress?.id}
-                      billingAddressId={updatedbillingAddress?.id}
-                      couponCode={couponData?.coupon_code}
-                      isGuest={Boolean(user?.is_guest || guestDetails?.token)}
-                      shippingDates={{ start: shippingDates?.[0], end: shippingDates?.[1] }}
-                      guestCartData={productsToDisplay}
-                      setIsPlacingOrder={setIsPlacingOrder}
-                    />
-                  </div>
-                ) : (
-                  <Text as="p" size="text5xl" className="text-black-900_7f font-normal uppercase opacity-30 lg:text-[34px] ">
-                    payment
-                  </Text>
-                )}
-              </div>
-            </div>
+                  <p className="m-0 text-center text-[12px] text-ink-soft">
+                    By placing your order you agree to our{' '}
+                    <Link href="/terms-and-conditions" className="underline underline-offset-[3px]">
+                      Terms
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="/privacy-policy" className="underline underline-offset-[3px]">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                </div>
+              ) : (
+                <SectionTitle muted>Payment</SectionTitle>
+              )}
+            </section>
           </div>
 
-          <div className="w-[33%] lg:w-[47%] sm:w-full md:w-[50%]">
-            {productsToDisplay?.length > 0 ? <OrderSummary cartProducts={productsToDisplay} promoCode={couponData?.coupon_code} /> : null}
-            <div className="mb-5 flex flex-col items-center gap-5 lg:gap-[20px] p-[30px] lg:p-5 sm:p-4 sm:px-3 bg-gray-50">
-              <Text as="p" size="textxl" className="text-black-900 text-[22px] font-normal !font-sans uppercase tracking-[0.44px] lg:text-[18px]">
-                Products
-              </Text>
-              {productsToDisplay?.map((product: any, index: number) => {
-                const ringPrice = product?.ringSizePricingDetails?.rate ?? null;
-                const couponItem = couponData?.items?.find((el: any) => el?.sku_details?.id === product?.sku_master_id);
-                const is_customizable = product?.cartJewelryDetails?.is_customizable;
-                const jewelryTypeName = product?.cartJewelryDetails?.jewelrySubType?.group;
-                const jewelryTypeData = jewelryTypeName?.toLowerCase()?.replace(' ', '-');
-                return (
-                  <div className="flex flex-col self-stretch border-b border-gray-400 last:border-0" key={index}>
-                    <div className="flex justify-between items-start gap-4 mb-4">
-                      <Image
-                        src={product?.jewelry_sku?.carat_images?.[0] ? `${product?.jewelry_sku?.carat_images?.[0]}` : '/images/no_images.svg'}
-                        alt="Product Image"
-                        fallback="/images/no_images.svg"
-                        width={120}
-                        height={126}
-                        preview={false}
-                        className="!h-auto !w-[130px] border 2xl:w-1/3 2xl:h-auto md:h-auto !aspect-square md:object-contain !object-contain bg-white"
-                      />
-                      <div className=" flex flex-col gap-2  w-2/3">
-                        <div className="flex flex-col gap-2">
-                          <div className="grid grid-cols-3 justify-between gap-5">
-                            <Link
-                              href={
-                                is_customizable
-                                  ? `/custom-jewelry?type=2&state=c&id=${product?.jewelry_sku?.sku_slug}&did=${product?.diamondDetails?.id}`
-                                  : `/${jewelryTypeData}/premade?slug=${product?.jewelry_sku?.sku_slug}&appraisal=${product?.is_appraisal}&warranty=${product?.is_warranty}${
-                                      product?.selectedYearValue?.year || product?.warranty_year
-                                        ? `&year=${product?.selectedYearValue?.year ?? product?.warranty_year}`
-                                        : ''
-                                    }`
-                              }
-                              onClick={() => {
-                                const warrantyDetail = {
-                                  warrantyName: `${product?.warranty_year} ${product?.warranty_amount}`,
-                                  yearPrice: {
-                                    year: product?.warranty_year,
-                                    price: product?.warranty_amount,
-                                  },
-                                };
-
-                                const appraisalDetail = {
-                                  appraisalName: product?.appraisalDetails?.id ?? `product?.is_appraisal`,
-                                  multipler: '',
-                                  polish: '',
-                                  price: product?.appraisal_amount,
-                                  symmetry: '',
-                                };
-                                const engravingDetail = {
-                                  fontFamily: product?.engravingText?.fontFamily,
-                                  text: product?.engravingText?.Text,
-                                };
-                                dispatch(setSelectedAppraisal(appraisalDetail));
-                                dispatch(setSelectedWarranty(warrantyDetail));
-                                dispatch(setSelectedEngraving(engravingDetail));
-                              }}
-                              className="col-span-2"
-                            >
-                              <ProductName productName={product?.fullTitle} />
-                            </Link>
-                            <div className="flex flex-col col-span-1 items-end justify-start">
-                              <Text
-                                as="p"
-                                size="textlg"
-                                className={`!font-castoro text-right text-[18px] font-medium tracking-[0.40px] lg:text-[15px] ${
-                                  product?.jewelry_sku?.discounted_price || couponItem?.sku_details?.selling_price
-                                    ? 'line-through !text-gray-400 !text-[15px]'
-                                    : ''
-                                }`}
-                              >
-                                {formatCurrency(
-                                  (couponData?.coupon_code
-                                    ? couponItem?.sku_details?.discounted_price
-                                      ? couponItem?.sku_details?.discounted_price + ringPrice
-                                      : couponItem?.sku_details?.selling_price + ringPrice
-                                    : Math.ceil(product?.jewelry_sku?.selling_price + ringPrice)) +
-                                    (product?.is_appraisal ? appraisalData?.price || 0 : 0) +
-                                    (product?.selectedYearValue?.price
-                                      ? product?.selectedYearValue?.price
-                                      : product?.warranty_amount
-                                        ? product?.warranty_amount
-                                        : 0) +
-                                    (product?.engravingText && product?.engravingText.Text != '' ? engraving?.data?.engraving_price : 0),
-                                )}
-                              </Text>
-                              {product?.jewelry_sku?.discounted_price && product?.jewelry_sku?.discounted_price != 0 ? (
-                                <Text
-                                  as="p"
-                                  size="textlg"
-                                  className="!font-castoro text-right text-[18px] font-medium tracking-[0.40px] lg:text-[15px] sm:!text-[14px]"
-                                >
-                                  {formatCurrency(
-                                    (couponData?.coupon_code
-                                      ? couponItem?.sku_details?.coupon_discounted_price + ringPrice
-                                      : Math.ceil(product?.jewelry_sku?.discounted_price + ringPrice)) +
-                                      (product?.is_appraisal ? appraisalData?.price || 0 : 0) +
-                                      (product?.selectedYearValue?.price
-                                        ? product?.selectedYearValue?.price
-                                        : product?.warranty_amount
-                                          ? product?.warranty_amount
-                                          : 0) +
-                                      (product?.engravingText && product?.engravingText.Text != '' ? engraving?.data?.engraving_price : 0),
-                                  )}
-                                </Text>
-                              ) : (
-                                couponData && (
-                                  <Text
-                                    as="p"
-                                    size="textlg"
-                                    className="!font-castoro text-right text-[18px] font-medium tracking-[0.40px] lg:text-[15px] sm:!text-[14px]"
-                                  >
-                                    {formatCurrency(
-                                      (couponData?.coupon_code
-                                        ? couponItem?.sku_details?.coupon_discounted_price + ringPrice
-                                        : Math.ceil(product?.jewelry_sku?.discounted_price + ringPrice)) +
-                                        (product?.is_appraisal ? appraisalData?.price || 0 : 0) +
-                                        (product?.selectedYearValue?.price
-                                          ? product?.selectedYearValue?.price
-                                          : product?.warranty_amount
-                                            ? product?.warranty_amount
-                                            : 0) +
-                                        (product?.engravingText && product?.engravingText.Text != '' ? engraving?.data?.engraving_price : 0),
-                                    )}
-                                  </Text>
-                                )
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-start">
-                            <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light tracking-[0.36px] lg:text-[12px]">
-                              {product?.cartJewelryDetails?.jewelrySubType?.group}
-                            </Text>
-                            <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light tracking-[0.36px]">
-                              {master.find((item: any) => item.id === product?.jewelry_sku?.metal_color_id)?.name}
-                            </Text>
-                            <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                              {master &&
-                                master?.find((el: any) => {
-                                  const diamondId =
-                                    product?.jewelry_sku?.center_diamond_id ??
-                                    product?.jewelry_sku?.accent_diamond_id ??
-                                    product?.jewelry_sku?.second_accent_diamond_id ??
-                                    product?.jewelry_sku?.metal_id;
-
-                                  return el?.id === diamondId;
-                                })?.group}
-                              {' | '}
-                              {master && master.find((item: any) => item.id === product?.jewelry_sku?.metal_type_id)?.name}
-                            </Text>
-                            {product?.ringSizePricingDetails && (
-                              <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                                Ring Size : {master.find((item: any) => item.id === product?.ringSizePricingDetails?.ring_size_id)?.name}
-                              </Text>
-                            )}
-                            {product?.jewelry_sku?.bracelet_length_ids && (
-                              <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                                Bracelet Length: {master.find((item: any) => item.id === product?.jewelry_sku?.bracelet_length_ids)?.name}
-                              </Text>
-                            )}
-                            {product?.jewelry_sku?.band_width_ids && (
-                              <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light tracking-[0.36px]">
-                                Band Width - mm: {master.find((item: any) => item.id === product?.jewelry_sku?.band_width_ids)?.name}
-                              </Text>
-                            )}
-                            {product?.is_appraisal && (
-                              <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                                Appraisal Price: <span className="font-bold">{formatCurrency(appraisalData?.price)}</span>
-                              </Text>
-                            )}
-                            {(product?.selectedYearValue || product?.is_warranty) && (
-                              <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                                Warranty: {product?.selectedYearValue?.year ? product?.selectedYearValue?.year : product?.warranty_year} Year (+
-                                <span className="font-bold">
-                                  {product?.selectedYearValue?.price
-                                    ? formatCurrency(product?.selectedYearValue?.price)
-                                    : formatCurrency(product?.warranty_amount)}
-                                </span>
-                                )
-                              </Text>
-                            )}
-                            {product?.engravingText && product?.engravingText.Text != '' && (
-                              <>
-                                <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                                  Engraving Text:{' '}
-                                  <span style={{ fontFamily: product?.engravingText?.fontFamily }}>{product?.engravingText.Text}</span>
-                                </Text>
-                                <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                                  Engraving Font Family: {product?.engravingText.fontFamily}
-                                </Text>
-                                <Text as="p" size="textmd" className="text-stone-400 text-[16px] !font-sans font-light capitalize tracking-[0.36px]">
-                                  Engraving Price: <span className="font-bold"> {formatCurrency(engraving?.data?.engraving_price ?? 0)}</span>
-                                </Text>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        {product?.diamondDetails && (
-                          <div className="flex flex-col gap-3 mt-2">
-                            <div className="bg-gray-400 h-px" />
-                            <div className="flex flex-col gap-1 items-start justify-center">
-                              <div className="grid grid-cols-3 w-full">
-                                <div className="col-span-2">
-                                  <ProductName productName={product?.diamondDetails?.fullTitle} />
-                                </div>
-                                <p className="!font-castoro text-[18px] col-span-1 text-right tracking-[0.2px] !text-black lg:!text-[15px] md:!text-[15px] sm:!text-[14px]">
-                                  {formatCurrency(product?.diamondDetails?.price)}
-                                </p>
-                              </div>
-                              <div className="w-[30px] aspect-square">
-                                <Image
-                                  src={
-                                    master.find((item: any) => item?.name === product?.diamondDetails?.shape_name && item?.parent_code == 'SHAPE')
-                                      ?.image?.[0]
-                                  }
-                                  preview={false}
-                                  className="aspect-square object-contain"
-                                  fallback="/images/no_images.svg"
-                                  alt={product?.diamondDetails?.shape_name}
-                                />
-                              </div>
-                              <div>
-                                <p className="text-[16px] tracking-[0.20px] text-stone-400 sm:!text-[12px]">
-                                  Clarity: {product?.diamondDetails?.clr}
-                                </p>
-                                <p className="text-[16px] tracking-[0.20px] text-stone-400 sm:!text-[12px]">Color: {product?.diamondDetails?.col}</p>
-                                <p className="text-[16px] tracking-[0.20px] text-stone-400 sm:!text-[12px]">
-                                  Shape: {product?.diamondDetails?.shape_name}
-                                </p>
-                                <p className="text-[16px] tracking-[0.20px] text-stone-400 sm:!text-[12px]">
-                                  {product?.diamondDetails?.diamond_type == 2 ? 'Lab Grown Diamond' : 'Natural Diamond'}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <div className="self-stretch md:order-1">
+            {productsToDisplay?.length > 0 ? <CheckoutSummary products={productsToDisplay} promoCode={couponData?.coupon_code} /> : null}
           </div>
         </div>
       </div>
-    </div>
-  ) : null;
+    </ConfigProvider>
+  );
 }

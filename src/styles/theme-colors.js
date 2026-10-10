@@ -1,23 +1,29 @@
 // Single source of truth for the brand palette.
 // Consumed by tailwind.config.js (as theme colors) and by antd ConfigProvider tokens in components.
+// Palette: "Atlantic" (design-mockups/plp-v3, product-page-v4) — white page, cool-grey tiles, near-black type,
+// navy as the brand colour and teal as a sparing accent. Token names are kept from the first redesign so every
+// page picks the palette up from here.
 module.exports = {
+  // Legacy names still used by older pages; mapped onto the Atlantic palette.
   primary: '#111111',
-  secondary: '#C9AE8A',
+  secondary: '#2F4156',
   text_w: '#ffffff',
   text: '#111111',
-  ivory: '#FAF9F6',
-  cream: '#F8F4EE',
-  section: '#F1E9DE',
-  luxury: '#C9AE8A',
-  mocha: '#8B7355',
+  ivory: '#FFFFFF',
+  cream: '#F3F3F2',
+  section: '#EEF3F7',
+  luxury: '#4E7486',
+  mocha: '#5F6368',
 
-  // Editorial palette (product listing redesign)
-  paper: '#FCFBF9', // page ground
-  stone: { DEFAULT: '#ECEAE6', deep: '#E3E0DA' }, // product tiles: cool grey so gold reads warm
-  ink: { DEFAULT: '#17140F', soft: '#6B645A', hover: '#2C2720' }, // text and dark buttons
-  line: { DEFAULT: '#DDD8D0', strong: '#B9B2A7' }, // hairlines and control borders
-  gilt: { DEFAULT: '#A2845A', soft: '#D9C7A7' }, // champagne accent, deepened for legibility
-  noir: { DEFAULT: '#0F0E0C', on: '#F3EEE6' }, // dark editorial tiles and text on them
+  paper: '#FFFFFF', // page ground
+  stone: { DEFAULT: '#F3F3F2', deep: '#EAEAE8' }, // product tiles and soft fills
+  ink: { DEFAULT: '#111111', soft: '#5F6368', faint: '#8A8D91', hover: '#2A2A2A' }, // text and dark buttons
+  line: { DEFAULT: '#E6E6E6', strong: '#CFCFCF' }, // hairlines and control borders
+  gilt: { DEFAULT: '#4E7486', soft: '#B9CCD6' }, // accent (teal); soft = accent on dark navy
+  noir: { DEFAULT: '#2F4156', on: '#F5EFEB' }, // brand navy surfaces and text on them
+  navy: { DEFAULT: '#2F4156', deep: '#22303F' },
+  teal: { DEFAULT: '#4E7486', soft: '#B9CCD6' },
+  mist: '#EEF3F7', // soft accent panels
   danger: '#A23B2E', // form validation messages
   ok: '#4E6B4A', // success states (password strength, confirmations)
   metal: {

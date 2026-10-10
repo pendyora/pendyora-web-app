@@ -35,7 +35,7 @@ interface Props {
 
 const Count = ({ n }: { n: number }) =>
   n > 0 ? (
-    <span className="absolute right-[3px] top-1 grid h-4 min-w-4 place-items-center rounded-full bg-ink px-1 text-[9.5px] font-semibold tabular-nums text-paper">
+    <span className="absolute right-[3px] top-1 grid h-4 min-w-4 place-items-center rounded-full bg-teal px-1 text-[9.5px] font-semibold tabular-nums text-paper">
       {n}
     </span>
   ) : null;
@@ -170,7 +170,7 @@ export default function SiteHeader({ headerMetaData, currencyProps, search }: Pr
       >
         <div
           className={`mx-auto grid max-w-[1440px] grid-cols-[auto_1fr_auto] items-center gap-8 px-[clamp(16px,3.2vw,56px)] transition-[height] duration-[350ms] ease-luxe lg:h-[62px] lg:grid-cols-[1fr_auto_1fr] lg:gap-3 ${
-            scrolled ? 'h-[62px]' : 'h-[76px]'
+            scrolled ? 'h-16' : 'h-[72px]'
           }`}
         >
           <div className="flex items-center gap-1">
@@ -193,8 +193,8 @@ export default function SiteHeader({ headerMetaData, currencyProps, search }: Pr
             {menu.map((entry) => {
               const expanded = openKey === entry.id;
               const current = !!entry.href && entry.href !== '/' && pathname?.startsWith(entry.href.split('?')[0]);
-              const className = `relative flex h-full items-center whitespace-nowrap text-[11.5px] font-medium uppercase tracking-[0.16em] transition-colors after:absolute after:inset-x-0 after:-bottom-px after:h-px after:origin-left after:bg-ink after:transition-transform after:duration-[350ms] after:ease-luxe ${
-                expanded || current ? 'text-ink after:scale-x-100' : 'text-ink-soft after:scale-x-0 hover:text-ink'
+              const className = `relative flex h-full items-center whitespace-nowrap text-[12px] font-medium uppercase tracking-[0.14em] transition-colors after:absolute after:inset-x-0 after:-bottom-px after:h-[1.5px] after:origin-left after:bg-ink after:transition-transform after:duration-[350ms] after:ease-luxe ${
+                expanded || current ? 'text-ink after:scale-x-100' : 'text-ink after:scale-x-0 hover:after:scale-x-100'
               }`;
               const handlers = {
                 'data-menu-key': entry.id,
@@ -237,8 +237,8 @@ export default function SiteHeader({ headerMetaData, currencyProps, search }: Pr
               aria-controls="mega-panel"
               aria-label="Search"
               onClick={() => (openKey === SEARCH ? close() : open(SEARCH))}
-              className={`mr-2 inline-flex h-[38px] min-w-[190px] items-center gap-2.5 border px-3.5 text-[11px] uppercase tracking-[0.16em] transition-colors xls:min-w-0 lg:mr-0 lg:w-10 lg:justify-center lg:border-0 lg:px-0 ${
-                openKey === SEARCH ? 'border-ink text-ink' : 'border-line text-ink-soft hover:border-ink hover:text-ink'
+              className={`mr-2 inline-flex h-10 min-w-[200px] items-center gap-2.5 border px-3.5 text-[13px] transition-colors xls:min-w-0 lg:mr-0 lg:w-10 lg:justify-center lg:border-0 lg:px-0 ${
+                openKey === SEARCH ? 'border-ink text-ink' : 'border-line-strong text-ink-soft hover:border-ink hover:text-ink'
               }`}
             >
               <SearchIcon className="h-4 w-4 lg:h-5 lg:w-5" />

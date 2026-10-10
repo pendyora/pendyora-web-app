@@ -774,7 +774,6 @@ export default function ProductProfile({
         comparePrice={hasDiscount ? formatCurrency(sellingPrice) : null}
         offLabel={offLabel}
         badges={badges}
-        ctaLabel={is_customizable ? 'Customize' : 'View details'}
         swatches={swatches}
         isWishlisted={isInWishlist || (!!user && !!wId)}
         onToggleWishlist={() => void handleAddtoWishlist()}

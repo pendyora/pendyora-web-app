@@ -54,8 +54,12 @@ function ModelView({ src }: { src: string }) {
         className="absolute inset-0 h-full w-full border-none"
         src={src}
       />
-      <span className="pointer-events-none absolute bottom-4 right-4 z-[2] bg-paper px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-ink">
-        360° view
+      <span className="pointer-events-none absolute bottom-3 left-3 z-[2] inline-flex h-[34px] items-center gap-2 bg-paper/95 px-3 text-[12px] font-semibold text-ink">
+        <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4 fill-none stroke-current stroke-[1.3]">
+          <path d="M3 12c0-2.5 4-4.5 9-4.5s9 2 9 4.5-4 4.5-9 4.5" />
+          <path d="m10 14 2 2.5-2 2.5" />
+        </svg>
+        360°
       </span>
     </div>
   );
@@ -95,7 +99,7 @@ function ZoomTile({ src, alt, onOpen }: { src: string; alt: string; onOpen: () =
 
 function NoteTile() {
   return (
-    <div className="flex aspect-square flex-col justify-between bg-noir p-[clamp(22px,2.6vw,40px)] text-noir-on">
+    <div className="relative flex aspect-[4/5] flex-col justify-between bg-navy p-[clamp(22px,2.6vw,40px)] text-noir-on before:pointer-events-none before:absolute before:inset-3.5 before:border before:border-teal before:content-['']">
       <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gilt-soft">The Pendyora atelier</span>
       <p className="m-0 font-cormorant text-[clamp(22px,2.1vw,32px)] italic leading-[1.2] text-noir-on">
         “Made to be looked at closely, and worn every day.”
@@ -140,9 +144,14 @@ interface PdpGalleryProps {
   loading: boolean;
   title: string;
   viewport: Viewport;
+  /** Small label on the first tile, e.g. "Bestseller". */
+  badge?: string;
 }
 
-export default function PdpGallery({ media, loading, title, viewport }: PdpGalleryProps) {
+const DESKTOP_TILES = 6;
+
+export default function PdpGallery({ media, loading, title, viewport, badge }: PdpGalleryProps) {
+  const [expanded, setExpanded] = useState(false);
   const [thumbs, setThumbs] = useState<SwiperClass | null>(null);
   const [active, setActive] = useState(0);
   const [preview, setPreview] = useState<{ open: boolean; index: number }>({ open: false, index: 0 });
@@ -157,12 +166,12 @@ export default function PdpGallery({ media, loading, title, viewport }: PdpGalle
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
-        {[0, 1, 2].map((i) => (
+        {[0, 1, 2, 3].map((i) => (
           <Skeleton.Node
             key={i}
             active
-            className={`!block !h-auto !w-full ${i === 0 ? 'col-span-2 md:col-span-1' : 'md:hidden'}`}
-            style={{ width: '100%', height: 'auto', aspectRatio: '1 / 1', borderRadius: 0 }}
+            className={`!block !h-auto !w-full ${i === 0 ? '' : 'md:hidden'}`}
+            style={{ width: '100%', height: 'auto', aspectRatio: '4 / 5', borderRadius: 0 }}
           />
         ))}
       </div>
@@ -183,33 +192,39 @@ export default function PdpGallery({ media, loading, title, viewport }: PdpGalle
     </div>
   );
 
-  // Desktop: lookbook mosaic. First piece spans both columns; an editorial tile fills an odd last slot.
-  const rest = visible.slice(1);
+  // Desktop: equal 4:5 tiles, two per row — never one oversized hero. The 360 view sits second, beside the
+  // first photo; a navy note tile fills an odd last slot. Long galleries show six tiles until expanded.
+  const firstPhoto = visible.findIndex((m) => m.kind === 'image');
+  const ordered = firstPhoto > 0 ? [visible[firstPhoto], ...visible.filter((_, i) => i !== firstPhoto)] : visible;
+  const shown = expanded ? ordered : ordered.slice(0, DESKTOP_TILES);
   const desktop = viewport !== 'mobile' && (
     <div className="grid grid-cols-2 gap-2 md:hidden">
-      {visible[0] && (
-        <figure className="relative col-span-2 m-0 aspect-square overflow-hidden bg-stone">
-          {visible[0].kind === 'model' ? (
-            <ModelView src={visible[0].src} />
-          ) : visible[0].kind === 'video' ? (
-            <MediaSlide item={visible[0]} alt={title} />
-          ) : (
-            <ZoomTile src={visible[0].src} alt={title} onOpen={() => openPhoto(visible[0].src)} />
+      {shown.map((item, i) => (
+        <figure key={`${item.src}-${i}`} className="relative m-0 aspect-[4/5] overflow-hidden bg-stone">
+          {i === 0 && badge && (
+            <span className="pointer-events-none absolute left-3 top-3 z-[2] text-[10.5px] font-semibold uppercase tracking-[0.14em] text-ink">
+              {badge}
+            </span>
           )}
-        </figure>
-      )}
-      {rest.map((item, i) => (
-        <figure key={`${item.src}-${i}`} className="relative m-0 aspect-square overflow-hidden bg-stone">
           {item.kind === 'model' ? (
             <ModelView src={item.src} />
           ) : item.kind === 'video' ? (
             <MediaSlide item={item} alt={title} />
           ) : (
-            <ZoomTile src={item.src} alt={`${title}, view ${i + 2}`} onOpen={() => openPhoto(item.src)} />
+            <ZoomTile src={item.src} alt={i === 0 ? title : `${title}, view ${i + 1}`} onOpen={() => openPhoto(item.src)} />
           )}
         </figure>
       ))}
-      {rest.length % 2 === 1 && <NoteTile />}
+      {shown.length % 2 === 1 && <NoteTile />}
+      {!expanded && ordered.length > DESKTOP_TILES && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="col-span-2 mt-2 justify-self-center border-b border-current text-[12px] font-semibold uppercase tracking-[0.12em] text-ink"
+        >
+          View all {ordered.length} images
+        </button>
+      )}
     </div>
   );
 
@@ -228,7 +243,7 @@ export default function PdpGallery({ media, loading, title, viewport }: PdpGalle
         className="[--swiper-navigation-color:theme(colors.ink.DEFAULT)] [--swiper-navigation-size:18px]"
       >
         {visible.map((item, i) => (
-          <SwiperSlide key={`${item.src}-${i}`} className="!aspect-square overflow-hidden bg-stone">
+          <SwiperSlide key={`${item.src}-${i}`} className="!aspect-[4/5] overflow-hidden bg-stone">
             {item.kind === 'model' ? (
               <ModelView src={item.src} />
             ) : (

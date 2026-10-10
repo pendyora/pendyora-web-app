@@ -20,11 +20,11 @@ export function OptionGroup({
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid gap-3.5">
+    <div className="grid gap-2.5">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-[11px] font-medium uppercase tracking-[0.2em] text-ink">
+        <span className="text-[13px] font-semibold text-ink">
           {label}
-          {value && <span className="ml-2 text-[13px] font-light normal-case tracking-[0.02em] text-ink-soft">{value}</span>}
+          {value && <span className="ml-1.5 font-normal text-ink-soft">{value}</span>}
         </span>
         {aside}
       </div>
@@ -40,8 +40,8 @@ export function ChoiceChip({ active, onClick, children }: { active: boolean; onC
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`min-h-[44px] min-w-[52px] border px-3.5 text-[13px] tabular-nums tracking-[0.04em] transition-colors duration-300 ease-luxe ${
-        active ? 'border-ink bg-ink text-paper' : 'border-line text-ink hover:border-ink'
+      className={`min-h-[48px] min-w-[64px] border px-4 text-[13.5px] tabular-nums transition-colors duration-300 ease-luxe ${
+        active ? 'border-ink text-ink shadow-[inset_0_0_0_0.5px_theme(colors.ink.DEFAULT)]' : 'border-line-strong text-ink hover:border-ink'
       }`}
     >
       {children}

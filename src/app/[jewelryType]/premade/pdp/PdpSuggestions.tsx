@@ -26,6 +26,8 @@ function Rail({ products, onSwiper }: { products: any[]; onSwiper: (s: SwiperCla
     <Swiper
       modules={[A11y]}
       onSwiper={onSwiper}
+      // Room for the swatch outline, which the rail's overflow would otherwise clip.
+      className="!-mx-1 !px-1 !pb-1"
       spaceBetween={12}
       slidesPerView={1.6}
       breakpoints={{ 551: { slidesPerView: 2.4 }, 770: { slidesPerView: 3, spaceBetween: 14 }, 1025: { slidesPerView: 4, spaceBetween: 16 } }}
@@ -58,7 +60,7 @@ export default function PdpSuggestions({ recentlyViewed }: { recentlyViewed: Rec
   if (suggestion?.length > 0) {
     items.push({ key: 'suggested', label: 'You may also like', children: <Rail products={suggestion} onSwiper={bind} /> });
   } else if (loading) {
-    items.push({ key: 'suggested', label: 'You may also like', children: <PlpGridSkeleton view="dense" count={4} /> });
+    items.push({ key: 'suggested', label: 'You may also like', children: <PlpGridSkeleton columns={4} count={4} /> });
   }
   if (recentlyViewed.length > 0) {
     items.push({ key: 'recent', label: 'Recently viewed', children: <Rail products={recentlyViewed} onSwiper={bind} /> });
@@ -71,9 +73,9 @@ export default function PdpSuggestions({ recentlyViewed }: { recentlyViewed: Rec
     <section id="pdp-suggestions" className="mx-auto w-full max-w-[1440px] px-[clamp(16px,3.2vw,56px)] py-[clamp(56px,7vw,96px)]">
       <div className="mb-2 flex flex-wrap items-end justify-between gap-5">
         <div>
-          <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gilt">Curated for you</span>
-          <h2 className="m-0 mt-2.5 text-balance font-cormorant text-[clamp(32px,3.6vw,48px)] font-normal leading-[1.04] text-ink">
-            Complete it, <em className="italic text-gilt">or compare it</em>
+          <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal">Curated for you</span>
+          <h2 className="m-0 mt-2.5 text-balance font-cormorant text-[clamp(30px,3vw,40px)] font-medium leading-[1.05] text-ink">
+            Pairs <em className="italic">beautifully</em> with
           </h2>
         </div>
         <div className="flex gap-2 sm:hidden">
@@ -91,7 +93,7 @@ export default function PdpSuggestions({ recentlyViewed }: { recentlyViewed: Rec
           ))}
         </div>
       </div>
-      <Tabs items={items} destroyInactiveTabPane className="[&_.ant-tabs-tab-btn]:uppercase [&_.ant-tabs-tab-btn]:tracking-[0.18em]" />
+      <Tabs items={items} destroyInactiveTabPane className="[&_.ant-tabs-tab-btn]:text-[13px] [&_.ant-tabs-tab-btn]:font-medium" />
     </section>
   );
 }

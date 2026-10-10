@@ -29,26 +29,8 @@ import {
 } from '@/store';
 import { isObjectEmpty } from '@/utils/objectUtils';
 
-import FilterDrawer, { DrawerSection, FilterGroup, plpTheme } from './FilterDrawer';
-import PlpGrid, { EditorialTitle, PlpGridSkeleton, PlpView } from './PlpGrid';
-const BannerData = [
-  {
-    desktop_image: '/images/img_mask_group_21_1.png',
-    mobile_image: '/images/img_mask_group_21_1.png',
-    name: '',
-
-    productPrice: '',
-    redirect_url: '',
-  },
-  {
-    desktop_image: '/images/img_mask_group_21_1.png',
-    mobile_image: '/images/img_mask_group_21_1.png',
-    name: '',
-
-    productPrice: '',
-    redirect_url: '',
-  },
-];
+import FilterDrawer, { DrawerSection, FilterGroup, FilterPanel, FilterPanelProps, plpTheme } from './FilterDrawer';
+import PlpGrid, { PlpGridSkeleton } from './PlpGrid';
 
 const SORT_OPTIONS = [
   { label: 'Featured', value: '' },
@@ -137,7 +119,8 @@ export default function PRODUCTPAGEPage() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerFocus, setDrawerFocus] = useState<DrawerSection | null>(null);
-  const [view, setView] = useState<PlpView>('dense');
+  // Desktop filter rail; hiding it widens the grid from 3 to 4 columns.
+  const [showRail, setShowRail] = useState(true);
   const [isProductCall, setIsProductCall] = useState(false);
   // Warm re-entry: if we're returning to the same jewelryType/collectionType with rows already
   // cached in Redux, skip the spinner and show the cached grid while a silent refresh runs.
@@ -1098,8 +1081,39 @@ export default function PRODUCTPAGEPage() {
   const showSkeleton = isLoading || isSortLoading;
   const shownCount = productCards.length;
   const totalCount = counts ?? 0;
-  const fbtn =
-    'inline-flex items-center gap-2 border border-line px-4 py-2.5 text-[11px] uppercase leading-[1.2] tracking-[0.16em] text-ink transition-colors hover:border-ink';
+
+  const panelProps: FilterPanelProps = {
+    loadingFilterId,
+    categories,
+    styles: (filters?.subTypes ?? []).map((item) => ({ id: item.id, name: masterName(item.id) ?? item.name })),
+    metals: optionsFrom(filters?.metal_color_id),
+    shapes: optionsFrom(filters?.shape_id),
+    diamondColors: optionsFrom(filters?.diamond_color_id).map(({ id, name }: any) => ({ id, name })),
+    specialTitles: (filters?.special_title ?? []).map((item) => ({ id: item.id, name: item.title })),
+    selected: {
+      metal: filtersData?.metal ?? [],
+      shape: filtersData?.shape ?? [],
+      diamond_color: filtersData?.diamond_color ?? [],
+      subTypes: filtersData?.subTypes ?? [],
+      specialTitle: filtersData?.specialTitle ?? [],
+    },
+    onToggle: toggleFilter,
+    gender: Number(filtersData?.gender_category ?? 1),
+    onGender: setGender,
+    priceSlot,
+    priceActive: !!price,
+    caratSlot,
+    caratActive: !!carat,
+  };
+  const columns = showRail ? 3 : 4;
+  const piecesLabel = `${totalCount} ${totalCount === 1 ? 'piece' : 'pieces'}`;
+  const filterIcon = (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} className="h-[18px] w-[18px]" aria-hidden>
+      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+      <circle cx="16" cy="7" r="2" />
+      <circle cx="10" cy="17" r="2" />
+    </svg>
+  );
 
   return (
     <ConfigProvider theme={plpTheme}>
@@ -1118,45 +1132,44 @@ export default function PRODUCTPAGEPage() {
           </div>
         )}
 
-        <div className={GUTTER}>
-          {/* Intro */}
-          <section className="grid grid-cols-[1.2fr_1fr] items-end gap-8 pb-[34px] pt-11 md:grid-cols-1 md:gap-4 md:pb-[22px] md:pt-7">
-            <div>
-              <nav aria-label="Breadcrumb" className="mb-[18px] flex flex-wrap gap-2.5 text-[11px] uppercase tracking-[0.14em] text-ink-soft">
-                <Link href="/" className="text-ink-soft hover:text-ink">
-                  Home
-                </Link>
-                <span aria-hidden className="text-line">
-                  /
-                </span>
-                {collectionType && (
-                  <>
-                    <Link href="/collections" className="text-ink-soft hover:text-ink">
-                      Collections
-                    </Link>
-                    <span aria-hidden className="text-line">
-                      /
-                    </span>
-                  </>
-                )}
-                <span aria-current="page">{pageTitle}</span>
-              </nav>
-              <h1 className="m-0 text-balance font-cormorant text-[clamp(46px,6.4vw,96px)] font-normal leading-[0.92] tracking-[-0.01em] text-ink">
-                <EditorialTitle text={pageTitle} emClassName="text-gilt" />
-              </h1>
+        <div className={`mx-auto max-w-[1440px] ${GUTTER}`}>
+          {/* Title row */}
+          <section className="pt-7 md:pt-5">
+            <nav aria-label="Breadcrumb" className="flex flex-wrap gap-2 text-[12px] text-ink-soft">
+              <Link href="/" className="text-ink-soft hover:text-ink">
+                Home
+              </Link>
+              <span aria-hidden className="text-line-strong">
+                /
+              </span>
+              {collectionType && (
+                <>
+                  <Link href="/collections" className="text-ink-soft hover:text-ink">
+                    Collections
+                  </Link>
+                  <span aria-hidden className="text-line-strong">
+                    /
+                  </span>
+                </>
+              )}
+              <span aria-current="page">{pageTitle}</span>
+            </nav>
+            <div className="mb-1.5 mt-3.5 flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
+              <h1 className="m-0 font-cormorant text-[clamp(38px,4vw,54px)] font-medium leading-none tracking-[-0.01em] text-ink">{pageTitle}</h1>
+              <small className="text-[13px] tabular-nums text-ink-soft">{piecesLabel}</small>
             </div>
-            {lede && <p className="m-0 mb-1.5 max-w-[44ch] justify-self-end text-[14.5px] text-ink-soft md:justify-self-start">{lede}</p>}
+            {lede && <p className="m-0 max-w-[62ch] text-[14.5px] text-ink-soft">{lede}</p>}
           </section>
 
-          {/* Style rail */}
+          {/* Style row: square tiles from the CMS styles */}
           {(filters?.subTypes?.length ?? 0) > 0 && (
-            <div className="relative mb-[30px]">
+            <div className="relative pb-[30px] pt-[26px]">
               <div
                 ref={railRef}
                 onScroll={updateRailEdges}
                 role="toolbar"
                 aria-label="Shop by style"
-                className="flex gap-3.5 overflow-x-auto scroll-smooth pb-1.5 [scrollbar-width:thin]"
+                className="flex gap-3 overflow-x-auto scroll-smooth [scrollbar-width:none]"
               >
                 {filters?.subTypes?.map((item) => {
                   const meta = productFilter?.find((el: any) => el.id === item.id);
@@ -1167,11 +1180,11 @@ export default function PRODUCTPAGEPage() {
                       type="button"
                       aria-pressed={active}
                       onClick={() => toggleFilter('subTypes', item.id)}
-                      className="group grid flex-[0_0_clamp(108px,10.5vw,148px)] gap-2.5 text-left"
+                      className="group grid flex-[0_0_clamp(96px,9.2vw,132px)] gap-2.5 text-center"
                     >
                       <span
-                        className={`relative block aspect-square overflow-hidden bg-stone ${
-                          active ? "after:absolute after:inset-0 after:shadow-[inset_0_0_0_1px_theme(colors.ink.DEFAULT)] after:content-['']" : ''
+                        className={`relative block aspect-square overflow-hidden border-b-2 bg-stone transition-colors ${
+                          active ? 'border-ink' : 'border-transparent group-hover:border-line-strong'
                         }`}
                       >
                         <img
@@ -1184,11 +1197,7 @@ export default function PRODUCTPAGEPage() {
                           <span className="absolute inset-0 z-[1] animate-shimmer bg-gradient-to-r from-transparent via-paper/60 to-transparent bg-[length:220%_100%]" />
                         )}
                       </span>
-                      <span
-                        className={`flex items-baseline justify-between gap-2 border-b pb-1.5 text-[11px] uppercase leading-[1.35] tracking-[0.14em] text-ink ${
-                          active ? 'border-ink font-semibold' : 'border-transparent'
-                        }`}
-                      >
+                      <span className={`text-[13px] leading-[1.35] text-ink ${active ? 'font-semibold' : 'font-medium'}`}>
                         {meta?.name ?? item.name}
                       </span>
                     </button>
@@ -1200,7 +1209,7 @@ export default function PRODUCTPAGEPage() {
                   type="button"
                   aria-label="Scroll styles left"
                   onClick={() => scrollRail(-1)}
-                  className="absolute -left-2.5 top-[calc(clamp(108px,10.5vw,148px)/2)] z-[2] grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-paper text-ink shadow-md shadow-ink/10 md:hidden"
+                  className="absolute -left-2.5 top-[calc(26px+clamp(96px,9.2vw,132px)/2)] z-[2] grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-paper text-ink shadow-md shadow-ink/10 md:hidden"
                 >
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.4} className="h-3.5 w-3.5" aria-hidden>
                     <path d="M10 3 5 8l5 5" />
@@ -1212,7 +1221,7 @@ export default function PRODUCTPAGEPage() {
                   type="button"
                   aria-label="Scroll styles right"
                   onClick={() => scrollRail(1)}
-                  className="absolute -right-2.5 top-[calc(clamp(108px,10.5vw,148px)/2)] z-[2] grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-paper text-ink shadow-md shadow-ink/10 md:hidden"
+                  className="absolute -right-2.5 top-[calc(26px+clamp(96px,9.2vw,132px)/2)] z-[2] grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-paper text-ink shadow-md shadow-ink/10 md:hidden"
                 >
                   <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.4} className="h-3.5 w-3.5" aria-hidden>
                     <path d="m6 3 5 5-5 5" />
@@ -1223,170 +1232,159 @@ export default function PRODUCTPAGEPage() {
           )}
         </div>
 
-        {/* Filter bar */}
-        <div className={`sticky top-0 z-20 flex items-center justify-between gap-4 border-y border-line bg-paper/95 py-3 backdrop-blur-md ${GUTTER}`}>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <button type="button" className={`${fbtn} md:hidden`} onClick={() => openDrawer('metal')}>
-              Metal
-            </button>
-            <button type="button" className={`${fbtn} md:hidden`} onClick={() => openDrawer('shape')}>
-              Shape
-            </button>
-            <button type="button" className={`${fbtn} md:hidden`} onClick={() => openDrawer('price')}>
-              Price
-            </button>
-            <button type="button" className={fbtn} onClick={() => openDrawer(null)}>
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.1} className="h-3.5 w-3.5" aria-hidden>
-                <path d="M1 4h14M1 12h14" />
-                <circle cx="5" cy="4" r="1.8" className="fill-paper" />
-                <circle cx="11" cy="12" r="1.8" className="fill-paper" />
-              </svg>
-              <span className="md:hidden">All filters</span>
-              <span className="hidden md:inline">Filter</span>
+        {/* Toolbar */}
+        <div className="sticky top-0 z-20 border-y border-line bg-paper">
+          <div className={`mx-auto flex min-h-14 max-w-[1440px] items-center gap-3.5 py-2 ${GUTTER}`}>
+            <button
+              type="button"
+              aria-expanded={showRail}
+              aria-controls="plp-filter-rail"
+              onClick={() => setShowRail((v) => !v)}
+              className="inline-flex flex-none items-center gap-2.5 text-[13px] font-medium text-ink lg:hidden"
+            >
+              {filterIcon}
+              {showRail ? 'Hide filters' : 'Show filters'}
               {chips.length > 0 && (
-                <span className="inline-grid h-[17px] min-w-[17px] place-items-center rounded-full bg-ink px-[5px] text-[10px] tracking-normal text-paper">
+                <span className="inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-ink px-[5px] text-[10px] text-paper">
                   {chips.length}
                 </span>
               )}
             </button>
-          </div>
+            <button
+              type="button"
+              onClick={() => openDrawer(null)}
+              className="hidden h-9 flex-none items-center gap-2 border border-ink px-3.5 text-[13px] font-medium text-ink lg:inline-flex"
+            >
+              {filterIcon}
+              Filters{chips.length > 0 ? ` · ${chips.length}` : ''}
+            </button>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="mr-2 text-[12px] tabular-nums text-ink-soft sm:hidden">
-              {totalCount} {totalCount === 1 ? 'piece' : 'pieces'}
-            </span>
-            <div role="group" aria-label="Grid size" className="mr-1.5 flex gap-0.5 border-l border-line pl-3.5 md:hidden">
-              <button
-                type="button"
-                aria-pressed={view === 'dense'}
-                aria-label="Four per row"
-                onClick={() => setView('dense')}
-                className="grid h-[30px] w-[30px] place-items-center text-ink-soft aria-pressed:text-ink"
-              >
-                <svg viewBox="0 0 16 16" fill="currentColor" className="h-[15px] w-[15px]" aria-hidden>
-                  <rect x="1" y="1" width="3" height="14" />
-                  <rect x="5" y="1" width="2.5" height="14" />
-                  <rect x="8.5" y="1" width="2.5" height="14" />
-                  <rect x="12" y="1" width="3" height="14" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                aria-pressed={view === 'large'}
-                aria-label="Two per row"
-                onClick={() => setView('large')}
-                className="grid h-[30px] w-[30px] place-items-center text-ink-soft aria-pressed:text-ink"
-              >
-                <svg viewBox="0 0 16 16" fill="currentColor" className="h-[15px] w-[15px]" aria-hidden>
-                  <rect x="1" y="1" width="6.3" height="14" />
-                  <rect x="8.7" y="1" width="6.3" height="14" />
-                </svg>
-              </button>
-            </div>
-            <div className="relative flex items-center gap-1.5 border-l border-line pl-4">
-              <span className="text-[11px] uppercase tracking-[0.16em] text-ink-soft sm:hidden">Sort</span>
-              <Select
-                variant="borderless"
-                aria-label="Sort"
-                value={filtersData?.sort_order ?? ''}
-                options={SORT_OPTIONS}
-                onChange={changeSort}
-                popupMatchSelectWidth={false}
-                className="min-w-[140px] [&_.ant-select-arrow]:text-ink [&_.ant-select-selection-item]:!text-[11px] [&_.ant-select-selection-item]:!font-semibold [&_.ant-select-selection-item]:uppercase [&_.ant-select-selection-item]:tracking-[0.16em] [&_.ant-select-selection-item]:text-ink [&_.ant-select-selector]:!px-0"
-              />
-              {isFasterPopup && isFasterPopupShow && products?.length > 0 && (
-                <div className="absolute right-0 top-[calc(100%+12px)] z-[25] grid w-[280px] gap-1 border border-line bg-paper py-4 pl-4 pr-9 shadow-lg shadow-ink/10 sm:w-[min(280px,calc(100vw-32px))]">
-                  <strong className="font-cormorant text-[20px] font-medium leading-[1.1] text-ink">Need it sooner?</strong>
-                  <p className="m-0 text-[12.5px] text-ink-soft">
+            {chips.length > 0 && (
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 md:hidden">
+                {chips.map((chip) => (
+                  <button
+                    key={chip.key}
+                    type="button"
+                    onClick={chip.onRemove}
+                    aria-label={`Remove filter ${chip.label}`}
+                    className="inline-flex h-[30px] items-center gap-2 bg-stone px-3 text-[12.5px] text-ink transition-colors hover:bg-stone-deep"
+                  >
+                    {chip.label}
+                    <RxCross2 className="h-2.5 w-2.5 text-ink-soft" />
+                  </button>
+                ))}
+                <button type="button" onClick={clearAll} className="text-[12.5px] text-ink-soft underline underline-offset-[3px] hover:text-ink">
+                  Clear all
+                </button>
+              </div>
+            )}
+
+            <div className="ml-auto flex flex-none items-center gap-[18px] text-[13px] text-ink-soft">
+              <span className="tabular-nums sm:hidden">{piecesLabel}</span>
+              <div className="relative flex items-center gap-1">
+                <span className="text-ink sm:hidden">Sort:</span>
+                <Select
+                  variant="borderless"
+                  aria-label="Sort"
+                  value={filtersData?.sort_order ?? ''}
+                  options={SORT_OPTIONS}
+                  onChange={changeSort}
+                  popupMatchSelectWidth={false}
+                  className="min-w-[124px] [&_.ant-select-arrow]:text-ink [&_.ant-select-selection-item]:!text-[13px] [&_.ant-select-selection-item]:!font-medium [&_.ant-select-selection-item]:text-ink [&_.ant-select-selector]:!px-0"
+                />
+                {isFasterPopup && isFasterPopupShow && products?.length > 0 && (
+                  <div className="absolute right-0 top-[calc(100%+12px)] z-[25] grid w-[280px] gap-1 border border-line bg-paper py-4 pl-4 pr-9 shadow-lg shadow-ink/10 sm:w-[min(280px,calc(100vw-32px))]">
+                    <strong className="font-cormorant text-[20px] font-medium leading-[1.1] text-ink">Need it sooner?</strong>
+                    <p className="m-0 text-[12.5px] text-ink-soft">
+                      <button
+                        type="button"
+                        className="text-teal underline underline-offset-[3px]"
+                        onClick={() => {
+                          changeSort('fastdelivery');
+                          dispatch(setIsFasterPopup(false));
+                        }}
+                      >
+                        Show pieces
+                      </button>{' '}
+                      that arrive the soonest.
+                    </p>
                     <button
                       type="button"
-                      className="text-ink underline underline-offset-[3px]"
-                      onClick={() => {
-                        changeSort('fastdelivery');
-                        dispatch(setIsFasterPopup(false));
-                      }}
+                      aria-label="Dismiss"
+                      onClick={() => dispatch(setIsFasterPopup(false))}
+                      className="absolute right-2.5 top-2.5 grid h-[22px] w-[22px] place-items-center text-ink"
                     >
-                      Show pieces
-                    </button>{' '}
-                    that arrive the soonest.
-                  </p>
-                  <button
-                    type="button"
-                    aria-label="Dismiss"
-                    onClick={() => dispatch(setIsFasterPopup(false))}
-                    className="absolute right-2.5 top-2.5 grid h-[22px] w-[22px] place-items-center text-ink"
-                  >
-                    <RxCross2 />
-                  </button>
-                </div>
-              )}
+                      <RxCross2 />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className={GUTTER}>
-          {/* Active filters */}
-          {chips.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 pt-3.5">
-              {chips.map((chip) => (
-                <button
-                  key={chip.key}
-                  type="button"
-                  onClick={chip.onRemove}
-                  aria-label={`Remove filter ${chip.label}`}
-                  className="inline-flex items-center gap-2 bg-stone py-[7px] pl-3 pr-2.5 text-[11px] uppercase tracking-[0.1em] text-ink transition-colors hover:bg-stone-deep"
-                >
-                  {chip.label}
-                  <RxCross2 className="h-2.5 w-2.5" />
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={clearAll}
-                className="ml-1.5 text-[11px] uppercase tracking-[0.12em] text-ink-soft underline underline-offset-4"
-              >
-                Clear all
-              </button>
-            </div>
-          )}
-
-          {/* Grid */}
-          {showSkeleton && <PlpGridSkeleton view={view} />}
-
-          {!showSkeleton && products?.length === 0 && (
-            <div className="grid justify-items-center gap-3 py-20 text-center">
-              <h3 className="m-0 font-cormorant text-[34px] font-normal text-ink">Nothing matches yet</h3>
-              <p className="m-0 text-ink-soft">Try removing a filter or two to see more pieces.</p>
-              <button type="button" onClick={clearAll} className="text-[11px] uppercase tracking-[0.12em] text-ink-soft underline underline-offset-4">
-                Clear all filters
-              </button>
-            </div>
-          )}
-
-          {!showSkeleton && products?.length > 0 && (
-            <>
-              <PlpGrid products={productCards} banners={PromotionalImages?.length > 0 ? PromotionalImages : BannerData} view={view} />
-              <div className="grid justify-items-center gap-4 pb-[72px] pt-[34px]">
-                {isLoadingMore ? (
-                  <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-ink-soft">
-                    <LuLoader className="h-4 w-4 animate-spin" /> Loading more pieces
-                  </span>
-                ) : (
-                  <span className="text-[12px] tabular-nums text-ink-soft">
-                    {shownCount >= totalCount ? `Showing all ${totalCount} pieces` : `Showing ${shownCount} of ${totalCount}`}
-                  </span>
-                )}
-                {totalCount > 0 && (
-                  <div className="relative h-px w-[200px] bg-line">
-                    <i
-                      className="absolute inset-y-0 left-0 bg-ink transition-[width] duration-500 ease-luxe"
-                      style={{ width: `${Math.min(100, (shownCount / totalCount) * 100)}%` }}
-                    />
-                  </div>
-                )}
+        <div
+          className={`mx-auto grid max-w-[1440px] items-start gap-10 pt-7 lg:grid-cols-1 ${GUTTER} ${
+            showRail ? 'grid-cols-[240px_minmax(0,1fr)]' : 'grid-cols-1'
+          }`}
+        >
+          {/* Filter rail (desktop) */}
+          {showRail && (
+            <aside
+              id="plp-filter-rail"
+              aria-label="Filters"
+              data-lenis-prevent
+              className="sticky top-[72px] max-h-[calc(100vh-88px)] overflow-y-auto pr-1.5 [scrollbar-width:thin] lg:hidden"
+            >
+              <FilterPanel {...panelProps} compact />
+              <div className="mt-[22px] bg-mist p-[18px]">
+                <b className="mb-1 block font-cormorant text-[20px] font-medium">Not sure of the size?</b>
+                <p className="m-0 mb-2.5 text-[13px] text-ink-soft">Get sized or see pieces with a specialist over video.</p>
+                <Link href="/virtual-appointment" className="border-b border-current text-[12px] font-semibold uppercase tracking-[0.08em] text-teal">
+                  Book an appointment
+                </Link>
               </div>
-            </>
+            </aside>
           )}
+
+          <div className="min-w-0">
+            {showSkeleton && <PlpGridSkeleton columns={columns} />}
+
+            {!showSkeleton && products?.length === 0 && (
+              <div className="grid justify-items-center gap-3 py-20 text-center">
+                <h3 className="m-0 font-cormorant text-[34px] font-normal text-ink">Nothing matches yet</h3>
+                <p className="m-0 text-ink-soft">Try removing a filter or two to see more pieces.</p>
+                <button type="button" onClick={clearAll} className="text-[13px] text-ink-soft underline underline-offset-4">
+                  Clear all filters
+                </button>
+              </div>
+            )}
+
+            {!showSkeleton && products?.length > 0 && (
+              <>
+                <PlpGrid products={productCards} banners={PromotionalImages ?? []} columns={columns} />
+                <div className="grid justify-items-center gap-3.5 pb-[72px] pt-12">
+                  {isLoadingMore ? (
+                    <span className="inline-flex items-center gap-2 text-[13px] text-ink-soft">
+                      <LuLoader className="h-4 w-4 animate-spin" /> Loading more pieces
+                    </span>
+                  ) : (
+                    <span className="text-[13px] tabular-nums text-ink-soft">
+                      {shownCount >= totalCount ? `Showing all ${totalCount} pieces` : `Showing ${shownCount} of ${totalCount}`}
+                    </span>
+                  )}
+                  {totalCount > 0 && (
+                    <div className="relative h-0.5 w-[220px] bg-line">
+                      <i
+                        className="absolute inset-y-0 left-0 bg-ink transition-[width] duration-500 ease-luxe"
+                        style={{ width: `${Math.min(100, (shownCount / totalCount) * 100)}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <FilterDrawer
@@ -1396,27 +1394,7 @@ export default function PRODUCTPAGEPage() {
           resultCount={totalCount}
           activeCount={chips.length}
           onClearAll={clearAll}
-          loadingFilterId={loadingFilterId}
-          categories={categories}
-          styles={(filters?.subTypes ?? []).map((item) => ({ id: item.id, name: masterName(item.id) ?? item.name }))}
-          metals={optionsFrom(filters?.metal_color_id)}
-          shapes={optionsFrom(filters?.shape_id)}
-          diamondColors={optionsFrom(filters?.diamond_color_id).map(({ id, name }: any) => ({ id, name }))}
-          specialTitles={(filters?.special_title ?? []).map((item) => ({ id: item.id, name: item.title }))}
-          selected={{
-            metal: filtersData?.metal ?? [],
-            shape: filtersData?.shape ?? [],
-            diamond_color: filtersData?.diamond_color ?? [],
-            subTypes: filtersData?.subTypes ?? [],
-            specialTitle: filtersData?.specialTitle ?? [],
-          }}
-          onToggle={toggleFilter}
-          gender={Number(filtersData?.gender_category ?? 1)}
-          onGender={setGender}
-          priceSlot={priceSlot}
-          priceActive={!!price}
-          caratSlot={caratSlot}
-          caratActive={!!carat}
+          {...panelProps}
         />
       </div>
     </ConfigProvider>

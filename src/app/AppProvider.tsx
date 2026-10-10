@@ -13,6 +13,7 @@ import Header from '@/components/Header';
 import { AppProvider } from '@/context/AppContext/AppProvider';
 import useYotpo from '@/hook/useYotpo';
 import store from '@/store';
+import themeColors from '@/styles/theme-colors';
 import { trackPageView } from '@/utils/metaPixel';
 
 const AUTH_ROUTES = ['/login', '/createanaccount', '/forgotpassword', '/forgot-password'];
@@ -31,27 +32,28 @@ const AppProviderData = ({ children, initialHeaderMegaData, initialPromoData }: 
     }
     trackPageView();
   }, [pathname]);
-  const primary_color = '#111111';
-  const secondary_color = '#C9AE8A';
-  const prev_secondary_color = '#F1E9DE';
+  // Global antd colours follow the Atlantic palette (src/styles/theme-colors.js).
+  const primary_color = themeColors.ink.DEFAULT;
+  const secondary_color = themeColors.navy.DEFAULT;
+  const prev_secondary_color = themeColors.line.strong;
   const customTheme = {
     token: {
       colorPrimary: primary_color,
-      colorPrimaryBg: '#F8F4EE',
-      colorText: '#111111',
-      colorBgBase: '#FAF9F6',
+      colorPrimaryBg: themeColors.mist,
+      colorText: themeColors.ink.DEFAULT,
+      colorBgBase: themeColors.paper,
       fontFamily: "'Libre Franklin', sans-serif",
       // colorBorder: "#BDBDBD", // Border color for inputs, cards, etc.
       colorSuccess: '#388E3C', // Success message or status color
       colorWarning: '#F57C00', // Warning message or status color
-      colorError: '#D32F2F', // Error message or status color
-      colorLink: '#1976D2', // Link color
-      colorLinkHover: '#1565C0', // Link hover color
+      colorError: themeColors.danger, // Error message or status color
+      colorLink: themeColors.teal.DEFAULT, // Link color
+      colorLinkHover: themeColors.navy.DEFAULT, // Link hover color
       // tableRowHoverBg: "#E0F7FA", // Hover color for table rows
       tableSelectedRowBg: '#A7FFEB', // Background color for selected table rows
       tableRowActiveBg: '#64FFDA', // Background color for active rows
       // colorTextHeading: "#2E7D32", // Heading text color
-      colorBgContainer: '#FAF9F6',
+      colorBgContainer: themeColors.paper,
       borderRadius: 8, // Default border radius for components
     },
   };

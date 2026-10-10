@@ -1313,14 +1313,15 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
       </div>
     </div>
   );
-  const quickPicks = (suggestion ?? []).slice(0, 3);
 
   return (
     <ConfigProvider theme={pdpTheme}>
-      {/* Mobile only: keeps "Add to bag" in reach once the main button scrolls away. The custom-jewelry flow has its own stepper. */}
+      {/* Keeps "Add to bag" in reach once the main button scrolls away. The custom-jewelry flow has its own stepper. */}
       {!isCustomFlow && (
         <PdpBuyBar
           title={product?.fullTitle ?? ''}
+          summary={specLine}
+          image={jewelryMetadata?.carat_images?.[0]}
           price={hasPrice ? formatCurrency(finalPrice) : ''}
           visible={ctaOutOfView && !footerInView}
           onBuy={handleAddtocart}
@@ -1331,7 +1332,7 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
 
       <section id="pdp-overview" className="mx-auto w-full max-w-[1440px] px-[clamp(16px,3.2vw,56px)] pb-[clamp(48px,6vw,80px)]">
         {!isCustomFlow && (
-          <nav aria-label="Breadcrumb" className="flex flex-wrap gap-2.5 py-5 text-[11px] uppercase tracking-[0.14em] text-ink-soft md:py-3.5">
+          <nav aria-label="Breadcrumb" className="flex flex-wrap gap-2 py-5 text-[12px] text-ink-soft md:py-3.5">
             <Link href="/" className="text-ink-soft hover:text-ink">
               Home
             </Link>
@@ -1361,24 +1362,24 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
           </div>
 
           {/* Buying column */}
-          <div ref={cRef} className="sticky grid min-w-0 gap-7 md:static" style={{ top: topOffset || 0 }}>
-            <div className="grid gap-3">
+          <div ref={cRef} className="sticky grid min-w-0 gap-[22px] pb-6 md:static" style={{ top: topOffset || 0 }}>
+            <div className="grid gap-2">
               {selectedProduct?.subType?.jewelry_type?.name && (
-                <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-gilt">{selectedProduct.subType.jewelry_type.name}</span>
+                <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal">{selectedProduct.subType.jewelry_type.name}</span>
               )}
               {product?.fullTitle ? (
-                <h1 className="m-0 text-balance font-cormorant text-[clamp(32px,3.2vw,48px)] font-normal leading-[1.04] text-ink">
+                <h1 className="m-0 text-balance font-cormorant text-[clamp(32px,3vw,42px)] font-medium leading-[1.05] tracking-[-0.005em] text-ink">
                   {product.fullTitle}
                 </h1>
               ) : (
                 <Skeleton active paragraph={{ rows: 1 }} title />
               )}
-              {specLine && <p className="m-0 font-cormorant text-[19px] italic leading-snug text-ink-soft">{specLine}</p>}
+              {specLine && <p className="m-0 text-[14px] leading-snug text-ink-soft">{specLine}</p>}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex min-h-5 items-center gap-3">
                   {process.env.NEXT_PUBLIC_YOTPO_APP_INSTANCE_STAR_ID && <YotpoStarReview selectedProduct={selectedProduct} />}
                   {!isCustomFlow && (
-                    <a href="#pdp-reviews" className="border-b border-line text-[12px] text-ink-soft hover:text-ink">
+                    <a href="#pdp-reviews" className="text-[13px] text-ink-soft underline underline-offset-[3px] hover:text-ink">
                       Read reviews
                     </a>
                   )}
@@ -1392,9 +1393,9 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
             <div className="grid gap-2">
               {hasPrice ? (
                 <div className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1">
-                  <span className="font-cormorant text-[32px] font-medium leading-none tabular-nums text-ink">{formatCurrency(finalPrice)}</span>
-                  {comparePrice && <s className="font-cormorant text-[20px] tabular-nums text-ink-soft">{formatCurrency(comparePrice)}</s>}
-                  {offLabel && <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gilt">{offLabel}</span>}
+                  <span className="text-[22px] leading-none tabular-nums text-ink">{formatCurrency(finalPrice)}</span>
+                  {comparePrice && <s className="text-[16px] tabular-nums text-ink-faint">{formatCurrency(comparePrice)}</s>}
+                  {offLabel && <span className="text-[12px] font-semibold text-teal">{offLabel}</span>}
                 </div>
               ) : (
                 <Skeleton.Input active size="small" />
@@ -1404,14 +1405,6 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
                 (typeof window === 'undefined' || (localStorage.getItem('currency') || 'USD') === 'USD') && (
                   <p className="affirm-as-low-as m-0 text-[13px] text-ink-soft" data-page-type="product" data-amount={affirmPriceInCents} />
                 )}
-              {product?.description && (
-                <p className="m-0 mt-1 line-clamp-3 text-[14px] leading-[1.7] text-ink-soft">
-                  {product.description}{' '}
-                  <a href="#pdp-details" className="text-ink underline underline-offset-4 hover:text-ink">
-                    Read more
-                  </a>
-                </p>
-              )}
             </div>
 
             <hr className="m-0 h-px border-0 bg-line" />
@@ -1841,47 +1834,46 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
               {product?.jewelry_id ? (
                 !isCustomFlow ? (
                   <>
-                    <Button
-                      type="primary"
-                      block
-                      loading={loading}
-                      onClick={handleAddtocart}
-                      disabled={count < 1}
-                      className="!h-14 !border-ink !bg-ink !text-[11px] !uppercase !tracking-[0.22em] !text-paper hover:!border-ink-hover hover:!bg-ink-hover"
-                    >
-                      {buyLabel}
-                      {hasPrice ? ` · ${formatCurrency(finalPrice)}` : ''}
-                    </Button>
-                    <div className="grid grid-cols-[minmax(0,1fr)_56px] gap-2.5">
-                      <Link
-                        href="/virtual-appointment"
-                        className="inline-flex h-14 items-center justify-center gap-3 border border-ink bg-transparent text-[11px] font-medium uppercase tracking-[0.2em] text-ink transition-colors duration-300 hover:bg-ink hover:text-paper hover:text-paper"
+                    <div className="grid grid-cols-[minmax(0,1fr)_56px] gap-2">
+                      <Button
+                        type="primary"
+                        block
+                        loading={loading}
+                        onClick={handleAddtocart}
+                        disabled={count < 1}
+                        className="!h-14 !border-ink !bg-ink !text-[12px] !font-semibold !uppercase !tracking-[0.18em] !text-paper hover:!border-ink-hover hover:!bg-ink-hover"
                       >
-                        <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4 fill-none stroke-current stroke-[1.2]">
-                          <path d="M3 6.5h13v11H3zM16 10.5l5-3v9l-5-3z" />
-                        </svg>
-                        Try it on over video
-                      </Link>
+                        {buyLabel}
+                      </Button>
                       <button
                         type="button"
                         aria-pressed={isWishlisted}
                         aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
                         onClick={toggleWishlist}
-                        className="grid h-14 w-14 place-items-center border border-ink text-ink transition-colors hover:bg-ink hover:text-paper"
+                        className="grid h-14 w-14 place-items-center border border-line-strong text-ink transition-colors hover:border-ink"
                       >
                         <svg
                           viewBox="0 0 24 24"
                           aria-hidden
-                          className={`h-5 w-5 stroke-current stroke-[1.2] ${isWishlisted ? 'fill-ink' : 'fill-none'}`}
+                          className={`h-5 w-5 stroke-[1.3] ${isWishlisted ? 'fill-teal stroke-teal' : 'fill-none stroke-current'}`}
                         >
                           <path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z" />
                         </svg>
                       </button>
                     </div>
+                    <Link
+                      href="/virtual-appointment"
+                      className="inline-flex h-12 items-center justify-center gap-2.5 border border-line-strong text-[13px] text-ink transition-colors hover:border-ink hover:text-ink"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden className="h-[17px] w-[17px] fill-none stroke-current stroke-[1.3]">
+                        <path d="M3 6.5h13v11H3zM16 10.5l5-3v9l-5-3z" />
+                      </svg>
+                      See it live with a jeweler · Book a video call
+                    </Link>
                     <button
                       type="button"
                       onClick={() => setOpenCustomRequest(true)}
-                      className="justify-self-start border-b border-line pb-0.5 text-[12px] text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                      className="justify-self-start pt-1 text-[13px] text-ink-soft underline underline-offset-[3px] transition-colors hover:text-ink"
                     >
                       Want something different? Request a custom version
                     </button>
@@ -1919,7 +1911,7 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
                         }
                       }
                     }}
-                    className="!h-14 !border-ink !bg-ink !text-[11px] !uppercase !tracking-[0.22em] !text-paper hover:!border-ink-hover hover:!bg-ink-hover"
+                    className="!h-14 !border-ink !bg-ink !text-[12px] !font-semibold !uppercase !tracking-[0.18em] !text-paper hover:!border-ink-hover hover:!bg-ink-hover"
                   >
                     {selectionRoute === 1
                       ? selectedSettingStore === null
@@ -1938,9 +1930,9 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
             </div>
 
             {!isCustomFlow && product?.jewelry_id && (
-              <div className="grid gap-3 bg-stone/60 px-5 py-[18px] text-[13px] text-ink-soft">
+              <div className="grid gap-3 bg-mist px-[18px] py-4 text-[13px] text-ink-soft">
                 <div className="flex items-start gap-3.5">
-                  <svg viewBox="0 0 24 24" aria-hidden className="mt-0.5 h-5 w-5 flex-none fill-none stroke-gilt stroke-[1.2]">
+                  <svg viewBox="0 0 24 24" aria-hidden className="mt-0.5 h-[18px] w-[18px] flex-none fill-none stroke-navy stroke-[1.3]">
                     <path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.2v3.3h-7" />
                     <circle cx="7" cy="17.5" r="1.8" />
                     <circle cx="17" cy="17.5" r="1.8" />
@@ -1955,7 +1947,7 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
                   </div>
                 </div>
                 <div className="flex items-start gap-3.5">
-                  <svg viewBox="0 0 24 24" aria-hidden className="mt-0.5 h-5 w-5 flex-none fill-none stroke-gilt stroke-[1.2]">
+                  <svg viewBox="0 0 24 24" aria-hidden className="mt-0.5 h-[18px] w-[18px] flex-none fill-none stroke-navy stroke-[1.3]">
                     <path d="M8 7L4 11l4 4M4 11h11a5 5 0 010 10h-3" />
                   </svg>
                   <span>
@@ -1968,51 +1960,16 @@ const PDPPage = ({ selectionRoute }: { selectionRoute?: any }) => {
               </div>
             )}
 
-            {!isCustomFlow && product?.jewelry_id && <PdpAssurance />}
-
-            {!isCustomFlow && quickPicks.length > 0 && (
-              <OptionGroup
-                label="You may also like"
-                aside={
-                  <a
-                    href="#pdp-suggestions"
-                    className="border-b border-ink pb-0.5 text-[10.5px] font-medium uppercase tracking-[0.16em] text-ink hover:text-ink"
-                  >
-                    See all
-                  </a>
-                }
-              >
-                <ul className="m-0 grid list-none border-t border-line p-0">
-                  {quickPicks.map((p: any) => (
-                    <li key={p?.sku_master_id ?? p?.jewelry_id} className="border-b border-line">
-                      <Link
-                        href={p?.is_customizable ? `/custom-jewelry?type=2&state=s&id=${p?.slug}` : `/${p?.slug}`}
-                        className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3.5 py-2.5 text-inherit hover:text-inherit"
-                      >
-                        <span className="block h-14 w-14 bg-stone">
-                          <img src={p?.productImage} alt="" loading="lazy" className="h-full w-full object-contain mix-blend-multiply" />
-                        </span>
-                        <span className="grid min-w-0">
-                          <b className="truncate font-cormorant text-[17px] font-medium leading-tight text-ink">{p?.productName}</b>
-                          <span className="text-[12px] tabular-nums text-ink-soft">{formatCurrency(p?.discounted_price ?? p?.productPrice)}</span>
-                        </span>
-                        <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4 fill-none stroke-ink stroke-[1.2]">
-                          <path d="M9.5 6l6 6-6 6" />
-                        </svg>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </OptionGroup>
-            )}
+            {!isCustomFlow && <PdpDetails deliveryNote={deliveryNote} />}
           </div>
         </div>
       </section>
 
+      {/* Order (design-mockups/product-page-v4): reviews, pairings, atelier, promise band. */}
       <PdpReviews />
       <PdpSuggestions recentlyViewed={recentlyViewed} />
-      <PdpDetails image={jewelryMetadata?.carat_images?.[1] ?? jewelryMetadata?.carat_images?.[0]} deliveryNote={deliveryNote} />
       <PdpAtelier />
+      {!isCustomFlow && <PdpAssurance />}
     </ConfigProvider>
   );
 };

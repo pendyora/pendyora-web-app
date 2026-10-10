@@ -17,13 +17,7 @@ interface Option {
   image?: string;
 }
 
-interface FilterDrawerProps {
-  open: boolean;
-  focusSection: DrawerSection | null;
-  onClose: () => void;
-  resultCount: number;
-  activeCount: number;
-  onClearAll: () => void;
+export interface FilterPanelProps {
   loadingFilterId?: string | null;
 
   categories: { name: string; href: string; active: boolean; onClick?: () => void }[];
@@ -42,6 +36,15 @@ interface FilterDrawerProps {
   priceActive: boolean;
   caratSlot: React.ReactNode | null;
   caratActive: boolean;
+}
+
+interface FilterDrawerProps extends FilterPanelProps {
+  open: boolean;
+  focusSection: DrawerSection | null;
+  onClose: () => void;
+  resultCount: number;
+  activeCount: number;
+  onClearAll: () => void;
 }
 
 // Shared antd theme for the listing page; colors come from the Tailwind palette.
@@ -78,6 +81,12 @@ export const plpTheme = {
   },
 };
 
+// Smaller tags for the desktop rail.
+const railTagClass = (active: boolean) =>
+  `inline-flex min-h-[32px] items-center border px-3 text-[12.5px] transition-colors ${
+    active ? 'border-ink bg-ink text-paper hover:text-paper' : 'border-line text-ink hover:border-ink hover:text-ink'
+  }`;
+
 const tagClass = (active: boolean) =>
   `inline-flex min-h-[42px] items-center border px-4 text-[11px] uppercase tracking-[0.14em] transition-colors ${
     active ? 'border-ink bg-ink text-paper hover:text-paper' : 'border-line text-ink hover:border-ink hover:text-ink'
@@ -89,6 +98,7 @@ function Section({
   badge,
   open,
   onToggle,
+  compact,
   children,
 }: {
   id: DrawerSection;
@@ -96,12 +106,18 @@ function Section({
   badge?: string;
   open: boolean;
   onToggle: () => void;
+  compact?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <section id={`plp-filter-${id}`} className="border-b border-line">
-      <button type="button" onClick={onToggle} aria-expanded={open} className="flex w-full items-center justify-between py-[22px] text-left">
-        <span className="font-cormorant text-[22px] font-medium text-ink">{title}</span>
+    <section id={`plp-filter-${compact ? 'rail-' : ''}${id}`} className="border-b border-line">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className={`flex w-full items-center justify-between text-left ${compact ? 'py-4' : 'py-[22px]'}`}
+      >
+        <span className={compact ? 'text-[14px] font-medium text-ink' : 'font-cormorant text-[22px] font-medium text-ink'}>{title}</span>
         {badge && <small className="ml-auto mr-4 text-[11px] uppercase tracking-[0.1em] text-gilt">{badge}</small>}
         <span
           aria-hidden
@@ -110,57 +126,32 @@ function Section({
           }`}
         />
       </button>
-      {open && <div className="pb-[22px]">{children}</div>}
+      {open && <div className={compact ? 'pb-4' : 'pb-[22px]'}>{children}</div>}
     </section>
   );
 }
 
-export default function FilterDrawer(props: FilterDrawerProps) {
-  const {
-    open,
-    focusSection,
-    onClose,
-    resultCount,
-    activeCount,
-    onClearAll,
-    loadingFilterId,
-    categories,
-    styles,
-    metals,
-    shapes,
-    diamondColors,
-    specialTitles,
-    selected,
-    onToggle,
-    gender,
-    onGender,
-    priceSlot,
-    priceActive,
-    caratSlot,
-    caratActive,
-  } = props;
-  const lenis = useLenis();
+/** The filter sections. Rendered as the left rail on desktop (`compact`) and inside the drawer on smaller screens. */
+export function FilterPanel({
+  compact,
+  onNavigate,
+  loadingFilterId,
+  categories,
+  styles,
+  metals,
+  shapes,
+  diamondColors,
+  specialTitles,
+  selected,
+  onToggle,
+  gender,
+  onGender,
+  priceSlot,
+  priceActive,
+  caratSlot,
+  caratActive,
+}: FilterPanelProps & { compact?: boolean; onNavigate?: () => void }) {
   const [openSections, setOpenSections] = useState<Set<DrawerSection>>(new Set(['metal', 'price', 'style']));
-
-  // Keep the page still while the drawer is open (Lenis drives page scrolling).
-  useEffect(() => {
-    if (open) {
-      lenis?.stop();
-    } else {
-      lenis?.start();
-    }
-    return () => lenis?.start();
-  }, [open, lenis]);
-
-  // Open and scroll to the section that the filter bar button asked for.
-  useEffect(() => {
-    if (!open || !focusSection) {
-      return;
-    }
-    setOpenSections((prev) => new Set(prev).add(focusSection));
-    const t = setTimeout(() => document.getElementById(`plp-filter-${focusSection}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 320);
-    return () => clearTimeout(t);
-  }, [open, focusSection]);
 
   const toggleSection = (id: DrawerSection) =>
     setOpenSections((prev) => {
@@ -195,6 +186,175 @@ export default function FilterDrawer(props: FilterDrawerProps) {
       })}
     </div>
   );
+
+  const tag = compact ? railTagClass : tagClass;
+
+  return (
+    <div className="font-libre text-ink">
+      {categories.length > 0 && (
+        <Section compact={compact} id="category" title="Category" open={openSections.has('category')} onToggle={() => toggleSection('category')}>
+          <div className="flex flex-wrap gap-1.5">
+            {categories.map((c) => (
+              <Link
+                key={c.href}
+                href={c.href}
+                onClick={() => {
+                  c.onClick?.();
+                  onNavigate?.();
+                }}
+                aria-current={c.active ? 'page' : undefined}
+                className={tag(c.active)}
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {styles.length > 0 && (
+        <Section
+          compact={compact}
+          id="style"
+          title="Style"
+          badge={countBadge(selected.subTypes.length)}
+          open={openSections.has('style')}
+          onToggle={() => toggleSection('style')}
+        >
+          <div className="flex flex-wrap gap-1.5">
+            {styles.map((s) => {
+              const active = selected.subTypes.includes(s.id);
+              return (
+                <button key={s.id} type="button" aria-pressed={active} onClick={() => onToggle('subTypes', s.id)} className={tag(active)}>
+                  {s.name}
+                </button>
+              );
+            })}
+          </div>
+        </Section>
+      )}
+
+      {metals.length > 0 && (
+        <Section
+          compact={compact}
+          id="metal"
+          title="Metal"
+          badge={countBadge(selected.metal.length)}
+          open={openSections.has('metal')}
+          onToggle={() => toggleSection('metal')}
+        >
+          {optionList('metal', metals, true)}
+        </Section>
+      )}
+
+      <Section
+        compact={compact}
+        id="price"
+        title="Price"
+        badge={priceActive ? 'Set' : undefined}
+        open={openSections.has('price')}
+        onToggle={() => toggleSection('price')}
+      >
+        {priceSlot}
+      </Section>
+
+      {shapes.length > 0 && (
+        <Section
+          compact={compact}
+          id="shape"
+          title="Shape"
+          badge={countBadge(selected.shape.length)}
+          open={openSections.has('shape')}
+          onToggle={() => toggleSection('shape')}
+        >
+          {optionList('shape', shapes, true)}
+        </Section>
+      )}
+
+      {diamondColors.length > 0 && (
+        <Section
+          compact={compact}
+          id="diamond_color"
+          title="Diamond color"
+          badge={countBadge(selected.diamond_color.length)}
+          open={openSections.has('diamond_color')}
+          onToggle={() => toggleSection('diamond_color')}
+        >
+          {optionList('diamond_color', diamondColors)}
+        </Section>
+      )}
+
+      {caratSlot && (
+        <Section
+          compact={compact}
+          id="carat"
+          title="Carat weight"
+          badge={caratActive ? 'Set' : undefined}
+          open={openSections.has('carat')}
+          onToggle={() => toggleSection('carat')}
+        >
+          {caratSlot}
+        </Section>
+      )}
+
+      {specialTitles.length > 0 && (
+        <Section
+          compact={compact}
+          id="specialTitle"
+          title="Featured"
+          badge={countBadge(selected.specialTitle.length)}
+          open={openSections.has('specialTitle')}
+          onToggle={() => toggleSection('specialTitle')}
+        >
+          {optionList('specialTitle', specialTitles)}
+        </Section>
+      )}
+
+      <Section
+        compact={compact}
+        id="gender"
+        title="Wearer"
+        badge={gender !== 1 ? (gender === 2 ? 'For him' : 'For her') : undefined}
+        open={openSections.has('gender')}
+        onToggle={() => toggleSection('gender')}
+      >
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { v: 1, label: 'Everyone' },
+            { v: 3, label: 'For her' },
+            { v: 2, label: 'For him' },
+          ].map((g) => (
+            <button key={g.v} type="button" aria-pressed={gender === g.v} onClick={() => onGender(g.v)} className={tag(gender === g.v)}>
+              {g.label}
+            </button>
+          ))}
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+export default function FilterDrawer({ open, focusSection, onClose, resultCount, activeCount, onClearAll, ...panel }: FilterDrawerProps) {
+  const lenis = useLenis();
+
+  // Keep the page still while the drawer is open (Lenis drives page scrolling).
+  useEffect(() => {
+    if (open) {
+      lenis?.stop();
+    } else {
+      lenis?.start();
+    }
+    return () => lenis?.start();
+  }, [open, lenis]);
+
+  // Scroll to the section that the filter bar button asked for.
+  useEffect(() => {
+    if (!open || !focusSection) {
+      return;
+    }
+    const t = setTimeout(() => document.getElementById(`plp-filter-${focusSection}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 320);
+    return () => clearTimeout(t);
+  }, [open, focusSection]);
 
   return (
     <ConfigProvider theme={plpTheme}>
@@ -240,138 +400,8 @@ export default function FilterDrawer(props: FilterDrawerProps) {
           footer: '!border-line !px-7 !py-[18px] sm:!px-[18px]',
         }}
       >
-        <div data-lenis-prevent className="font-libre text-ink">
-          {categories.length > 0 && (
-            <Section id="category" title="Category" open={openSections.has('category')} onToggle={() => toggleSection('category')}>
-              <div className="flex flex-wrap gap-1.5">
-                {categories.map((c) => (
-                  <Link
-                    key={c.href}
-                    href={c.href}
-                    onClick={() => {
-                      c.onClick?.();
-                      onClose();
-                    }}
-                    aria-current={c.active ? 'page' : undefined}
-                    className={tagClass(c.active)}
-                  >
-                    {c.name}
-                  </Link>
-                ))}
-              </div>
-            </Section>
-          )}
-
-          {styles.length > 0 && (
-            <Section
-              id="style"
-              title="Style"
-              badge={countBadge(selected.subTypes.length)}
-              open={openSections.has('style')}
-              onToggle={() => toggleSection('style')}
-            >
-              <div className="flex flex-wrap gap-1.5">
-                {styles.map((s) => {
-                  const active = selected.subTypes.includes(s.id);
-                  return (
-                    <button key={s.id} type="button" aria-pressed={active} onClick={() => onToggle('subTypes', s.id)} className={tagClass(active)}>
-                      {s.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </Section>
-          )}
-
-          {metals.length > 0 && (
-            <Section
-              id="metal"
-              title="Metal"
-              badge={countBadge(selected.metal.length)}
-              open={openSections.has('metal')}
-              onToggle={() => toggleSection('metal')}
-            >
-              {optionList('metal', metals, true)}
-            </Section>
-          )}
-
-          <Section
-            id="price"
-            title="Price"
-            badge={priceActive ? 'Set' : undefined}
-            open={openSections.has('price')}
-            onToggle={() => toggleSection('price')}
-          >
-            {priceSlot}
-          </Section>
-
-          {shapes.length > 0 && (
-            <Section
-              id="shape"
-              title="Shape"
-              badge={countBadge(selected.shape.length)}
-              open={openSections.has('shape')}
-              onToggle={() => toggleSection('shape')}
-            >
-              {optionList('shape', shapes, true)}
-            </Section>
-          )}
-
-          {diamondColors.length > 0 && (
-            <Section
-              id="diamond_color"
-              title="Diamond color"
-              badge={countBadge(selected.diamond_color.length)}
-              open={openSections.has('diamond_color')}
-              onToggle={() => toggleSection('diamond_color')}
-            >
-              {optionList('diamond_color', diamondColors)}
-            </Section>
-          )}
-
-          {caratSlot && (
-            <Section
-              id="carat"
-              title="Carat weight"
-              badge={caratActive ? 'Set' : undefined}
-              open={openSections.has('carat')}
-              onToggle={() => toggleSection('carat')}
-            >
-              {caratSlot}
-            </Section>
-          )}
-
-          {specialTitles.length > 0 && (
-            <Section
-              id="specialTitle"
-              title="Featured"
-              badge={countBadge(selected.specialTitle.length)}
-              open={openSections.has('specialTitle')}
-              onToggle={() => toggleSection('specialTitle')}
-            >
-              {optionList('specialTitle', specialTitles)}
-            </Section>
-          )}
-
-          <Section
-            id="gender"
-            title="Wearer"
-            badge={gender !== 1 ? (gender === 2 ? 'For him' : 'For her') : undefined}
-            open={openSections.has('gender')}
-            onToggle={() => toggleSection('gender')}
-          >
-            <div className="flex flex-wrap gap-1.5">
-              {[
-                { v: 1, label: 'Everyone' },
-                { v: 3, label: 'For her' },
-                { v: 2, label: 'For him' },
-              ].map((g) => (
-                <button key={g.v} type="button" aria-pressed={gender === g.v} onClick={() => onGender(g.v)} className={tagClass(gender === g.v)}>
-                  {g.label}
-                </button>
-              ))}
-            </div>
-          </Section>
+        <div data-lenis-prevent>
+          <FilterPanel {...panel} onNavigate={onClose} />
         </div>
       </Drawer>
     </ConfigProvider>

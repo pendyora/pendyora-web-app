@@ -12,10 +12,13 @@ export interface PlpBanner {
   redirect_url?: string;
 }
 
-export type PlpView = 'dense' | 'large';
+/** 3 columns while the filter rail is open, 4 when it is hidden (design-mockups/plp-v3). */
+export type PlpColumns = 3 | 4;
 
-// Products per editorial block. 12 cards + one 2×2 tile = 4 full rows on the 4-column grid.
-const BLOCK_SIZE = 12;
+// Products between promo tiles. Tiles are card-sized and pinned to the left or right edge of the grid, so they stay
+// on an edge whatever the column count; `grid-flow-row-dense` lets products fill the cells around them.
+const BLOCK_SIZE = 8;
+const SERVICE_TILE = 'service';
 
 /** Renders "Fine Jewelry" as "Fine <em>Jewelry</em>" — the last word is set in italic. */
 export function EditorialTitle({ text, emClassName = '' }: { text?: string | null; emClassName?: string }) {
@@ -32,125 +35,91 @@ export function EditorialTitle({ text, emClassName = '' }: { text?: string | nul
   );
 }
 
-const ArrowIcon = () => (
-  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.2} className="h-[13px] w-[13px]" aria-hidden>
-    <path d="M3 13 13 3M5 3h8v8" />
-  </svg>
-);
-
-function PromoTile({ banner, side, view }: { banner: PlpBanner; side: 'right' | 'left'; view: PlpView }) {
-  const noir = side === 'left';
+function BannerTile({ banner, edge }: { banner: PlpBanner; edge: string }) {
   const href = banner.redirect_url || '#';
-  const placement = side === 'left' ? 'col-[1/span_2] md:col-[1/-1]' : 'col-span-2 md:col-span-full';
-  const rows = view === 'large' ? 'row-span-1' : 'row-span-2 md:row-span-1';
-  const frame =
-    view === 'large'
-      ? 'aspect-video flex-none md:aspect-[4/5]'
-      : `min-h-[420px] flex-1 md:min-h-0 md:flex-none ${noir ? 'md:aspect-[3/4]' : 'md:aspect-[4/5]'}`;
-
-  const picture = (
-    <picture className="contents">
-      {banner.mobile_image && <source media="(max-width: 550px)" srcSet={banner.mobile_image} />}
-      <img
-        src={banner.desktop_image}
-        alt={banner.name || 'Featured collection'}
-        loading="lazy"
-        className={`absolute inset-0 h-full w-full object-cover transition-transform duration-[1600ms] ease-luxe group-hover:scale-[1.03] ${
-          noir ? 'object-[50%_30%]' : ''
-        }`}
-      />
-    </picture>
-  );
-
-  if (noir) {
-    return (
-      <article className={`group flex min-w-0 flex-col ${placement} ${rows}`}>
-        <Link
-          href={href}
-          className={`relative block overflow-hidden bg-noir after:absolute after:inset-0 after:bg-gradient-to-b after:from-transparent after:from-45% after:to-noir/85 after:content-[''] ${frame}`}
-        >
-          {picture}
-          <div className="absolute inset-x-0 bottom-0 z-[1] flex flex-wrap items-end justify-between gap-5 p-[clamp(20px,3vw,40px)] text-noir-on">
-            <div>
-              <div className="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-gilt-soft">Featured</div>
-              {banner.name && (
-                <h2 className="m-0 mt-1.5 text-balance font-cormorant text-[clamp(34px,3.4vw,52px)] font-normal leading-none text-noir-on">
-                  <EditorialTitle text={banner.name} />
-                </h2>
-              )}
-            </div>
-            <span className="inline-flex flex-none items-center gap-2.5 rounded-full border border-noir-on px-5 py-[11px] text-[11px] uppercase tracking-[0.16em] text-noir-on transition-colors group-hover:bg-noir-on group-hover:text-noir">
-              Shop now <ArrowIcon />
-            </span>
-          </div>
-        </Link>
-      </article>
-    );
-  }
-
   return (
-    <article className={`group flex min-w-0 flex-col ${placement} ${rows}`}>
-      <Link href={href} className={`relative block overflow-hidden bg-stone ${frame}`} aria-label={banner.name || 'Featured collection'}>
-        {picture}
-      </Link>
-      <div className="flex items-end justify-between gap-5 pt-[18px] md:flex-col md:items-start">
-        <div>
-          <div className="text-[10.5px] font-semibold uppercase tracking-[0.2em] text-gilt">Featured</div>
-          {banner.name && (
-            <h2 className="m-0 mt-1.5 text-balance font-cormorant text-[clamp(34px,3.4vw,52px)] font-normal leading-none text-ink">
-              <EditorialTitle text={banner.name} />
-            </h2>
-          )}
-        </div>
-        <Link
-          href={href}
-          className="inline-flex flex-none items-center gap-2.5 rounded-full border border-ink px-5 py-[11px] text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:bg-ink hover:text-paper"
-        >
-          Discover <ArrowIcon />
-        </Link>
-      </div>
-    </article>
+    <Link href={href} className={`group grid min-w-0 content-start gap-3 ${edge}`}>
+      <span className="relative block aspect-[4/5] overflow-hidden bg-stone">
+        <picture className="contents">
+          {banner.mobile_image && <source media="(max-width: 550px)" srcSet={banner.mobile_image} />}
+          <img
+            src={banner.desktop_image}
+            alt={banner.name || 'Featured collection'}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-luxe group-hover:scale-[1.03]"
+          />
+        </picture>
+      </span>
+      <span className="grid gap-1">
+        <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-teal">Featured</span>
+        {banner.name && <span className="font-cormorant text-[24px] font-medium leading-[1.1] text-ink md:text-[20px]">{banner.name}</span>}
+        <span className="mt-1 justify-self-start border-b border-current text-[12px] font-semibold uppercase tracking-[0.1em] text-ink">
+          Shop now
+        </span>
+      </span>
+    </Link>
   );
 }
 
-export function gridClassName(view: PlpView) {
-  return view === 'large'
-    ? 'grid grid-flow-row-dense grid-cols-2 gap-x-4 gap-y-14 pb-5 pt-[26px] md:grid-cols-1 md:gap-y-8'
-    : 'grid grid-flow-row-dense grid-cols-4 gap-x-3 gap-y-11 pb-5 pt-[26px] lg:grid-cols-3 md:grid-cols-2 md:gap-x-2 md:gap-y-8';
+/** Brand tile: navy, framed, pointing to a real service (no offer copy, so nothing to keep in sync). */
+function ServiceTile({ edge }: { edge: string }) {
+  return (
+    <Link
+      href="/virtual-appointment"
+      className={`group relative grid aspect-[4/5] min-w-0 content-end overflow-hidden bg-navy p-7 text-noir-on before:absolute before:inset-3.5 before:border before:border-teal before:content-[''] md:p-[18px] ${edge}`}
+    >
+      <span className="relative text-[10.5px] font-semibold uppercase tracking-[0.16em] text-noir-on/80">Book a jeweler</span>
+      <span className="relative mb-[18px] mt-2.5 font-cormorant text-[clamp(28px,2.6vw,40px)] leading-[1.05] md:text-[24px]">
+        See it before
+        <br />
+        you <em className="italic">decide.</em>
+      </span>
+      <span className="relative inline-flex h-[42px] items-center justify-self-start bg-teal px-5 text-[11.5px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors group-hover:bg-noir-on group-hover:text-navy">
+        Video appointment
+      </span>
+    </Link>
+  );
+}
+
+export function gridClassName(columns: PlpColumns) {
+  return `grid grid-flow-row-dense gap-x-4 gap-y-10 pb-5 lg:grid-cols-3 md:grid-cols-2 md:gap-x-2.5 md:gap-y-7 ${
+    columns === 4 ? 'grid-cols-4' : 'grid-cols-3'
+  }`;
 }
 
 interface PlpGridProps {
   products: any[];
   banners: PlpBanner[];
-  view: PlpView;
+  columns: PlpColumns;
 }
 
-export default function PlpGrid({ products, banners, view }: PlpGridProps) {
+export default function PlpGrid({ products, banners, columns }: PlpGridProps) {
+  const usable = banners.filter((b) => !!b?.desktop_image);
+  // Second tile is always the service tile; the CMS banners fill the rest.
+  const tiles: (PlpBanner | typeof SERVICE_TILE)[] = usable.length ? [usable[0], SERVICE_TILE, ...usable.slice(1)] : [SERVICE_TILE];
   const items: React.ReactNode[] = [];
-  const usableBanners = banners.filter((b) => !!b?.desktop_image);
 
-  for (let start = 0, block = 0; start < products.length; start += BLOCK_SIZE, block++) {
-    const chunk = products.slice(start, start + BLOCK_SIZE);
-    // Only full blocks get an editorial tile, so the grid never ends on a half-empty row.
-    const banner = chunk.length === BLOCK_SIZE && usableBanners.length > 0 ? usableBanners[block % usableBanners.length] : null;
-    const side = block % 2 === 0 ? 'right' : 'left';
+  products.forEach((product, i) => {
+    items.push(<ProductProfile key={`${product?.sku_master_id ?? product?.jewelry_id}-${i}`} {...product} isStatic layout="plp" />);
+    // Only after a full block, so a short last page never ends with a lone promo.
+    if ((i + 1) % BLOCK_SIZE === 0 && i + 1 < products.length) {
+      const n = (i + 1) / BLOCK_SIZE - 1;
+      const edge = n % 2 === 0 ? 'col-[1/2]' : 'col-[-2/-1]';
+      const tile = tiles[n % tiles.length];
+      items.push(
+        tile === SERVICE_TILE ? <ServiceTile key={`promo-${n}`} edge={edge} /> : <BannerTile key={`promo-${n}`} banner={tile} edge={edge} />,
+      );
+    }
+  });
 
-    chunk.forEach((product, i) => {
-      if (banner && ((side === 'left' && i === 0) || (side === 'right' && i === 2))) {
-        items.push(<PromoTile key={`promo-${block}`} banner={banner} side={side} view={view} />);
-      }
-      items.push(<ProductProfile key={`${product?.sku_master_id ?? product?.jewelry_id}-${start + i}`} {...product} isStatic layout="plp" />);
-    });
-  }
-
-  return <div className={gridClassName(view)}>{items}</div>;
+  return <div className={gridClassName(columns)}>{items}</div>;
 }
 
-export function PlpGridSkeleton({ view, count = 8 }: { view: PlpView; count?: number }) {
+export function PlpGridSkeleton({ columns, count = 6 }: { columns: PlpColumns; count?: number }) {
   const shimmer =
     "relative overflow-hidden bg-stone after:absolute after:inset-0 after:animate-shimmer after:bg-gradient-to-r after:from-transparent after:via-paper/60 after:to-transparent after:bg-[length:220%_100%] after:content-['']";
   return (
-    <div className={gridClassName(view)} aria-busy="true" aria-label="Loading pieces">
+    <div className={gridClassName(columns)} aria-busy="true" aria-label="Loading pieces">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="flex min-w-0 flex-col">
           <div className={`aspect-[4/5] ${shimmer}`} />

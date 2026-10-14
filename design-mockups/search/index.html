@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pendyora Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap">
+<style>
+/* Search results, Atlantic palette. The query lives in a large editable field at the top (no need to reopen the header
+   search), related searches as chips, then a category/sort bar and the same product cards as the PLP. "No results" keeps
+   people moving: suggestions, popular searches and bestsellers instead of a dead end. */
+:root{
+  color-scheme: light;
+  --page:#FFFFFF; --tile:#F3F3F2; --soft:#F8F9FA;
+  --ink:#111111; --ink-2:#5F6368; --ink-3:#8A8D91;
+  --line:#E6E6E6; --line-2:#CFCFCF;
+  --navy:#2F4156; --navy-2:#22303F; --teal:#4E7486; --on-navy:#F5EFEB; --mist:#EEF3F7;
+  --gold-y:linear-gradient(135deg,#F6E3A6,#D8B25A 50%,#B88E35);
+  --gold-w:linear-gradient(135deg,#FAFAF8,#D7D6D2 50%,#AFAEAA);
+  --gold-r:linear-gradient(135deg,#F7D4C2,#DCA28A 50%,#BF7E66);
+  --display:"Cormorant Garamond", Garamond, "Times New Roman", serif;
+  --ui:"Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --gutter:clamp(16px,3.2vw,48px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.55 var(--ui);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+img{display:block;max-width:100%}
+:focus-visible{outline:1.5px solid var(--teal);outline-offset:3px}
+.wrap{max-width:1440px;margin-inline:auto;padding-inline:var(--gutter)}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+
+.review{background:#202124;color:#E8EAED;font-size:11.5px;display:flex;gap:8px;align-items:center;justify-content:center;padding:7px var(--gutter)}
+.review b{letter-spacing:.14em;text-transform:uppercase;font-weight:600;font-size:10.5px;color:#9AA0A6;margin-right:4px}
+.review button{padding:4px 12px;border:1px solid #5F6368;border-radius:999px}
+.review button[aria-pressed="true"]{background:#E8EAED;color:#202124;border-color:#E8EAED}
+.announce{background:var(--navy);color:var(--on-navy);text-align:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:10px var(--gutter);font-weight:500}
+.hdr{position:sticky;top:0;z-index:30;background:var(--page);border-bottom:1px solid var(--line)}
+.hdr .wrap{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:32px;height:72px}
+.mark{font-family:var(--display);font-weight:500;font-size:26px;letter-spacing:.32em}
+.nav{display:flex;justify-content:center;gap:clamp(16px,2.4vw,36px)}
+.nav a{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding-block:26px;border-bottom:1.5px solid transparent}
+.nav a:hover{border-color:var(--ink)}
+.tools{display:flex;align-items:center;gap:6px}
+.hsearch{display:flex;align-items:center;gap:10px;height:40px;min-width:200px;padding:0 14px;border:1px solid var(--ink);color:var(--ink);font-size:13px;margin-right:8px}
+.tool{position:relative;display:grid;place-items:center;width:40px;height:40px}
+.count{position:absolute;top:3px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--teal);color:#fff;font-size:9.5px;font-weight:600;display:grid;place-items:center;padding-inline:4px}
+
+/* Query block */
+.qblock{padding-block:clamp(28px,3.5vw,48px) 20px}
+.crumbs{display:flex;gap:8px;font-size:12px;color:var(--ink-2);margin-bottom:16px}
+.crumbs span[aria-hidden]{color:var(--line-2)}
+.qfield{display:flex;align-items:center;gap:16px;border-bottom:1.5px solid var(--ink);padding-bottom:10px;max-width:900px}
+.qfield .icon{width:26px;height:26px}
+.qfield input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-family:var(--display);font-size:clamp(32px,3.6vw,52px);line-height:1.1}
+.qfield button{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.meta{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:14px;color:var(--ink-2)}
+.meta b{color:var(--ink);font-weight:600}
+.related{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.related span{font-size:12.5px;color:var(--ink-3);margin-right:4px}
+.related a{height:32px;padding:0 12px;border:1px solid var(--line-2);display:inline-flex;align-items:center;font-size:13px;color:var(--ink-2)}
+.related a:hover{border-color:var(--ink);color:var(--ink)}
+
+/* Toolbar */
+.bar{position:sticky;top:72px;z-index:20;background:var(--page);border-block:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:22px;min-height:56px}
+.cats{display:flex;gap:24px;overflow-x:auto;scrollbar-width:none;flex:1}
+.cats button{flex:none;padding:17px 0 15px;font-size:13.5px;color:var(--ink-2);border-bottom:1.5px solid transparent}
+.cats button span{color:var(--ink-3);margin-left:4px;font-size:12.5px}
+.cats button[aria-pressed="true"]{color:var(--ink);font-weight:600;border-color:var(--ink)}
+.sort{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);flex:none}
+.sort select{border:0;font-weight:500;color:var(--ink);background:transparent;font-size:13px;cursor:pointer}
+
+/* Results */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:40px 16px;padding-block:28px 24px}
+.card{position:relative;display:grid;gap:10px;align-content:start}
+.media{position:relative;aspect-ratio:4/5;background:var(--tile);overflow:hidden}
+.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;transition:opacity .5s var(--ease),transform 1.2s var(--ease)}
+.media img.alt{opacity:0;mix-blend-mode:normal}
+.card:hover .media img.alt{opacity:1}
+.card:hover .media img{transform:scale(1.025)}
+.badge{position:absolute;left:12px;top:12px;z-index:1;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.heart{position:absolute;right:6px;top:6px;z-index:1;width:36px;height:36px;display:grid;place-items:center}
+.heart[aria-pressed="true"] svg{fill:var(--teal);stroke:var(--teal)}
+.name{font-size:15px;font-weight:500;line-height:1.35}
+.name mark{background:none;color:inherit;font-weight:700}
+.meta2{font-size:13px;color:var(--ink-2)}
+.price{font-size:14px}
+.sw{display:flex;gap:8px;margin-top:4px}
+.sw i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.sw i:first-child{outline:1px solid var(--ink);outline-offset:2px}
+
+/* Inline guide card in results */
+.guide{grid-column:span 2;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:var(--mist);align-items:stretch}
+.guide figure{margin:0;overflow:hidden}
+.guide figure img{width:100%;height:100%;object-fit:cover}
+.guide .t{padding:28px;display:grid;align-content:center;gap:10px}
+.guide h3{margin:0;font-family:var(--display);font-weight:500;font-size:28px;line-height:1.1}
+.guide p{margin:0;font-size:14px;color:var(--ink-2)}
+.guide a{justify-self:start;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid currentColor}
+
+.more{display:grid;justify-items:center;gap:14px;padding:24px 0 80px;font-size:13px;color:var(--ink-2)}
+.more i{display:block;width:220px;height:2px;background:var(--line);position:relative}
+.more i::after{content:"";position:absolute;inset:0 auto 0 0;width:33%;background:var(--ink)}
+.more button{height:48px;padding:0 36px;border:1px solid var(--ink);font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+
+/* No results */
+.none{display:none;padding-block:12px 80px}
+.none .box{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);padding-block:28px 48px;border-bottom:1px solid var(--line)}
+.none h2{margin:0 0 10px;font-family:var(--display);font-weight:500;font-size:34px;line-height:1.05}
+.none p{margin:0 0 6px;color:var(--ink-2)}
+.none ul{margin:14px 0 0;padding-left:18px;color:var(--ink-2);display:grid;gap:6px}
+.none .dym{font-size:15px;color:var(--ink);margin-top:14px}
+.none .dym a{color:var(--teal);text-decoration:underline;text-underline-offset:3px;font-style:italic;font-family:var(--display);font-size:20px}
+.none .help{background:var(--navy);color:var(--on-navy);padding:28px;display:grid;gap:10px;align-content:start}
+.none .help b{font-family:var(--display);font-weight:500;font-size:26px;color:#fff}
+.none .help span{opacity:.85}
+.none .help a{justify-self:start;height:46px;padding:0 20px;display:inline-flex;align-items:center;gap:8px;background:var(--on-navy);color:var(--navy);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:6px}
+.none h3{margin:40px 0 16px;font-family:var(--display);font-weight:500;font-size:28px}
+body.empty .results{display:none}
+body.empty .none{display:block}
+
+.foot{background:var(--navy-2);color:rgba(245,239,235,.8);font-size:12px;text-align:center;padding:24px var(--gutter)}
+
+@media (max-width:1280px){ .hsearch span{display:none} .hsearch{min-width:0} }
+@media (max-width:1024px){
+  .nav{display:none}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .none .box{grid-template-columns:1fr}
+}
+@media (max-width:769px){
+  .hdr .wrap{height:60px}
+  .bar{top:60px}
+  .hsearch{border:0;padding:0;width:40px;justify-content:center;margin:0}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 10px}
+  .guide{grid-template-columns:1fr}
+  .guide figure{aspect-ratio:16/9}
+  .mark{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="review" role="region" aria-label="Mockup controls">
+  <b>Mockup</b>
+  <button type="button" data-s="ok" aria-pressed="true">Results</button>
+  <button type="button" data-s="none" aria-pressed="false">No results</button>
+</div>
+<div class="announce">Free insured shipping on every order · Book a virtual appointment</div>
+<header class="hdr">
+  <div class="wrap">
+    <a class="mark" href="#">PENDYORA</a>
+    <nav class="nav" aria-label="Main"><a href="#">Engagement</a><a href="#">Wedding</a><a href="#">Jewelry</a><a href="#">Gifts</a><a href="#">Education</a></nav>
+    <div class="tools">
+      <a class="hsearch" href="#"><svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>Search</span></a>
+      <a class="tool" href="#" aria-label="Account"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></a>
+      <a class="tool" href="#" aria-label="Wishlist"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg><span class="count">2</span></a>
+      <a class="tool" href="#" aria-label="Bag"><svg class="icon" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="count">1</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap qblock">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span aria-hidden="true">/</span><span>Search</span></nav>
+    <form class="qfield" role="search" onsubmit="event.preventDefault()">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+      <label class="sr" for="q">Search</label><input id="q" value="diamond hoops" autocomplete="off">
+      <button type="button" onclick="document.getElementById('q').value='';document.getElementById('q').focus()">Clear</button>
+    </form>
+    <div class="meta results"><span><b>24 pieces</b> for “<span id="qEcho">diamond hoops</span>”</span></div>
+    <div class="related results"><span>Related:</span><a href="#">Diamond studs</a><a href="#">Huggies</a><a href="#">Gold hoops</a><a href="#">Pavé earrings</a><a href="#">Ear stacks</a></div>
+  </section>
+
+  <div class="bar results">
+    <div class="wrap">
+      <div class="cats" id="cats" role="toolbar" aria-label="Category">
+        <button type="button" aria-pressed="true">All<span>24</span></button><button type="button" aria-pressed="false">Earrings<span>18</span></button><button type="button" aria-pressed="false">Rings<span>3</span></button><button type="button" aria-pressed="false">Necklaces<span>2</span></button><button type="button" aria-pressed="false">Bracelets<span>1</span></button>
+      </div>
+      <label class="sort">Sort:<select><option>Best match</option><option>Price, low to high</option><option>Price, high to low</option><option>Newest</option></select></label>
+    </div>
+  </div>
+
+  <section class="wrap results">
+    <div class="grid" id="grid"></div>
+    <div class="more"><span>Showing 8 of 24</span><i></i><button type="button">Load more</button></div>
+  </section>
+
+  <section class="wrap none" aria-live="polite">
+    <div class="box">
+      <div>
+        <h2>No pieces match “<span id="noQ">diamnd hops</span>”</h2>
+        <p class="dym">Did you mean <a href="#">diamond hoops</a>?</p>
+        <ul><li>Check the spelling, or try fewer words</li><li>Search by type: “studs”, “tennis bracelet”, “solitaire”</li><li>Try a metal or stone: “rose gold”, “sapphire”</li></ul>
+        <div class="related" style="margin-top:22px"><span>Popular:</span><a href="#">Engagement rings</a><a href="#">Tennis bracelet</a><a href="#">Diamond studs</a><a href="#">Wedding bands</a></div>
+      </div>
+      <div class="help"><b>Can't find it?</b><span>Describe what you're looking for and a jeweler will find it, or design it for you.</span><a href="#"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><rect x="3" y="6.5" width="13" height="11"/><path d="m16 10.5 5-3v9l-5-3z"/></svg>Ask a jeweler</a></div>
+    </div>
+    <h3>Our bestsellers</h3>
+    <div class="grid" id="best" style="padding-top:0"></div>
+  </section>
+</main>
+<footer class="foot">© 2026 Pendyora · Mockup: design-mockups/search · Atlantic palette</footer>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const R = [
+    ['Lumen Pavé Hoops', 'p-pave-circle', 'm-ear-pearl', '18K Yellow gold', 690, 'New', ['y', 'w']],
+    ['Galet Diamond Hoops', 'p-pebble-hoops', 'm-ear-pearl', '18K Yellow gold', 860, '', ['y', 'w']],
+    ['Larme Teardrop Hoops', 'p-teardrop', 'm-bw-ear', '18K Rose gold', 720, 'Bestseller', ['r', 'y', 'w']],
+    ['Mira Diamond Huggies', 'p-mini-hoops', 'm-bw-ear', '14K Yellow gold', 380, '', ['y', 'w', 'r']],
+    null,
+    ['Ondine Twist Hoops', 'p-gold-hoops', 'm-hands-stack', '18K Yellow gold', 540, '', ['y']],
+    ['Brillante Diamond Studs', 'p-loose-diamond', 'm-bw-ear', '18K White gold', 1450, '', ['w', 'y']],
+    ['Halo Diamond Ring', 'p-halo', 'm-bw-hand', '18K White gold', 2400, '', ['w']],
+  ];
+  const SW = { y: 'var(--gold-y)', w: 'var(--gold-w)', r: 'var(--gold-r)' };
+  const heart = '<svg class="icon" viewBox="0 0 24 24" style="width:19px;height:19px"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg>';
+  const hl = (name, q) => q.split(/\s+/).filter(Boolean).reduce((s, w) => s.replace(new RegExp(`(${w})`, 'ig'), '<mark>$1</mark>'), name);
+  const card = ([n, img, alt, metal, price, badge, sw], q) => `<article class="card"><a class="media" href="#"><img src="img/${img}.jpg" alt="${n}" loading="lazy"><img class="alt" src="img/${alt}.jpg" alt="" loading="lazy"></a>
+    ${badge ? `<span class="badge">${badge}</span>` : ''}<button class="heart" aria-label="Save ${n}" aria-pressed="false">${heart}</button>
+    <a class="name" href="#">${q ? hl(n, q) : n}</a><span class="meta2">${metal}</span><span class="price">$${price.toLocaleString()}</span><span class="sw">${sw.map(s => `<i style="background:${SW[s]}"></i>`).join('')}</span></article>`;
+  const guide = `<a class="guide" href="#"><figure><img src="img/m-ear-pearl.jpg" alt="" loading="lazy"></figure><div class="t"><span class="eyebrow">From the journal</span><h3>How to build an ear stack</h3><p>Three rules for mixing hoops, huggies and studs.</p><span class="guide-link" style="font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid currentColor;justify-self:start">Read the guide</span></div></a>`;
+  $('#grid').innerHTML = R.map(r => r ? card(r, 'diamond hoops') : guide).join('');
+  $('#best').innerHTML = R.filter(Boolean).slice(0, 4).map(r => card(r, '')).join('');
+  document.addEventListener('click', e => { const h = e.target.closest('.heart'); if (h) h.setAttribute('aria-pressed', h.getAttribute('aria-pressed') !== 'true'); });
+  $('#cats').addEventListener('click', e => { const b = e.target.closest('button'); if (b) document.querySelectorAll('#cats button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  document.querySelectorAll('.review [data-s]').forEach(b => b.addEventListener('click', () => {
+    const empty = b.dataset.s === 'none';
+    document.body.classList.toggle('empty', empty);
+    $('#q').value = empty ? 'diamnd hops' : 'diamond hoops';
+    document.querySelectorAll('.review [data-s]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  }));
+})();
+</script>
+</body>
+</html>

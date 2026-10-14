@@ -8,15 +8,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap">
 <style>
-/* Virtual appointment, Atlantic palette. Left: why book (photo, what happens, what to have ready). Right: a booking
-   card that does one step at a time — topic → day & time → your details → booked — with a running summary, so the
-   whole booking happens in the first screen. Same API as today: service, date, slot, time zone, name, email, phone, message. */
+/* Virtual appointment: one simple page. Four numbered sections, all visible (topic → day → time → details), plain labels
+   above fields, and a summary card that fills in beside the form with the Book button. No steps, no hidden pickers.
+   Sends the same data as today: topic, date, slot, time zone, name, email, phone, note. Atlantic palette. */
 :root{
   color-scheme: light;
-  --page:#FFFFFF; --tile:#F3F3F2; --soft:#F8F9FA;
+  --page:#FFFFFF; --tile:#F3F3F2; --soft:#F8F9FA; --paper:#F7F3EC;
   --ink:#111111; --ink-2:#5F6368; --ink-3:#8A8D91;
   --line:#E6E6E6; --line-2:#CFCFCF;
-  --navy:#2F4156; --navy-2:#22303F; --teal:#4E7486; --on-navy:#F5EFEB; --mist:#EEF3F7; --sky:#B9CCD6; --danger:#A23B2E;
+  --navy:#2F4156; --navy-2:#22303F; --teal:#4E7486; --on-navy:#F5EFEB; --mist:#EEF3F7; --sky:#B9CCD6; --danger:#A23B2E; --ok:#4E8A5E;
   --display:"Cormorant Garamond", Garamond, "Times New Roman", serif;
   --ui:"Libre Franklin", "Helvetica Neue", Arial, sans-serif;
   --gutter:clamp(16px,3.2vw,48px);
@@ -31,8 +31,6 @@ img{display:block;max-width:100%}
 :focus-visible{outline:1.5px solid var(--teal);outline-offset:3px}
 .wrap{max-width:1440px;margin-inline:auto;padding-inline:var(--gutter)}
 .icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;flex:none}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
 
 .announce{background:var(--navy);color:var(--on-navy);text-align:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:10px var(--gutter);font-weight:500}
 .hdr{position:sticky;top:0;z-index:30;background:var(--page);border-bottom:1px solid var(--line)}
@@ -46,137 +44,128 @@ img{display:block;max-width:100%}
 .tool{position:relative;display:grid;place-items:center;width:40px;height:40px}
 .count{position:absolute;top:3px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--teal);color:#fff;font-size:9.5px;font-weight:600;display:grid;place-items:center;padding-inline:4px}
 
-/* Layout */
-.book{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-areas:'head card' 'body card';grid-template-rows:auto 1fr;column-gap:clamp(32px,5vw,80px);row-gap:0;padding-block:clamp(28px,3.5vw,48px) clamp(56px,6vw,88px);align-items:start}
-.crumbs{display:flex;gap:8px;font-size:12px;color:var(--ink-2);margin-bottom:14px}
+/* Title band */
+.band{background:var(--soft);border-bottom:1px solid var(--line)}
+.band .wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding-block:clamp(28px,3.5vw,44px)}
+.crumbs{display:flex;gap:8px;font-size:12px;color:var(--ink-2);margin-bottom:10px}
 .crumbs span[aria-hidden]{color:var(--line-2)}
-h1{margin:10px 0 12px;font-family:var(--display);font-weight:400;font-size:clamp(40px,4.4vw,62px);line-height:1}
+h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(36px,4vw,54px);line-height:1}
 h1 em{font-style:italic}
-.lede{margin:0 0 24px;max-width:44ch;color:var(--ink-2);font-size:15.5px;line-height:1.7}
-.why-head{grid-area:head}
-.why-body{grid-area:body}
-.card{grid-area:card}
-.why figure{position:relative;margin:0 0 26px;aspect-ratio:16/10;overflow:hidden;background:var(--tile)}
-.why figure img{width:100%;height:100%;object-fit:cover}
-.why figure span{position:absolute;left:14px;bottom:14px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);padding:6px 10px;font-size:12px;font-weight:500}
-.why figure span i{width:8px;height:8px;border-radius:50%;background:#4E8A5E;box-shadow:0 0 0 4px rgba(78,138,94,.15)}
-.expect{list-style:none;margin:0;padding:0;display:grid;gap:16px}
-.expect li{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start}
-.expect .ic{width:40px;height:40px;border-radius:50%;background:var(--mist);display:grid;place-items:center;color:var(--navy)}
-.expect .ic .icon{width:18px;height:18px}
-.expect b{display:block;font-weight:500;font-size:15px}
-.expect span{font-size:13.5px;color:var(--ink-2)}
-.facts{display:flex;gap:22px;flex-wrap:wrap;margin-top:26px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
-.facts b{display:block;font-family:var(--display);font-weight:500;font-size:24px;color:var(--ink);line-height:1.1}
+.band p{margin:10px 0 0;color:var(--ink-2);max-width:52ch;font-size:15px}
+.perks{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.perks span{display:inline-flex;align-items:center;gap:8px}
+.perks .icon{width:16px;height:16px;color:var(--navy)}
 
-/* Booking card */
-.card{border:1px solid var(--line);background:var(--page);box-shadow:0 30px 70px -45px rgba(17,20,26,.35);position:sticky;top:96px}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
-.steps button{display:flex;align-items:center;gap:10px;padding:16px 20px;font-size:13px;color:var(--ink-3);text-align:left;border-bottom:2px solid transparent;margin-bottom:-1px}
-.steps i{width:24px;height:24px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font-style:normal;font-size:11.5px;flex:none}
-.steps small{display:block;font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
-.steps button[aria-current]{color:var(--ink);font-weight:600;border-color:var(--ink)}
-.steps button[aria-current] i{background:var(--ink);border-color:var(--ink);color:#fff}
-.steps button.done{color:var(--ink)}
-.steps button.done i{background:var(--teal);border-color:var(--teal);color:#fff}
-.steps button:disabled{cursor:default}
-.pane{display:none;padding:clamp(22px,2.6vw,34px)}
-.pane.on{display:grid;gap:18px}
-.pane h2{margin:0;font-family:var(--display);font-weight:500;font-size:28px;line-height:1.05}
-.pane .sub{margin:-10px 0 0;color:var(--ink-2);font-size:13.5px}
+/* Layout */
+.page{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);gap:clamp(32px,5vw,80px);padding-block:clamp(32px,4vw,56px) 80px;align-items:start}
+.sec{padding-bottom:30px;margin-bottom:30px;border-bottom:1px solid var(--line)}
+.sec:last-of-type{border-bottom:0;margin-bottom:0}
+.sec h2{display:flex;align-items:baseline;gap:12px;margin:0 0 4px;font-family:var(--display);font-weight:500;font-size:28px;line-height:1.1}
+.sec h2 .n{font-style:italic;font-size:20px;color:var(--teal);min-width:24px}
+.sec .sub{margin:0 0 16px 36px;color:var(--ink-2);font-size:13.5px}
+.sec .body{margin-left:36px}
+.sec.bad h2{color:var(--danger)}
+.sec .err{display:none;color:var(--danger);font-size:12.5px;margin:10px 0 0 36px}
+.sec.bad .err{display:block}
 
-.services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.svc{display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);text-align:left;transition:border-color .2s}
-.svc:hover{border-color:var(--line-2)}
-.svc[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 .5px var(--ink);background:var(--soft)}
-.svc img{width:56px;height:56px;object-fit:cover;background:var(--tile)}
-.svc b{display:block;font-weight:500;font-size:14.5px}
-.svc small{font-size:12.5px;color:var(--ink-2)}
-.mode{display:flex;gap:8px;flex-wrap:wrap}
-.mode button{height:38px;padding:0 14px;border:1px solid var(--line-2);font-size:13px;display:inline-flex;align-items:center;gap:8px}
-.mode button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-.mode .icon{width:16px;height:16px}
+/* Topics */
+.topics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.topic{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;text-align:left;padding:10px;border:1px solid var(--line-2);transition:border-color .2s,background .2s}
+.topic:hover{border-color:var(--ink)}
+.topic[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--soft)}
+.topic img{width:48px;height:48px;object-fit:cover;background:var(--tile)}
+.topic b{display:block;font-weight:500;font-size:14px;line-height:1.3}
+.topic small{font-size:12px;color:var(--ink-2)}
+.how{display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap}
+.how span{font-size:13px;color:var(--ink-2);margin-right:4px}
+.pill{height:40px;padding:0 16px;border:1px solid var(--line-2);font-size:13.5px;display:inline-flex;align-items:center;gap:8px}
+.pill:hover{border-color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pill .icon{width:16px;height:16px}
 
-.tz{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
-.tz select{height:36px;border:1px solid var(--line-2);padding:0 30px 0 10px;appearance:none;background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.3'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center/14px;font-size:13px}
-.days{display:grid;grid-template-columns:auto repeat(7,minmax(0,1fr)) auto;gap:6px;align-items:stretch}
-.days .nav-btn{width:32px;display:grid;place-items:center;border:1px solid var(--line);color:var(--ink-2)}
-.days .nav-btn .icon{width:16px;height:16px}
-.day{display:grid;justify-items:center;gap:2px;padding:10px 0;border:1px solid var(--line);font-size:12px;color:var(--ink-2)}
-.day b{font-size:18px;font-weight:500;color:var(--ink)}
-.day:disabled{opacity:.35;cursor:not-allowed}
+/* Days + times */
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.day{display:grid;justify-items:center;gap:1px;padding:10px 0;border:1px solid var(--line-2);font-size:12px;color:var(--ink-2)}
+.day b{font-size:20px;font-weight:500;color:var(--ink);line-height:1.3;font-variant-numeric:lining-nums tabular-nums}
+.day:hover{border-color:var(--ink)}
+.day:disabled{opacity:.4;cursor:not-allowed;border-style:dashed}
 .day[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 .day[aria-pressed="true"] b{color:#fff}
-.slots-h{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2)}
-.slots-h b{color:var(--ink);font-weight:500}
-.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.slot{height:44px;border:1px solid var(--line-2);font-size:13.5px;font-variant-numeric:tabular-nums}
-.slot:hover{border-color:var(--ink)}
-.slot:disabled{color:var(--line-2);border-style:dashed;cursor:not-allowed;text-decoration:line-through}
-.slot[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.more-days{margin-top:10px;font-size:13px;color:var(--teal);text-decoration:underline;text-underline-offset:3px}
+.tzrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:13px;color:var(--ink-2)}
+.tzrow select{height:38px;border:1px solid var(--line-2);padding:0 30px 0 12px;appearance:none;background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.3'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/14px;font-size:13px;color:var(--ink)}
+.times{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.time{height:46px;border:1px solid var(--line-2);font-size:14px;font-variant-numeric:tabular-nums}
+.time:hover{border-color:var(--ink)}
+.time:disabled{color:var(--line-2);border-style:dashed;cursor:not-allowed;text-decoration:line-through}
+.time[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.empty-times{color:var(--ink-3);font-size:13.5px;padding:14px 0}
 
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.phone{display:grid;grid-template-columns:110px 1fr;gap:12px}
-.f{position:relative;display:grid}
-.f input,.f select,.f textarea{border:1px solid var(--line-2);background:var(--page);padding:22px 14px 8px;font-size:14px;border-radius:0;appearance:none;width:100%}
-.f input,.f select{height:56px}
-.f textarea{min-height:110px;resize:vertical}
-.f select{background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.3'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/16px}
-.f :is(input,select,textarea):focus{outline:none;border-color:var(--ink);box-shadow:inset 0 0 0 .5px var(--ink)}
-.f label{position:absolute;left:14px;top:8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);pointer-events:none}
-.f .err{display:none;color:var(--danger);font-size:12px;margin-top:6px}
-.f.bad :is(input,textarea){border-color:var(--danger)}
-.f.bad .err{display:block}
+/* Fields: plain labels above */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px;max-width:680px}
+.fields .full{grid-column:1/-1}
+.fld{display:grid;gap:6px}
+.fld label{font-size:13px;font-weight:500}
+.fld label small{font-weight:400;color:var(--ink-3)}
+.fld input,.fld select,.fld textarea{height:50px;border:1px solid var(--line-2);background:var(--page);padding:0 14px;font-size:15px;border-radius:0;width:100%}
+.fld textarea{height:auto;min-height:96px;padding:12px 14px;resize:vertical}
+.fld :is(input,select,textarea):focus{outline:none;border-color:var(--ink);box-shadow:inset 0 0 0 .5px var(--ink)}
+.phone{display:grid;grid-template-columns:96px 1fr;gap:8px}
+.fld select{appearance:none;background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.3'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/14px}
+.fld .msg{display:none;color:var(--danger);font-size:12.5px}
+.fld.bad :is(input,textarea){border-color:var(--danger)}
+.fld.bad .msg{display:block}
 
-.summary{display:flex;gap:14px;align-items:center;background:var(--mist);padding:14px 16px;font-size:13.5px}
-.summary img{width:44px;height:44px;object-fit:cover}
-.summary b{font-weight:600}
-.summary button{margin-left:auto;font-size:12.5px;color:var(--teal);text-decoration:underline;text-underline-offset:3px}
-.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:4px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:54px;padding:0 34px;background:var(--ink);color:#fff;font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
-.btn:disabled{background:var(--line-2);cursor:not-allowed}
-.back{font-size:13px;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px}
-.back:hover{color:var(--ink)}
-.back .icon{width:16px;height:16px}
-.fine{font-size:12px;color:var(--ink-3);margin:0}
+/* Summary card */
+.sum{position:sticky;top:96px;display:grid;gap:16px}
+.card{background:var(--paper);border:1px solid #E8E1D5;padding:26px 24px;display:grid;gap:16px}
+.card .mk{font-family:var(--display);font-weight:500;letter-spacing:.3em;font-size:15px;color:var(--navy)}
+.card h3{margin:0;font-family:var(--display);font-weight:500;font-size:26px;line-height:1.1}
+.card dl{margin:0;display:grid;gap:12px;border-top:1px solid #E3DBCD;padding-top:14px}
+.card dl div{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;font-size:14px}
+.card dl .icon{width:18px;height:18px;color:var(--navy);margin-top:1px}
+.card dd{margin:0}
+.card dd.wait{color:#A39A8E;font-style:italic}
+.card dt{display:contents}
+.book{display:flex;align-items:center;justify-content:center;gap:10px;height:56px;width:100%;background:var(--ink);color:#fff;font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;transition:background .2s}
+.book:hover{background:#2A2A2A}
+.book .icon{width:16px;height:16px}
+.fine{margin:0;font-size:12px;color:var(--ink-3);text-align:center}
+.expect{border:1px solid var(--line);padding:18px 20px;display:grid;gap:10px;font-size:13.5px;color:var(--ink-2)}
+.expect b{color:var(--ink);font-weight:500;font-size:14px}
+.expect li{margin-bottom:4px}
+.expect ul{margin:0;padding-left:18px}
 
-.done{text-align:center;justify-items:center}
-.done .ring{width:68px;height:68px;border-radius:50%;border:1px solid var(--teal);display:grid;place-items:center;color:var(--teal)}
-.done .when{display:grid;gap:4px;border:1px solid var(--line);padding:18px 24px;width:100%;max-width:420px}
-.done .when b{font-family:var(--display);font-weight:500;font-size:24px}
-.done .when span{font-size:13.5px;color:var(--ink-2)}
-.done .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.done .ctas a{height:48px;padding:0 22px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+/* Done */
+.done{display:none;text-align:center;justify-items:center;gap:14px;padding:clamp(40px,6vw,80px) 0 90px}
+.done .ring{width:72px;height:72px;border-radius:50%;border:1px solid var(--teal);display:grid;place-items:center;color:var(--teal)}
+.done h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(34px,3.6vw,48px)}
+.done p{margin:0;color:var(--ink-2);max-width:52ch}
+.done .when{border:1px solid var(--line);padding:18px 28px;display:grid;gap:4px}
+.done .when b{font-family:var(--display);font-weight:500;font-size:26px}
+.done .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.done .ctas a{height:50px;padding:0 24px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 .done .ctas a:first-child{background:var(--ink);color:#fff}
 .done .ctas .icon{width:16px;height:16px}
+body.booked .page{display:none}
+body.booked .done{display:grid}
 
-/* Reassurance band */
-.band{background:var(--navy);color:var(--on-navy)}
-.band .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding-block:36px}
-.band div{display:flex;gap:14px}
-.band .icon{color:var(--sky);margin-top:2px}
-.band b{display:block;font-family:var(--display);font-weight:500;font-size:20px;color:#fff}
-.band span{font-size:13px;opacity:.82}
 .foot{background:var(--navy-2);color:rgba(245,239,235,.8);font-size:12px;text-align:center;padding:24px var(--gutter)}
 
-@media (max-width:1280px){ .search span{display:none} .search{min-width:0} }
+@media (max-width:1280px){ .search span{display:none} .search{min-width:0} .topics{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:1024px){
   .nav{display:none}
-  .book{grid-template-columns:1fr;grid-template-areas:'head' 'card' 'body';row-gap:28px}
-  .card{position:static}
-  .band .wrap{grid-template-columns:1fr}
+  .page{grid-template-columns:1fr}
+  .sum{position:static}
 }
 @media (max-width:769px){
   .hdr .wrap{height:60px}
   .search{border:0;padding:0;width:40px;justify-content:center;margin:0}
-  .steps button{padding:12px 10px;gap:6px}
-  .steps small{display:none}
-  .services{grid-template-columns:1fr}
-  .slots{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .days{grid-template-columns:repeat(7,minmax(0,1fr))}
-  .days .nav-btn{display:none}
-  .grid2{grid-template-columns:1fr}
-  .card{margin-inline:calc(var(--gutter) * -1);border-inline:0}
+  .sec .sub,.sec .body,.sec .err{margin-left:0}
+  .topics{grid-template-columns:1fr}
+  .days{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .times{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fields{grid-template-columns:1fr}
   .mark{font-size:20px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -198,172 +187,153 @@ h1 em{font-style:italic}
   </div>
 </header>
 
-<main class="wrap">
-  <div class="book">
-    <section class="why why-head" aria-labelledby="ttl">
-      <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span aria-hidden="true">/</span><span>Virtual appointment</span></nav>
-      <span class="eyebrow">Free · 30 minutes · No obligation</span>
-      <h1 id="ttl">See it <em>before</em><br>you decide</h1>
-      <p class="lede">A one-to-one video call with a Pendyora jeweler. See pieces up close in natural light, compare stones side by side, and get sized — from wherever you are.</p>
-    </section>
-    <section class="why why-body" aria-label="What to expect">
-      <figure><img src="img/m-hands-hold.jpg" alt="A jeweler showing a diamond ring on video"><span><i></i>Jewelers available today</span></figure>
-      <ul class="expect">
-        <li><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M6.5 4h11l3.5 5-9 11L3 9zM3 9h18"/></svg></span><span><b>See pieces live</b>We show any piece on camera, on the hand, in daylight and under lamp light.</span></li>
-        <li><span class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="14" r="6.5"/><path d="M9.5 5.5 12 3l2.5 2.5L12 8z"/></svg></span><span><b>Get your size right</b>We'll guide you through measuring, or send a free sizer first.</span></li>
-        <li><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></span><span><b>Talk through ideas</b>Bring a photo or sketch; we'll sketch with you and quote on the call.</span></li>
-      </ul>
-      <div class="facts"><span><b>30 min</b>per appointment</span><span><b>Free</b>no purchase needed</span><span><b>Video or phone</b>your choice</span></div>
-    </section>
-
-    <section class="card" aria-label="Book an appointment">
-      <nav class="steps" id="steps" aria-label="Booking steps">
-        <button type="button" data-step="0"><i>1</i><span>Topic<small id="s0">Choose a topic</small></span></button>
-        <button type="button" data-step="1"><i>2</i><span>Day &amp; time<small id="s1">Pick a slot</small></span></button>
-        <button type="button" data-step="2"><i>3</i><span>Your details<small id="s2">Confirm</small></span></button>
-      </nav>
-
-      <div class="pane" data-pane="0">
-        <h2>What would you like to see?</h2>
-        <p class="sub">We'll match you with the right jeweler.</p>
-        <div class="services" id="services"></div>
-        <div class="mode" role="radiogroup" aria-label="Call type">
-          <button type="button" aria-pressed="true" data-mode="Video"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11"/><path d="m16 10.5 5-3v9l-5-3z"/></svg>Video call</button>
-          <button type="button" aria-pressed="false" data-mode="Phone"><svg class="icon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg>Phone call</button>
-        </div>
-        <div class="actions"><span></span><button class="btn" type="button" id="toTime" disabled>Choose a time</button></div>
-      </div>
-
-      <div class="pane" data-pane="1">
-        <h2>Pick a day and time</h2>
-        <div class="tz"><span>Times shown in</span><label class="sr" for="tz">Time zone</label><select id="tz"><option>Eastern (New York)</option><option>Central (Chicago)</option><option>Pacific (Los Angeles)</option><option>London</option><option>India (Kolkata)</option></select></div>
-        <div class="days" id="days"></div>
-        <div class="slots-h"><span id="dayLabel"></span><span><b id="slotCount"></b> times free</span></div>
-        <div class="slots" id="slots"></div>
-        <div class="actions"><button class="back" type="button" data-go="0"><svg class="icon" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><button class="btn" type="button" id="toDetails" disabled>Continue</button></div>
-      </div>
-
-      <div class="pane" data-pane="2">
-        <h2>Your details</h2>
-        <div class="summary" id="summary"></div>
-        <form id="form" novalidate style="display:grid;gap:12px">
-          <div class="grid2">
-            <div class="f"><input id="nm" required autocomplete="name" placeholder=" "><label for="nm">Full name</label><span class="err">Enter your name</span></div>
-            <div class="f"><input id="em" type="email" required autocomplete="email" placeholder=" "><label for="em">Email</label><span class="err">Enter a valid email address</span></div>
-          </div>
-          <div class="phone">
-            <div class="f"><select id="cc" aria-label="Country code"><option>+1</option><option>+44</option><option>+61</option><option>+91</option></select><label for="cc">Code</label></div>
-            <div class="f"><input id="ph" type="tel" required autocomplete="tel-national" placeholder=" "><label for="ph">Phone</label><span class="err">We need a number in case the video drops</span></div>
-          </div>
-          <div class="f"><textarea id="msg" placeholder=" "></textarea><label for="msg">Anything we should prepare? (optional)</label></div>
-          <div class="actions"><button class="back" type="button" data-go="1"><svg class="icon" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>Back</button><button class="btn" type="submit">Book appointment</button></div>
-          <p class="fine">You'll get a confirmation email with the call link. Reschedule or cancel any time from that email.</p>
-        </form>
-      </div>
-
-      <div class="pane done" data-pane="3">
-        <span class="ring"><svg class="icon" viewBox="0 0 24 24" style="width:28px;height:28px"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-        <span class="eyebrow">You're booked</span>
-        <h2 id="doneTitle">See you soon</h2>
-        <div class="when" id="when"></div>
-        <p class="sub" style="margin:0" id="doneMsg"></p>
-        <div class="ctas"><a href="#"><svg class="icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Add to calendar</a><a href="#">Browse while you wait</a></div>
-      </div>
-    </section>
-  </div>
-</main>
-
-<section class="band" aria-label="Why book">
+<section class="band">
   <div class="wrap">
-    <div><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg><span><b>A real jeweler</b>Not a sales script. Ask anything.</span></div>
-    <div><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6z"/></svg><span><b>No pressure</b>Most people don't buy on the call — that's fine.</span></div>
-    <div><svg class="icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span><b>Easy to move</b>Reschedule or cancel from your email.</span></div>
+    <div>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span aria-hidden="true">/</span><span>Virtual appointment</span></nav>
+      <h1>Book a <em>virtual appointment</em></h1>
+      <p>See pieces live with a Pendyora jeweler, compare stones and get sized, from home.</p>
+    </div>
+    <div class="perks">
+      <span><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5l3 2"/></svg>30 minutes</span>
+      <span><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.6-3.2 8-7.5 9.5-4.3-1.5-7.5-4.9-7.5-9.5V6z"/></svg>Free, no obligation</span>
+      <span><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11"/><path d="m16 10.5 5-3v9l-5-3z"/></svg>Video or phone</span>
+    </div>
   </div>
 </section>
+
+<main class="wrap">
+  <form class="page" id="form" novalidate>
+    <div>
+      <section class="sec" id="secTopic" aria-labelledby="h1t">
+        <h2 id="h1t"><span class="n">01</span>What would you like to see?</h2>
+        <p class="sub">Pick one. We'll match you with the right jeweler.</p>
+        <div class="body">
+          <div class="topics" id="topics"></div>
+          <div class="how" role="radiogroup" aria-label="Call type"><span>Talk by</span>
+            <button type="button" class="pill" data-mode="Video call" aria-pressed="true"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11"/><path d="m16 10.5 5-3v9l-5-3z"/></svg>Video</button>
+            <button type="button" class="pill" data-mode="Phone call" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg>Phone</button>
+          </div>
+        </div>
+        <p class="err">Please choose what you'd like to see.</p>
+      </section>
+
+      <section class="sec" id="secDay" aria-labelledby="h2t">
+        <h2 id="h2t"><span class="n">02</span>Choose a day</h2>
+        <p class="sub">We're open Monday to Saturday.</p>
+        <div class="body"><div class="days" id="days"></div><button type="button" class="more-days" id="moreDays">Show the next week</button></div>
+        <p class="err">Please choose a day.</p>
+      </section>
+
+      <section class="sec" id="secTime" aria-labelledby="h3t">
+        <h2 id="h3t"><span class="n">03</span>Choose a time</h2>
+        <p class="sub" id="timeSub">Pick a day first.</p>
+        <div class="body">
+          <div class="tzrow"><span id="free"></span><label>Time zone <select id="tz"><option>New York (ET)</option><option>Chicago (CT)</option><option>Los Angeles (PT)</option><option>London (GMT)</option><option>India (IST)</option></select></label></div>
+          <div class="times" id="times"><p class="empty-times">Choose a day above to see the free times.</p></div>
+        </div>
+        <p class="err">Please choose a time.</p>
+      </section>
+
+      <section class="sec" aria-labelledby="h4t">
+        <h2 id="h4t"><span class="n">04</span>Your details</h2>
+        <p class="sub">So we can send you the link and call if the video drops.</p>
+        <div class="body fields">
+          <div class="fld"><label for="fn">First name</label><input id="fn" autocomplete="given-name" required><span class="msg">Enter your first name</span></div>
+          <div class="fld"><label for="ln">Last name</label><input id="ln" autocomplete="family-name" required><span class="msg">Enter your last name</span></div>
+          <div class="fld"><label for="em">Email</label><input id="em" type="email" autocomplete="email" required><span class="msg">Enter a valid email address</span></div>
+          <div class="fld"><label for="ph">Phone</label><div class="phone"><select aria-label="Country code"><option>+1</option><option>+44</option><option>+61</option><option>+91</option></select><input id="ph" type="tel" autocomplete="tel-national" required></div><span class="msg">Enter a phone number</span></div>
+          <div class="fld full"><label for="note">Anything we should prepare? <small>(optional)</small></label><textarea id="note" placeholder="e.g. a piece you liked, your budget, a date you need it by"></textarea></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="sum" aria-label="Your appointment">
+      <div class="card">
+        <span class="mk">PENDYORA</span>
+        <h3>Your appointment</h3>
+        <dl>
+          <div><dt><svg class="icon" viewBox="0 0 24 24"><path d="M6.5 4h11l3.5 5-9 11L3 9zM3 9h18"/></svg></dt><dd id="sTopic" class="wait">Choose what to see</dd></div>
+          <div><dt><svg class="icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></dt><dd id="sWhen" class="wait">Choose a day and time</dd></div>
+          <div><dt><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11"/><path d="m16 10.5 5-3v9l-5-3z"/></svg></dt><dd id="sHow">Video call · 30 minutes</dd></div>
+          <div><dt><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></dt><dd>With a Pendyora jeweler</dd></div>
+        </dl>
+        <button class="book" type="submit"><svg class="icon" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Book appointment</button>
+        <p class="fine">Free. You'll get a confirmation email with the link, and can move or cancel it from there.</p>
+      </div>
+      <div class="expect"><b>On the call</b><ul><li>See pieces on the hand, in daylight</li><li>Compare stones side by side</li><li>Get your ring size right</li></ul></div>
+    </aside>
+  </form>
+
+  <section class="done" aria-live="polite">
+    <span class="ring"><svg class="icon" viewBox="0 0 24 24" style="width:30px;height:30px"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
+    <h2 id="doneTitle">You're booked</h2>
+    <div class="when" id="doneWhen"></div>
+    <p id="doneMsg"></p>
+    <div class="ctas"><a href="#"><svg class="icon" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Add to calendar</a><a href="#">Browse pieces</a></div>
+  </section>
+</main>
 <footer class="foot">© 2026 Pendyora · Mockup: design-mockups/appointment · Atlantic palette</footer>
 
 <script>
 (() => {
   const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-  const SERVICES = [
-    ['Engagement rings', 'Settings, stones, sizing', 'p-ring-yellow'],
-    ['Wedding bands', 'Pairs, fit, matching', 'p-eternity-macro'],
-    ['Diamonds', 'Compare stones side by side', 'p-loose-diamond'],
-    ['Fine jewelry', 'Earrings, necklaces, bracelets', 'p-teardrop'],
-    ['Custom design', 'Your idea, sketched with you', 'p-ring-stack'],
-    ['Something else', 'Gifts, care, anything', 'p-pendant'],
-  ];
-  const st = { step: 0, reached: 0, service: null, mode: 'Video', day: null, slot: null };
-  const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const TOPICS = [['Engagement rings', 'Settings, stones, sizing', 'p-ring-yellow'], ['Wedding bands', 'Pairs, fit, matching', 'p-eternity-macro'], ['Diamonds', 'Compare side by side', 'p-loose-diamond'], ['Fine jewelry', 'Earrings, necklaces, bracelets', 'p-teardrop'], ['Custom design', 'Your idea, sketched together', 'p-ring-stack'], ['Something else', 'Gifts, care, anything', 'p-pendant']];
+  const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], DOWL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const today = new Date(2026, 9, 14);
+  const st = { topic: null, mode: 'Video call', day: null, time: null, week: 0 };
+  const label = h => `${h > 12 ? h - 12 : h}:00 ${h >= 12 ? 'pm' : 'am'}`;
 
-  $('#services').innerHTML = SERVICES.map(([t, s, img], i) => `<button type="button" class="svc" data-i="${i}" aria-pressed="false"><img src="img/${img}.jpg" alt=""><span><b>${t}</b><small>${s}</small></span></button>`).join('');
-  $('#services').addEventListener('click', e => {
-    const b = e.target.closest('.svc'); if (!b) return;
-    $$('.svc').forEach(x => x.setAttribute('aria-pressed', x === b)); st.service = +b.dataset.i; $('#toTime').disabled = false; sync();
-  });
-  $$('.mode button').forEach(b => b.addEventListener('click', () => { $$('.mode button').forEach(x => x.setAttribute('aria-pressed', x === b)); st.mode = b.dataset.mode; sync(); }));
+  $('#topics').innerHTML = TOPICS.map(([t, s, img], i) => `<button type="button" class="topic" data-i="${i}" aria-pressed="false"><img src="img/${img}.jpg" alt=""><span><b>${t}</b><small>${s}</small></span></button>`).join('');
+  $('#topics').addEventListener('click', e => { const b = e.target.closest('.topic'); if (!b) return; st.topic = +b.dataset.i; $$('.topic').forEach(x => x.setAttribute('aria-pressed', x === b)); $('#secTopic').classList.remove('bad'); sum(); });
+  $$('.pill').forEach(b => b.addEventListener('click', () => { st.mode = b.dataset.mode; $$('.pill').forEach(x => x.setAttribute('aria-pressed', x === b)); sum(); }));
 
-  // Next 7 days; Sundays closed. Slots hourly 9–5 with a few taken (live: generated from time zone + API availability).
-  const days = Array.from({ length: 7 }, (_, i) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + i));
-  $('#days').innerHTML = `<button type="button" class="nav-btn" aria-label="Earlier days" disabled><svg class="icon" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>` +
-    days.map((d, i) => `<button type="button" class="day" data-i="${i}" aria-pressed="false" ${d.getDay() === 0 ? 'disabled aria-label="Closed"' : ''}><span>${DAYS[d.getDay()]}</span><b>${d.getDate()}</b><span>${MONTHS[d.getMonth()]}</span></button>`).join('') +
-    `<button type="button" class="nav-btn" aria-label="Later days"><svg class="icon" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
-  const fmtDay = d => `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
-  function renderSlots() {
-    const d = days[st.day];
-    const hours = [9, 10, 11, 12, 13, 14, 15, 16, 17].filter(h => !(d.getDay() === 6 && (h < 10 || h > 15)));
+  function dayList() { return Array.from({ length: 7 }, (_, i) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + i + st.week * 7)); }
+  function renderDays() {
+    const list = dayList();
+    $('#days').innerHTML = list.map((d, i) => `<button type="button" class="day" data-i="${i}" aria-pressed="${st.day && st.day.getTime() === d.getTime()}" ${d.getDay() === 0 ? 'disabled aria-label="Closed on Sunday"' : ''}><span>${DOW[d.getDay()]}</span><b>${d.getDate()}</b><span>${MON[d.getMonth()]}</span></button>`).join('');
+    $('#moreDays').textContent = st.week ? 'Show this week' : 'Show the next week';
+  }
+  $('#days').addEventListener('click', e => { const b = e.target.closest('.day'); if (!b || b.disabled) return; st.day = dayList()[+b.dataset.i]; st.time = null; $('#secDay').classList.remove('bad'); renderDays(); renderTimes(); sum(); });
+  $('#moreDays').addEventListener('click', () => { st.week = st.week ? 0 : 1; renderDays(); });
+
+  function renderTimes() {
+    if (!st.day) return;
+    const d = st.day, sat = d.getDay() === 6;
+    const hrs = [9, 10, 11, 12, 13, 14, 15, 16, 17].filter(h => !sat || (h >= 10 && h <= 15));
     const taken = new Set([(d.getDate() * 3) % 9 + 9, (d.getDate() * 5) % 9 + 9]);
-    if (st.day === 0) [9, 10, 11].forEach(h => taken.add(h)); // earlier today
-    const label = h => `${h > 12 ? h - 12 : h}:00 ${h >= 12 ? 'pm' : 'am'}`;
-    $('#slots').innerHTML = hours.map(h => `<button type="button" class="slot" data-h="${label(h)}" aria-pressed="${st.slot === label(h)}" ${taken.has(h) ? 'disabled' : ''}>${label(h)}</button>`).join('');
-    $('#dayLabel').textContent = fmtDay(d);
-    $('#slotCount').textContent = hours.filter(h => !taken.has(h)).length;
+    $('#times').innerHTML = hrs.map(h => `<button type="button" class="time" data-t="${label(h)}" aria-pressed="${st.time === label(h)}" ${taken.has(h) ? 'disabled aria-label="' + label(h) + ', taken"' : ''}>${label(h)}</button>`).join('');
+    $('#timeSub').textContent = `Free times on ${DOWL[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}.`;
+    $('#free').textContent = `${hrs.filter(h => !taken.has(h)).length} times free`;
   }
-  $('#days').addEventListener('click', e => {
-    const b = e.target.closest('.day'); if (!b || b.disabled) return;
-    $$('.day').forEach(x => x.setAttribute('aria-pressed', x === b)); st.day = +b.dataset.i; st.slot = null; $('#toDetails').disabled = true; renderSlots(); sync();
-  });
-  $('#slots').addEventListener('click', e => {
-    const b = e.target.closest('.slot'); if (!b || b.disabled) return;
-    $$('.slot').forEach(x => x.setAttribute('aria-pressed', x === b)); st.slot = b.dataset.h; $('#toDetails').disabled = false; sync();
-  });
+  $('#times').addEventListener('click', e => { const b = e.target.closest('.time'); if (!b || b.disabled) return; st.time = b.dataset.t; $$('.time').forEach(x => x.setAttribute('aria-pressed', x === b)); $('#secTime').classList.remove('bad'); sum(); });
+  $('#tz').addEventListener('change', sum);
 
-  function sync() {
-    $('#s0').textContent = st.service == null ? 'Choose a topic' : `${SERVICES[st.service][0]} · ${st.mode}`;
-    $('#s1').textContent = st.slot ? `${fmtDay(days[st.day])}, ${st.slot}` : 'Pick a slot';
-    $$('#steps button').forEach(b => {
-      const i = +b.dataset.step;
-      b.toggleAttribute('aria-current', i === st.step);
-      b.classList.toggle('done', i < st.step || (st.step === 3));
-      b.disabled = i > st.reached || st.step === 3;
-    });
-    $$('.pane').forEach(p => p.classList.toggle('on', +p.dataset.pane === st.step));
-    if (st.step === 2) {
-      const [t, , img] = SERVICES[st.service];
-      $('#summary').innerHTML = `<img src="img/${img}.jpg" alt=""><span><b>${t}</b> · ${st.mode} call<br>${fmtDay(days[st.day])}, ${st.slot} ${$('#tz').value.split(' ')[0]} time · 30 min</span><button type="button" data-go="1">Change</button>`;
-    }
+  function when() { return st.day ? `${DOWL[st.day.getDay()]} ${st.day.getDate()} ${MON[st.day.getMonth()]}${st.time ? `, ${st.time} ${$('#tz').value.match(/\((.*)\)/)[1]}` : ''}` : null; }
+  function sum() {
+    $('#sTopic').textContent = st.topic == null ? 'Choose what to see' : TOPICS[st.topic][0];
+    $('#sTopic').classList.toggle('wait', st.topic == null);
+    $('#sWhen').textContent = when() || 'Choose a day and time';
+    $('#sWhen').classList.toggle('wait', !st.time);
+    $('#sHow').textContent = `${st.mode} · 30 minutes`;
   }
-  function go(i) { st.step = i; st.reached = Math.max(st.reached, Math.min(i, 2)); sync(); }
-  document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) go(+g.dataset.go); });
-  $('#steps').addEventListener('click', e => { const b = e.target.closest('button'); if (b && !b.disabled) go(+b.dataset.step); });
-  $('#toTime').addEventListener('click', () => { if (st.day == null) { const first = $$('.day:not(:disabled)')[0]; first.click(); } go(1); });
-  $('#toDetails').addEventListener('click', () => go(2));
+
   $('#form').addEventListener('submit', e => {
-    e.preventDefault(); let first = null;
-    [['nm', v => v], ['em', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)], ['ph', v => v]].forEach(([id, ok]) => {
-      const el = document.getElementById(id), bad = !ok(el.value.trim());
-      el.closest('.f').classList.toggle('bad', bad); if (bad && !first) first = el;
+    e.preventDefault();
+    let first = null;
+    [['secTopic', st.topic == null], ['secDay', !st.day], ['secTime', !st.time]].forEach(([id, bad]) => { const s = document.getElementById(id); s.classList.toggle('bad', bad); if (bad && !first) first = s; });
+    [['fn', v => v], ['ln', v => v], ['em', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)], ['ph', v => v.replace(/\D/g, '').length >= 7]].forEach(([id, ok]) => {
+      const el = document.getElementById(id), bad = !ok(el.value.trim()); el.closest('.fld').classList.toggle('bad', bad); if (bad && !first) first = el;
     });
-    if (first) { first.focus(); return; }
-    $('#doneTitle').textContent = `See you soon, ${$('#nm').value.trim().split(' ')[0]}`;
-    $('#when').innerHTML = `<b>${fmtDay(days[st.day])}, ${st.slot}</b><span>${SERVICES[st.service][0]} · ${st.mode} call · 30 min</span>`;
-    $('#doneMsg').textContent = `We've emailed the ${st.mode === 'Video' ? 'video link' : 'details'} to ${$('#em').value.trim()}.`;
-    st.step = 3; sync();
+    if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (first.focus && first.tagName === 'INPUT') first.focus({ preventScroll: true }); return; }
+    $('#doneTitle').textContent = `You're booked, ${$('#fn').value.trim()}`;
+    $('#doneWhen').innerHTML = `<b>${when()}</b><span style="color:var(--ink-2);font-size:14px">${TOPICS[st.topic][0]} · ${st.mode} · 30 minutes</span>`;
+    $('#doneMsg').textContent = `We've emailed the ${st.mode === 'Video call' ? 'video link' : 'details'} to ${$('#em').value.trim()}. You can move or cancel it from that email.`;
+    document.body.classList.add('booked'); window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-  $('#form').addEventListener('input', e => e.target.closest('.f')?.classList.remove('bad'));
-  sync();
+  $('#form').addEventListener('input', e => e.target.closest('.fld')?.classList.remove('bad'));
+  renderDays(); sum();
 })();
 </script>
 </body>

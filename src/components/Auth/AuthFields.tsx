@@ -72,6 +72,38 @@ export function FloatPassword({ label, value, onFocus, onBlur, className = '', .
   );
 }
 
+export function FloatTextArea({
+  label,
+  value,
+  onFocus,
+  onBlur,
+  className = '',
+  ...rest
+}: React.ComponentProps<typeof Input.TextArea> & { label: string }) {
+  const [focused, setFocused] = useState(false);
+  const up = focused || (value !== undefined && value !== null && String(value) !== '');
+  return (
+    <div className="group relative">
+      <Input.TextArea
+        {...rest}
+        value={value}
+        onFocus={(e) => {
+          setFocused(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          onBlur?.(e);
+        }}
+        className={`!min-h-[130px] !rounded-none !bg-transparent !px-4 !pb-3 !pt-7 !text-[14px] ${className}`}
+      />
+      <label htmlFor={rest.id} className={`${LABEL} ${up ? LABEL_UP : 'top-[18px] text-[13px]'}`}>
+        {label}
+      </label>
+    </div>
+  );
+}
+
 const RULES = [
   { key: 'len', label: '8+ characters', test: (v: string) => v.length >= 8 },
   { key: 'case', label: 'Upper & lower case', test: (v: string) => /[a-z]/.test(v) && /[A-Z]/.test(v) },

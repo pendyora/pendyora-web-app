@@ -24,6 +24,7 @@ module.exports = {
   navy: { DEFAULT: '#2F4156', deep: '#22303F' },
   teal: { DEFAULT: '#4E7486', soft: '#B9CCD6' },
   mist: '#EEF3F7', // soft accent panels
+  haze: '#F8F9FA', // light grey page bands (client-care title band, search, account)
   danger: '#A23B2E', // form validation messages
   ok: '#4E6B4A', // success states (password strength, confirmations)
   metal: {

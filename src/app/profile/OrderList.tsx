@@ -1,743 +1,272 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+'use client';
+import React, { useEffect } from 'react';
 
-import { Button, Image, Pagination, Steps, Table, TableColumnsType } from 'antd';
-import dayjs from 'dayjs';
-import ralativeTime from 'dayjs/plugin/relativeTime';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { LuLoader } from 'react-icons/lu';
-import { MdOutlineArrowBackIosNew, MdOutlineClose } from 'react-icons/md';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { LuArrowLeft, LuDownload, LuLoader } from 'react-icons/lu';
 
+import { Box, PanelHead, boxLink } from '@/components/Account/AccountShell';
+import { Money, OrderTracker, StatusPill, orderDate } from '@/components/Account/orderBits';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { fetchGetOrdeDetails, fetchOrderList } from '@/store/slices/Order/orderSlice';
+import { fetchGetOrdeDetails } from '@/store/slices/Order/orderSlice';
 import { formatCurrency } from '@/utils/common';
 
-const steps = [
-  {
-    title: 'Confirmed',
-  },
-  {
-    title: 'Manufacturing',
-  },
-  {
-    title: 'Out for Delivery',
-  },
-  {
-    title: 'Delivered',
-  },
-];
-dayjs.extend(ralativeTime);
-const OrderList = () => {
-  const { loading, orderList, orderDetails } = useAppSelector((state) => state.order);
-  const { data } = useAppSelector((state) => state.master);
-  const { user } = useAppSelector((state) => state.auth.auth);
+const FALLBACK = '/images/no_images.svg';
+const imgOf = (item: any) => item?.skuOrderItems?.carat_images?.[0] || FALLBACK;
 
-  const dispatch = useAppDispatch();
-  const router = useRouter();
+const STONE_TYPE: Record<string, string> = { N: 'Natural', L: 'Lab-grown', NG: 'Natural gemstone', LG: 'Lab-grown gemstone' };
+
+/** Orders (design-mockups/account#orders): cards for every order; ?order=ID opens the detail view. */
+export default function OrderList() {
   const searchParams = useSearchParams();
-  const id = searchParams.get('order');
+  const id = searchParams?.get('order');
+  return id ? <OrderDetail id={id} /> : <Orders />;
+}
 
-  const [dataList, setDataList] = useState([]);
-  const [dataDetails, setDataDetails] = useState<any>({});
-  const [pageSize, setPageSize] = useState<number>(50);
-  const [currentPage, setCurrentPage] = useState(1);
-  const fetchProducts = async () => {
-    await dispatch(fetchOrderList());
-  };
-  useEffect(() => {
-    if (!user) {
-      return router.push(`/`);
-    } else {
-      if (!id) {
-        return router.push(`/profile/purchases`);
-      }
-    }
-  }, [user, id]);
-  useEffect(() => {
-    setDataList(orderList);
-  }, [orderList]);
+function Orders() {
+  const { orderList, loading } = useAppSelector((state) => state.order);
+  const orders: any[] = orderList ?? [];
 
-  useEffect(() => {
-    fetchProducts();
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (orderDetails && orderDetails.order_id) {
-      setDataDetails(orderDetails);
-    }
-  }, [orderDetails]);
-  useEffect(() => {
-    if (user && id) {
-      dispatch(fetchGetOrdeDetails(id));
-    }
-  }, [user, id]);
-
-  const items = steps.map((item) => ({ key: item.title, title: item.title }));
-
-  const columns: TableColumnsType<any> = [
-    {
-      title: 'ORDER DATE',
-      dataIndex: 'createdAt',
-      key: 'orderDate',
-      render: (date: string) => <p>{dayjs(date).format('D MMM, YYYY')}</p>,
-    },
-    {
-      title: 'ORDER ID',
-      dataIndex: 'order_id',
-      key: 'order_id',
-    },
-    {
-      title: 'STATUS',
-      dataIndex: 'order_status',
-      key: 'status',
-      render: (status: number) => {
-        return (
-          <div
-            className={`px-2 flex items-center justify-center h-[28px] w-[150px] text-center rounded ${
-              status === 0
-                ? 'bg-amber-100 text-amber-600'
-                : status === 1
-                  ? 'bg-amber-100 text-amber-600'
-                  : status === 2
-                    ? 'bg-blue-100 text-blue-600'
-                    : status === 3
-                      ? 'bg-purple-100 text-purple-600'
-                      : status === 4
-                        ? 'bg-green-100 text-green-600'
-                        : 'bg-red-100 text-red-600'
-            }`}
-          >
-            {status == 0
-              ? 'Processing'
-              : status == 1
-                ? ' Confirmed'
-                : status == 2
-                  ? 'Manufacturing'
-                  : status == 3
-                    ? 'Out for Delivery'
-                    : status == 4
-                      ? ' Delivered'
-                      : status == 5
-                        ? 'Cancelled'
-                        : ''}
-          </div>
-        );
-      },
-    },
-
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_: any, record: any) => (
-        <div
-          className={`px-2 cursor-pointer flex items-center uppercase justify-center  !bg-secondary !text-text_w  h-[28px] w-[100px] text-center`}
-          onClick={() => {
-            setDataDetails(record);
-            router.push(`/profile/purchases?order=${record?.order_id}`);
-          }}
-        >
-          View
-        </div>
-      ),
-    },
-  ];
   return (
-    <div>
-      <div className="">
-        {loading && (
-          <div className="w-full flex justify-center items-center min-h-[50vh]">
-            {/* <Spin></Spin> */}
-            <div className="w-full flex justify-center items-center">
-              <LuLoader className="h-10 w-10 animate-spin" />
-            </div>
-          </div>
-        )}
-        {id && !loading && dataDetails && Object.keys(dataDetails).length > 0 ? (
-          <>
-            <div className="flex flex-col gap-3 p-3 sm:px-0">
-              <Button
-                type="default"
-                className="w-28 !bg-secondary !text-text_w uppercase rounded-lg sm:!text-[12px] sm:!h-[35px]"
-                onClick={() => {
-                  setDataDetails({});
-                  router.push(`/profile/purchases`);
-                }}
-              >
-                <MdOutlineArrowBackIosNew /> Back
-              </Button>
-              <div className="py-7 lg:py-4 md:flex-wrap ">
-                <Steps
-                  current={dataDetails?.order_status}
-                  // progressDot
-                  className="p-4 py-10 flex mb-10 md:p-2 order-details-progress"
-                  items={items}
-                />
-              </div>
-
-              <div className="flex bg-[#f9f9f9] md:flex-col rounded-lg gap-2 p-2 shadow-[0_4px_4px_0_#e2e2e23f] md:text-[15px]">
-                <div className="flex px-2 sm:px-3 md:px-6 py-2 flex-col gap-2 w-1/2 md:w-full">
-                  <div className="flex">
-                    <p className="w-[30%] md:w-1/2 sm:w-1/3">Order Date</p>
-                    <p className="">: {dayjs(dataDetails?.createdAt).format('D MMM, YYYY')}</p>
-                  </div>
-                  <div className="flex">
-                    <p className="w-[30%] md:w-1/2 sm:w-1/3"> Order No</p> <p className="">: {dataDetails?.order_id}</p>
-                  </div>
+    <>
+      <PanelHead title="Orders" sub="Track, view and get help with your orders." />
+      {loading && orders.length === 0 ? (
+        <div className="grid min-h-[30vh] place-items-center">
+          <LuLoader className="h-7 w-7 animate-spin text-ink-soft" />
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="grid justify-items-start gap-3 border border-line p-7">
+          <b className="font-cormorant text-[24px] font-medium">No orders yet</b>
+          <p className="m-0 text-ink-soft">When you place an order, you&apos;ll be able to track it here.</p>
+          <Link
+            href="/all"
+            className="mt-1 inline-flex h-12 items-center bg-ink px-7 text-[12px] font-semibold uppercase tracking-[0.14em] text-paper hover:text-paper"
+          >
+            Start shopping
+          </Link>
+        </div>
+      ) : (
+        <div className="grid gap-3.5">
+          {orders.map((o) => {
+            const items: any[] = o?.orderDetails ?? [];
+            const first = items[0];
+            return (
+              <article key={o.order_id} className="border border-line">
+                <div className="grid grid-cols-[repeat(3,auto)_1fr] items-center gap-7 border-b border-line bg-haze px-5 py-3.5 text-[12.5px] text-ink-soft md:grid-cols-2 md:gap-x-4 md:gap-y-2.5">
+                  <span>
+                    Order<b className="block text-[14px] font-medium text-ink">{o.order_id}</b>
+                  </span>
+                  <span>
+                    Placed<b className="block text-[14px] font-medium text-ink">{orderDate(o)}</b>
+                  </span>
+                  {o?.after_gst_amount != null && (
+                    <span>
+                      Total<b className="block text-[14px] font-medium tabular-nums text-ink">{formatCurrency(o.after_gst_amount)}</b>
+                    </span>
+                  )}
+                  <Link
+                    href={`/profile/purchases?order=${o.order_id}`}
+                    className="justify-self-end border-b border-current text-[12px] font-semibold uppercase tracking-[0.12em] text-ink hover:text-ink md:col-span-2 md:justify-self-start"
+                  >
+                    View order
+                  </Link>
                 </div>
-                <div className="flex flex-col gap-2 w-1/2 md:w-full">
-                  <div className="px-2 flex flex-col gap-2 py-2 sm:px-0 sm:py-0">
-                    {dataDetails?.orderDetails?.map((item: any) => {
-                      return (
-                        <>
-                          <div className="flex px-4 sm:px-3 lg:grid lg:grid-cols-3 md:grid-cols-2 gap-4 ">
-                            <p className="w-[50%] whitespace-nowrap lg:col-span-2 md:col-span-1 flex items-center lg:text-[16px] sm:text-[14px]">
-                              {' '}
-                              {item.jewelryOrderItems?.jewelrySubType?.group} (<MdOutlineClose />
-                              {item.count})
-                            </p>
-                            <div className="md:-ml-2 sm:!text-[14px]">
-                              {': '}
-                              <span
-                                className={`!font-castoro ${item?.jewelry_coupon_price || item?.jewelry_discount_price ? 'line-through text-[12px] text-gray-400 mr-2' : ''}`}
-                              >
-                                {formatCurrency(item?.jewelry_price + item?.appraisal_amount) || '-'}
-                              </span>
-                              {(item?.jewelry_coupon_price || item?.jewelry_discount_price) && (
-                                <span className="!font-castoro">
-                                  {formatCurrency(
-                                    item?.jewelry_coupon_price
-                                      ? item?.jewelry_coupon_price + item?.appraisal_amount
-                                      : item?.jewelry_discount_price
-                                        ? item?.jewelry_discount_price + item?.appraisal_amount
-                                        : item?.jewelry_price + item?.appraisal_amount,
-                                  ) || '-'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          {item?.engravingText && item?.engravingText?.Text.trim() != '' && (
-                            <div className="flex px-4 sm:px-3 lg:grid lg:grid-cols-3 md:grid-cols-2 gap-4 ">
-                              <p className="w-[50%] whitespace-nowrap lg:col-span-2 md:col-span-1 flex items-center lg:text-[16px] sm:text-[14px]">
-                                {' '}
-                                Engraving (<MdOutlineClose />
-                                {item.count})
-                              </p>
-                              <div className="md:-ml-2 sm:!text-[14px]">
-                                {': '}
-                                <span
-                                  className={`!font-castoro ${item?.jewelry_coupon_price || item?.jewelry_discount_price ? 'line-through text-[12px] text-gray-400 mr-2' : ''}`}
-                                >
-                                  {item?.engravingText?.Text.trim() != '' ? formatCurrency(item.engraving_price) : '0'}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                          {item.diamondDetails && (
-                            <div className="flex px-4 sm:px-3 lg:grid lg:grid-cols-3 md:grid-cols-2 gap-4 ">
-                              <p className="w-[50%] whitespace-nowrap lg:col-span-2 md:col-span-1 flex items-center lg:text-[16px] sm:text-[14px]">
-                                {item?.diamondDetails?.diamond_type == 2 ? 'Lab' : 'Natural'}
-                                {' Diamond'}
-                                (<MdOutlineClose />
-                                {item.count})
-                              </p>
-
-                              <div className="md:-ml-2 sm:!text-[14px]">
-                                {': '}
-                                {item?.diamond_amount && <span className="!font-castoro">{formatCurrency(item?.diamond_amount) || '-'}</span>}
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      );
-                    })}
-                    <div className="flex px-4 lg:grid lg:grid-cols-3 md:grid-cols-2 py-2 sm:px-3 sm:gap-0 bg-[#E9F8EC] font-semibold gap-4">
-                      <p className=" w-[50%] lg:col-span-2 whitespace-nowrap md:col-span-1 flex  items-center">Paid Amount</p>
-                      <div className=" tracking-wide">
-                        {': '}
-                        {dataDetails?.after_gst_amount && (
-                          <span className="!font-castoro">{formatCurrency(dataDetails?.after_gst_amount) || '-'}</span>
-                        )}
-                      </div>
-                    </div>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-5 px-5 py-[18px] md:grid-cols-1">
+                  <div className="flex items-center gap-2.5">
+                    {items.slice(0, 3).map((it, i) => (
+                      <img key={i} src={imgOf(it)} alt="" loading="lazy" className="h-20 w-16 flex-none bg-stone object-contain mix-blend-multiply" />
+                    ))}
+                    <span className="ml-1.5 text-[13.5px] text-ink-soft">
+                      {first?.jewelryOrderItems?.fullTitle}
+                      {items.length > 1 ? ` + ${items.length - 1} more` : ''}
+                    </span>
                   </div>
+                  <StatusPill status={Number(o.order_status ?? 0)} />
                 </div>
-              </div>
-              {dataDetails?.orderDetails?.map((item: any, index: number) => {
-                return (
-                  <div className=" p-3.5 sm:px-3 bg-[#f9f9f9] rounded-lg shadow-[0_4px_4px_0_#e2e2e23f] " key={index}>
-                    <div className="flex px-1 pb-2 sm:grid sm:grid-cols-4 sm:gap-3">
-                      <div className="w-[100px] sm:col-span-1 md:w-[80px] md:h-auto sm:w-full sm:block hidden">
-                        <Image
-                          src={item?.skuOrderItems?.carat_images?.[0] || '/images/no_images.svg'}
-                          alt="Product Image"
-                          preview={false}
-                          fallback="/images/no_images.svg"
-                          className="w-[100px] md:w-[80px] md:h-auto object-contain sm:w-full"
-                        />
-                      </div>
-                      <p className="tracking-wide sm:col-span-3 text-[20px] font-medium sm:text-[15px]">{item.jewelryOrderItems.fullTitle}</p>
-                    </div>
-                    <div className="flex gap-6 sm:flex-col justify-between md:gap-[10px] sm:gap-1">
-                      <div className="flex sm:flex-col items-start  sm:w-full w-[60%] md:w-[65%] gap-3 md:text-[15px]">
-                        <div className="w-[100px] md:w-[80px] md:h-auto sm:w-full sm:hidden">
-                          <Image
-                            src={item?.skuOrderItems?.carat_images?.[0] || '/images/no_images.svg'}
-                            alt="Product Image"
-                            preview={false}
-                            fallback="/images/no_images.svg"
-                            className="w-[100px] md:w-[80px] md:h-auto object-contain sm:w-full"
-                          />
-                        </div>
-                        <div className="flex flex-col sm:w-full w-2/3 lg:w-2/3 gap-2 sm:gap-1 sm:mx-4">
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Type</p>
-                            <p className=""> : {item?.jewelryOrderItems?.jewelrySubType?.group || '-'}</p>
-                          </div>
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Sub Type</p>
-                            <p className=""> : {item?.jewelryOrderItems?.jewelrySubType?.name || '-'}</p>
-                          </div>
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Code</p>
-                            <p className=""> : {item?.jewelryOrderItems?.code || '-'}</p>
-                          </div>
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Qty</p>
-                            <p className=""> : {item.count || '-'}</p>
-                          </div>
-                          {item?.is_appraisal && (
-                            <div className="flex sm:text-[14px]">
-                              <p className="w-[40%] lg:w-[32%] md:w-[35%]">Appraisal Price</p>
-                              <p className=""> : {formatCurrency(item.appraisal_amount) || '-'}</p>
-                            </div>
-                          )}
-                          {item?.is_warranty && (
-                            <div className="flex sm:text-[14px]">
-                              <p className="w-[40%] lg:w-[32%] md:w-[35%]">Warranty Price</p>
-                              <p className="">
-                                {' '}
-                                : {item?.warranty_year} Year {formatCurrency(item.warranty_amount) || '-'}
-                              </p>
-                            </div>
-                          )}
-                          {item?.engravingText?.Text.trim() != '' && (
-                            <div className="flex sm:text-[14px]">
-                              <p className="w-[40%] lg:w-[32%] md:w-[35%]">Engraving Text</p>
-                              <p className="" style={{ fontFamily: item?.engravingText?.fontFamily }}>
-                                : {item?.engravingText?.Text.trim() || '-'}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex flex-col  sm:w-full  w-[40%] lg:w-[42%] md:text-[15px] sm:mx-4 sm:gap-1 gap-2">
-                        {/* <p className="tracking-wide">Discount Amount: -</p> */}
-                        <div className="flex sm:text-[14px]">
-                          <p className="w-[40%] lg:w-[32%] md:w-[35%]">Amount</p>
-                          <div className="">
-                            {': '}
-                            <span className={`!font-castoro ${item?.jewelry_discount_price ? 'line-through text-[12px] text-gray-400 mr-2' : ''}`}>
-                              {formatCurrency(item?.jewelry_price + item?.appraisal_amount) || '-'}
-                            </span>
-                            {item?.jewelry_discount_price && (
-                              <span className="!font-castoro">
-                                {formatCurrency(item?.jewelry_discount_price ? item?.jewelry_discount_price : item?.jewelry_price) || '-'}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex sm:text-[14px]">
-                          <p className="w-[40%] lg:w-[32%] md:w-[35%]">Type</p>
-                          <p className=""> : {item.jewelryOrderItems.customisable == true ? 'Customized' : 'Premade'}</p>
-                        </div>
-                        <div className="flex sm:text-[14px]">
-                          <p className="w-[40%] lg:w-[32%] md:w-[35%]">Metal Type</p>
-                          <p className="">
-                            {' '}
-                            :{' '}
-                            {`${data.find((ele: any) => ele.id == item?.skuOrderItems?.metal_type_id)?.name} ${
-                              data.find((ele: any) => ele.id == item?.skuOrderItems?.metal_color_id)?.name
-                            }`}
-                          </p>
-                        </div>
-                        {(item?.jewelryOrderItems?.jewelrySubType?.parent_code === 'WEDDING_BANDS' ||
-                          item?.jewelryOrderItems?.jewelrySubType?.parent_code === 'ENGAGEMENT_RINGS') && (
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Ring Size</p>
-                            <p className=""> : {item.ring_size || '-'}</p>
-                          </div>
-                        )}
-                        {item?.skuOrderItems?.bracelet_length_ids && (
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Bracelet Length - Inch</p>
-                            <p className=""> : {data.find((el: any) => el.id === item?.skuOrderItems?.bracelet_length_ids)?.name}</p>
-                          </div>
-                        )}
-                        {item?.skuOrderItems?.band_width_ids && (
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Band Width - mm</p>
-                            <p className=""> : {data.find((el: any) => el.id === item?.skuOrderItems?.band_width_ids)?.name}</p>
-                          </div>
-                        )}
-                        {item?.appraisalDetails && (
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Appraisal</p>
-                            <p className="">
-                              {' '}
-                              :{' '}
-                              <span
-                                onClick={() => window.open(item?.appraisalDetails?.appraisal_link, '_blank')}
-                                className="text-blue-600 underline cursor-pointer"
-                              >
-                                Download
-                              </span>
-                            </p>
-                          </div>
-                        )}
-                        {item?.engravingText?.Text.trim() != '' && (
-                          <div className="flex sm:text-[14px]">
-                            <p className="w-[40%] lg:w-[32%] md:w-[35%]">Engraving Font Family</p>
-                            <p className=""> : {item?.engravingText?.fontFamily || '-'}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {item?.diamondDetails && (
-                      <div className="flex flex-col gap-3 sm:mt-3">
-                        <p className="text-[16px] mt-2 uppercase font-semibold text-[#090909]">Diamond Details</p>
-                        <div className="flex gap-6 sm:flex-col justify-between md:gap-[10px] sm:gap-1 sm:mx-2">
-                          <div className="flex items-start sm:justify-between  sm:w-full w-[60%] md:w-[65%] gap-3 md:text-[15px] ">
-                            <div className="w-[100px] md:w-[80px] md:h-auto sm:w-1/3">
-                              <Image
-                                src={item.diamondDetails?.imageFile || '/images/no_images.svg'}
-                                alt="Product Image"
-                                preview={false}
-                                fallback="/images/no_images.svg"
-                                className="w-[100px] md:w-[80px] md:h-auto object-contain sm:w-full"
-                              />
-                            </div>
-                            <div className="flex flex-col sm:w-full w-2/3 lg:w-2/3 gap-2 sm:gap-1">
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Stone No.</p>
-                                <p className="">: {item?.diamondDetails?.stock_no || '-'}</p>
-                              </div>
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Shape</p>
-                                <p className="">: {item?.diamondDetails?.shape_name || '-'}</p>
-                              </div>
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Type</p>
-                                <p className="">: {item?.diamondDetails?.diamond_type == 2 ? 'Lab' : 'Natural'}</p>
-                              </div>
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Qty</p>
-                                <p className=""> : {item.count || '-'}</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="sm:flex hidden items-start sm:justify-between  sm:w-full w-[60%] md:w-[65%] gap-3 md:text-[15px] ">
-                            <div className="w-[100px] md:w-[80px] md:h-auto sm:w-1/3"></div>
-                            <div className=" flex flex-col  sm:w-full  w-[40%] lg:w-[42%] md:text-[15px] sm:gap-1 gap-2">
-                              {/* <p className="tracking-wide">Discount Amount: -</p> */}
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Report No.</p>
-                                <div className="">
-                                  {': '}
-                                  <a href={item?.diamondDetails?.certificateFile} target="_blank" rel="noreferrer">
-                                    {item?.diamondDetails?.report_no}
-                                  </a>
-                                </div>
-                              </div>
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Carat</p>
-                                <p className="">: {item?.diamondDetails?.carats || '-'}</p>
-                              </div>
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Color</p>
-                                <p className="">: {item.diamondDetails.col || '-'}</p>
-                              </div>
-
-                              <div className="flex sm:text-[14px]">
-                                <p className="w-[40%] lg:w-[32%] md:w-[35%]">Lab</p>
-                                <p className="">: {item.diamondDetails.lab || '-'}</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="sm:hidden flex flex-col  sm:w-full  w-[40%] lg:w-[42%] md:text-[15px] sm:gap-1 gap-2">
-                            {/* <p className="tracking-wide">Discount Amount: -</p> */}
-                            <div className="flex sm:text-[14px]">
-                              <p className="w-[40%] lg:w-[32%] md:w-[35%]">Report No.</p>
-                              <div className="">
-                                {': '}
-                                <a href={item?.diamondDetails?.certificateFile} target="_blank" rel="noreferrer">
-                                  {item?.diamondDetails?.report_no}
-                                </a>
-                              </div>
-                            </div>
-                            <div className="flex sm:text-[14px]">
-                              <p className="w-[40%] lg:w-[32%] md:w-[35%]">Carat</p>
-                              <p className="">: {item?.diamondDetails?.carats || '-'}</p>
-                            </div>
-                            <div className="flex sm:text-[14px]">
-                              <p className="w-[40%] lg:w-[32%] md:w-[35%]">Color</p>
-                              <p className="">: {item.diamondDetails.col || '-'}</p>
-                            </div>
-
-                            <div className="flex sm:text-[14px]">
-                              <p className="w-[40%] lg:w-[32%] md:w-[35%]">Lab</p>
-                              <p className="">: {item.diamondDetails.lab || '-'}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {(item.skuOrderItems?.center_diamond_id || item.skuOrderItems?.accent_diamond_id) && (
-                      <>
-                        <hr className="mt-6" />
-                        <div className="flex flex-col w-full mb-2 gap-3 sm:gap-0 sm:mx-2">
-                          <p className="text-[16px] mt-2 font-semibold text-[#090909]">Diamond Details</p>
-                          <div className="flex gap-4 sm:gap-1 flex-row sm:flex-col">
-                            {item.skuOrderItems?.centerDiamondDetails && (
-                              <div className="w-1/3 sm:w-full flex flex-col gap-2 mb-1 sm:mb-0 p-2 sm:gap-1 sm:py-1 bg-gray-100 shadow-[0_4px_4px_0_#e2e2e23f] ">
-                                <div>
-                                  <p className="text-[16px] mt-2 uppercase sm:font-medium sm:capitalize font-semibold text-[#090909] sm:text-[16px]">
-                                    Center Diamond
-                                  </p>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%] ">Shape</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    : {`${data.find((ele: any) => ele.id == item?.skuOrderItems?.centerDiamondDetails?.name)?.name}`}{' '}
-                                  </div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Type</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    :{' '}
-                                    {item?.skuOrderItems?.centerDiamondDetails?.diamond_type == 'N'
-                                      ? 'Natural'
-                                      : item?.skuOrderItems?.centerDiamondDetails?.diamond_type == 'L'
-                                        ? 'Lab'
-                                        : item?.skuOrderItems?.centerDiamondDetails?.diamond_type == 'NG'
-                                          ? 'Natural Gems Stone'
-                                          : 'Lab Gems Stone'}
-                                  </div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Size Type</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {item?.skuOrderItems?.centerDiamondDetails?.size}</div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Color</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    :{' '}
-                                    {`${
-                                      data.find((ele: any) => ele.id == item?.skuOrderItems?.centerDiamondDetails?.color)?.name
-                                        ? `${data.find((ele: any) => ele.id == item?.skuOrderItems?.centerDiamondDetails?.color)?.name}`
-                                        : '-'
-                                    }`}
-                                  </div>
-                                </div>
-                                {/* <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Price</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {formatCurrency(item?.skuOrderItems?.centerDiamondDetails?.rate)}</div>
-                                </div> */}
-                              </div>
-                            )}
-                            {item.skuOrderItems?.accentDiamondDetails && (
-                              <div className="w-1/3 sm:w-full flex flex-col gap-2 mb-2 sm:mb-0 p-2 sm:gap-1 sm:py-1 bg-gray-100 shadow-[0_4px_4px_0_#e2e2e23f] ">
-                                <div>
-                                  <p className="text-[16px] uppercase mt-2 sm:font-medium sm:capitalize font-semibold text-[#090909]">Accent 1</p>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Shape</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    : {`${data.find((ele: any) => ele.id == item?.skuOrderItems?.accentDiamondDetails?.name)?.name || '-'}`}
-                                  </div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Type</div>
-                                  <div className="w-[60%] lg:w-[57%] ">
-                                    :{' '}
-                                    {item?.skuOrderItems?.accentDiamondDetails?.diamond_type == 'N'
-                                      ? 'Natural'
-                                      : item?.skuOrderItems?.accentDiamondDetails?.diamond_type == 'L'
-                                        ? 'Lab'
-                                        : item?.skuOrderItems?.accentDiamondDetails?.diamond_type == 'NG'
-                                          ? 'Natural Gems Stone'
-                                          : 'Lab Gems Stone'}
-                                  </div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Size Type</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {item?.skuOrderItems?.accentDiamondDetails?.size}</div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Color</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    :{' '}
-                                    {`${
-                                      data.find((ele: any) => ele.id == item?.skuOrderItems?.accentDiamondDetails?.color)?.name
-                                        ? `${data.find((ele: any) => ele.id == item?.skuOrderItems?.accentDiamondDetails?.color)?.name}`
-                                        : '-'
-                                    }`}
-                                  </div>
-                                </div>
-                                {/* <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Price</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {formatCurrency(item?.skuOrderItems?.accentDiamondDetails?.rate) || '-'}</div>
-                                </div> */}
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">count</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {item?.skuOrderItems?.accent_diamond_count || '-'}</div>
-                                </div>
-                              </div>
-                            )}
-                            {item.skuOrderItems?.secondAccentDiamondId && (
-                              <div className="w-1/3  sm:w-full flex flex-col gap-2 mb-2 sm:mb-0 p-2 sm:gap-1 sm:py-1 bg-gray-100 shadow-[0_4px_4px_0_#e2e2e23f] ">
-                                <div>
-                                  <p className="text-[16px] mt-2 uppercase sm:font-medium sm:capitalize font-semibold text-[#090909]">Accent 2</p>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Shape</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    : {`${data.find((ele: any) => ele.id == item?.skuOrderItems?.secondAccentDiamondId?.name)?.name || '-'}`}{' '}
-                                  </div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Type</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    :{' '}
-                                    {item?.skuOrderItems?.secondAccentDiamondId?.diamond_type == 'N'
-                                      ? 'Natural'
-                                      : item?.skuOrderItems?.secondAccentDiamondId?.diamond_type == 'L'
-                                        ? 'Lab'
-                                        : item?.skuOrderItems?.secondAccentDiamondId?.diamond_type == 'NG'
-                                          ? 'Natural Gems Stone'
-                                          : 'Lab Gems Stone'}
-                                  </div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Size Type</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {item?.skuOrderItems?.secondAccentDiamondId?.size}</div>
-                                </div>
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Color</div>
-                                  <div className="w-[60%] lg:w-[57%]">
-                                    :{' '}
-                                    {`${
-                                      data.find((ele: any) => ele.id == item?.skuOrderItems?.secondAccentDiamondId?.color)?.name
-                                        ? `${data.find((ele: any) => ele.id == item?.skuOrderItems?.secondAccentDiamondId?.color)?.name}`
-                                        : '-'
-                                    }`}
-                                  </div>
-                                </div>
-                                {/* <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">Price</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {formatCurrency(item?.skuOrderItems?.secondAccentDiamondId?.rate)}</div>
-                                </div> */}
-                                <div className="flex sm:text-[14px]">
-                                  <div className="w-[40%] lg:w-[43%]">count</div>
-                                  <div className="w-[60%] lg:w-[57%]">: {item?.skuOrderItems?.second_accent_diamond_count}</div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          !loading && (
-            <>
-              <Table
-                columns={columns}
-                dataSource={dataList}
-                loading={{ indicator: <LuLoader className="h-10 w-10 animate-spin" />, spinning: loading }}
-                className="sm:hidden block"
-              />
-              <div className="hidden sm:flex flex-col gap-2 my-3 h-fit">
-                {dataList?.slice((currentPage - 1) * pageSize, currentPage * pageSize)?.map((orderItem: any, i: number) => {
-                  const firstProductImage = orderItem?.orderDetails?.[0]?.skuOrderItems?.carat_images?.[0] ?? null;
-                  return (
-                    <div
-                      key={i}
-                      className="w-full border-b pb-3 last:border-b-transparent border-b-gray-200 min-h-[20px] grid grid-cols-4 gap-3 p-1"
-                      onClick={() => {
-                        setDataDetails(orderItem);
-                        router.push(`/profile/purchases?order=${orderItem?.order_id}`);
-                      }}
-                    >
-                      <div className="col-span-1 bg-[#f0f0f0] aspect-square">
-                        <Image
-                          src={firstProductImage}
-                          fallback="/images/no_images.svg"
-                          alt={`order-${i}-image`}
-                          preview={false}
-                          className="mix-blend-multiply aspect-square"
-                        />
-                      </div>
-                      <div className="col-span-3 flex flex-col gap-2">
-                        <p className="text-[12px]">Order Date : {dayjs(orderItem?.createdAt).format('D MMM, YYYY')}</p>
-                        <p className="text-[12px]">Order Id : {orderItem?.order_id}</p>
-                        <p className="text-[12px] flex items-center">
-                          Status :
-                          <span
-                            className={`px-2 ml-2 flex text-[10px] items-center justify-center h-[22px] w-[80px] text-center rounded ${
-                              orderItem?.order_status === 0
-                                ? 'bg-amber-100 text-amber-600'
-                                : orderItem?.order_status === 1
-                                  ? 'bg-amber-100 text-amber-600'
-                                  : orderItem?.order_status === 2
-                                    ? 'bg-blue-100 text-blue-600'
-                                    : orderItem?.order_status === 3
-                                      ? 'bg-purple-100 text-purple-600'
-                                      : orderItem?.order_status === 4
-                                        ? 'bg-green-100 text-green-600'
-                                        : 'bg-red-100 text-red-600'
-                            }`}
-                          >
-                            {orderItem?.order_status == 0
-                              ? 'Processing'
-                              : orderItem?.order_status == 1
-                                ? ' Confirmed'
-                                : orderItem?.order_status == 2
-                                  ? 'Manufacturing'
-                                  : orderItem?.order_status == 3
-                                    ? 'Out for Delivery'
-                                    : orderItem?.order_status == 4
-                                      ? ' Delivered'
-                                      : orderItem?.order_status == 5
-                                        ? 'Cancelled'
-                                        : ''}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-                <div className="flex justify-center mt-2">
-                  <Pagination
-                    current={currentPage}
-                    pageSize={pageSize}
-                    total={dataList?.length}
-                    onChange={(page: number) => {
-                      setCurrentPage(page);
-                    }}
-                    showSizeChanger={false}
-                  />
-                </div>
-              </div>
-            </>
-          )
-        )}
-      </div>
-    </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </>
   );
-};
+}
 
-export default OrderList;
+function Spec({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <>
+      <dt className="text-ink-faint">{label}</dt>
+      <dd className="m-0 text-ink">{children}</dd>
+    </>
+  );
+}
+
+function OrderDetail({ id }: { id: string }) {
+  const dispatch = useAppDispatch();
+  const { orderDetails, loading } = useAppSelector((state) => state.order);
+  const { data: master } = useAppSelector((state) => state.master);
+  const nameOf = (mid: any) => master?.find((m: any) => m.id == mid)?.name;
+
+  useEffect(() => {
+    dispatch(fetchGetOrdeDetails(id));
+  }, [dispatch, id]);
+
+  const o: any = orderDetails?.order_id == id ? orderDetails : null;
+
+  if (!o) {
+    return (
+      <div className="grid min-h-[30vh] place-items-center">
+        {loading ? <LuLoader className="h-7 w-7 animate-spin text-ink-soft" /> : <p className="text-ink-soft">We couldn&apos;t find this order.</p>}
+      </div>
+    );
+  }
+
+  const items: any[] = o.orderDetails ?? [];
+  const status = Number(o.order_status ?? 0);
+
+  return (
+    <>
+      <Link href="/profile/purchases" className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-ink-soft hover:text-ink">
+        <LuArrowLeft className="h-4 w-4" strokeWidth={1.3} />
+        All orders
+      </Link>
+      <PanelHead
+        title={`Order ${o.order_id}`}
+        sub={`Placed ${orderDate(o, 'D MMMM YYYY')} · ${items.length} ${items.length === 1 ? 'piece' : 'pieces'}`}
+        action={<StatusPill status={status} />}
+      />
+      <OrderTracker status={status} placedAt={o.createdAt} />
+
+      <div className="mt-6 grid grid-cols-[minmax(0,1.3fr)_minmax(260px,0.7fr)] gap-6 lg:grid-cols-1">
+        <ul className="m-0 list-none border-t border-line p-0">
+          {items.map((item, i) => {
+            const sku = item?.skuOrderItems ?? {};
+            const isRing = ['WEDDING_BANDS', 'ENGAGEMENT_RINGS'].includes(item?.jewelryOrderItems?.jewelrySubType?.parent_code);
+            const engraving = item?.engravingText?.Text?.trim();
+            const stones = [
+              ['Centre stone', sku.centerDiamondDetails, null],
+              ['Accent stones', sku.accentDiamondDetails, sku.accent_diamond_count],
+              ['Second accent', sku.secondAccentDiamondId, sku.second_accent_diamond_count],
+            ].filter(([, d]) => d) as [string, any, any][];
+            return (
+              <li key={i} className="grid grid-cols-[88px_minmax(0,1fr)_auto] gap-4 border-b border-line py-5 md:grid-cols-[72px_minmax(0,1fr)]">
+                <img src={imgOf(item)} alt="" className="h-[110px] w-[88px] bg-stone object-contain mix-blend-multiply md:h-[90px] md:w-[72px]" />
+                <div className="min-w-0">
+                  <b className="block text-[15px] font-medium">{item?.jewelryOrderItems?.fullTitle}</b>
+                  <dl className="m-0 mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-1 text-[13px]">
+                    <Spec label="Metal">{[nameOf(sku.metal_type_id), nameOf(sku.metal_color_id)].filter(Boolean).join(' ') || '—'}</Spec>
+                    {isRing && <Spec label="Ring size">{item?.ring_size || '—'}</Spec>}
+                    {sku.bracelet_length_ids && <Spec label="Length">{nameOf(sku.bracelet_length_ids)} in</Spec>}
+                    {sku.band_width_ids && <Spec label="Band width">{nameOf(sku.band_width_ids)} mm</Spec>}
+                    <Spec label="Quantity">{item?.count ?? 1}</Spec>
+                    <Spec label="Code">{item?.jewelryOrderItems?.code || '—'}</Spec>
+                    {engraving && (
+                      <Spec label="Engraving">
+                        <span style={{ fontFamily: item?.engravingText?.fontFamily }}>“{engraving}”</span>
+                        {item?.engraving_price ? <span className="text-ink-faint"> · {formatCurrency(item.engraving_price)}</span> : null}
+                      </Spec>
+                    )}
+                    {item?.is_warranty && (
+                      <Spec label="Warranty">
+                        {item?.warranty_year} year{item?.warranty_year > 1 ? 's' : ''} · {formatCurrency(item?.warranty_amount)}
+                      </Spec>
+                    )}
+                    {item?.is_appraisal && (
+                      <Spec label="Appraisal">
+                        {formatCurrency(item?.appraisal_amount)}
+                        {item?.appraisalDetails?.appraisal_link && (
+                          <>
+                            {' · '}
+                            <a href={item.appraisalDetails.appraisal_link} target="_blank" rel="noreferrer" className={boxLink}>
+                              Download
+                            </a>
+                          </>
+                        )}
+                      </Spec>
+                    )}
+                  </dl>
+
+                  {item?.diamondDetails && (
+                    <div className="mt-3.5 grid grid-cols-[56px_1fr] gap-3 bg-haze p-3">
+                      <img src={item.diamondDetails.imageFile || FALLBACK} alt="" className="h-14 w-14 bg-paper object-contain" />
+                      <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-[12.5px]">
+                        <Spec label="Diamond">
+                          {[
+                            item.diamondDetails.carats && `${item.diamondDetails.carats} ct`,
+                            item.diamondDetails.shape_name,
+                            item.diamondDetails.diamond_type == 2 ? 'Lab-grown' : 'Natural',
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </Spec>
+                        <Spec label="Colour · Lab">{[item.diamondDetails.col, item.diamondDetails.lab].filter(Boolean).join(' · ') || '—'}</Spec>
+                        <Spec label="Stone no.">{item.diamondDetails.stock_no || '—'}</Spec>
+                        {item.diamondDetails.report_no && (
+                          <Spec label="Certificate">
+                            {item.diamondDetails.certificateFile ? (
+                              <a href={item.diamondDetails.certificateFile} target="_blank" rel="noreferrer" className={boxLink}>
+                                {item.diamondDetails.report_no}
+                              </a>
+                            ) : (
+                              item.diamondDetails.report_no
+                            )}
+                          </Spec>
+                        )}
+                        {item?.diamond_amount ? <Spec label="Diamond price">{formatCurrency(item.diamond_amount)}</Spec> : null}
+                      </dl>
+                    </div>
+                  )}
+
+                  {stones.length > 0 && (
+                    <div className="mt-3.5 grid grid-cols-3 gap-2 md:grid-cols-1">
+                      {stones.map(([label, d, count]) => (
+                        <dl key={label} className="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 bg-haze p-3 text-[12.5px]">
+                          <dt className="col-span-2 mb-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-ink-faint">{label}</dt>
+                          <Spec label="Shape">{nameOf(d?.name) || '—'}</Spec>
+                          <Spec label="Type">{STONE_TYPE[d?.diamond_type] ?? 'Lab-grown gemstone'}</Spec>
+                          <Spec label="Size">{d?.size || '—'}</Spec>
+                          <Spec label="Colour">{nameOf(d?.color) || '—'}</Spec>
+                          {count ? <Spec label="Count">{count}</Spec> : null}
+                        </dl>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <span className="text-right text-[14px] md:col-start-2 md:text-left">
+                  <Money item={item} />
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="grid content-start gap-3.5">
+          <Box title="Payment">
+            <dl className="m-0 grid gap-2 text-[14px]">
+              {o?.after_gst_amount != null && (
+                <div className="flex justify-between border-t border-line pt-2.5 font-semibold">
+                  <dt>Paid</dt>
+                  <dd className="m-0 tabular-nums">{formatCurrency(o.after_gst_amount)}</dd>
+                </div>
+              )}
+            </dl>
+          </Box>
+          <Box title="Need help?">
+            <p className="m-0 text-[13.5px] text-ink-soft">Questions about delivery, sizing or a return? Mention order {o.order_id}.</p>
+            <Link
+              href="/contactpage"
+              className="inline-flex h-12 items-center justify-center bg-ink text-[12px] font-semibold uppercase tracking-[0.14em] text-paper hover:text-paper"
+            >
+              Contact client care
+            </Link>
+            {items.some((it) => it?.appraisalDetails?.appraisal_link) && (
+              <span className="inline-flex items-center gap-1.5 text-[12.5px] text-ink-faint">
+                <LuDownload className="h-3.5 w-3.5" /> Appraisal documents are linked on each piece.
+              </span>
+            )}
+          </Box>
+        </div>
+      </div>
+    </>
+  );
+}

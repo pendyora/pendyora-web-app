@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pendyora Client Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap">
+<style>
+/* Client-care pages (Terms, Privacy, Shipping & returns, FAQs, Contact), Atlantic palette.
+   One template for the long policy pages: title band → sticky "On this page" rail | readable 68ch column → help band.
+   FAQs and Contact get their own layouts but share the title band, so all five read as one section of the site. */
+:root{
+  color-scheme: light;
+  --page:#FFFFFF; --tile:#F3F3F2; --soft:#F8F9FA;
+  --ink:#111111; --ink-2:#5F6368; --ink-3:#8A8D91;
+  --line:#E6E6E6; --line-2:#CFCFCF;
+  --navy:#2F4156; --teal:#4E7486; --on-navy:#F5EFEB; --mist:#EEF3F7; --danger:#A23B2E;
+  --display:"Cormorant Garamond", Garamond, "Times New Roman", serif;
+  --ui:"Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --gutter:clamp(16px,3.2vw,48px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.55 var(--ui);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+img{display:block;max-width:100%}
+:focus-visible{outline:1.5px solid var(--teal);outline-offset:3px}
+.wrap{max-width:1440px;margin-inline:auto;padding-inline:var(--gutter)}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+
+/* Mockup chrome */
+.review{background:#202124;color:#E8EAED;font-size:11.5px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:7px var(--gutter)}
+.review b{letter-spacing:.14em;text-transform:uppercase;font-weight:600;font-size:10.5px;color:#9AA0A6;margin-right:4px}
+.review a{padding:4px 12px;border:1px solid #5F6368;border-radius:999px}
+.review a[aria-current]{background:#E8EAED;color:#202124;border-color:#E8EAED}
+
+/* Announcement + header (as built) */
+.announce{background:var(--navy);color:var(--on-navy);text-align:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:10px var(--gutter);font-weight:500}
+.hdr{position:sticky;top:0;z-index:30;background:var(--page);border-bottom:1px solid var(--line)}
+.hdr .wrap{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:32px;height:72px}
+.mark{font-family:var(--display);font-weight:500;font-size:26px;letter-spacing:.32em}
+.nav{display:flex;justify-content:center;gap:clamp(16px,2.4vw,36px)}
+.nav a{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding-block:26px;border-bottom:1.5px solid transparent}
+.nav a:hover{border-color:var(--ink)}
+.tools{display:flex;align-items:center;gap:6px}
+.search{display:flex;align-items:center;gap:10px;height:40px;min-width:200px;padding:0 14px;border:1px solid var(--line-2);color:var(--ink-2);font-size:13px;margin-right:8px}
+.tool{position:relative;display:grid;place-items:center;width:40px;height:40px}
+.count{position:absolute;top:3px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--teal);color:#fff;font-size:9.5px;font-weight:600;display:grid;place-items:center;padding-inline:4px}
+
+/* Title band (shared) */
+.band{background:var(--soft);border-bottom:1px solid var(--line)}
+.band .wrap{padding-block:clamp(36px,5vw,64px) clamp(28px,4vw,48px);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end}
+.crumbs{display:flex;gap:8px;font-size:12px;color:var(--ink-2);margin-bottom:14px}
+.crumbs span[aria-hidden]{color:var(--line-2)}
+h1{margin:0;font-family:var(--display);font-weight:500;font-size:clamp(38px,4.4vw,58px);line-height:1;letter-spacing:-.01em}
+.band p{margin:14px 0 0;max-width:62ch;color:var(--ink-2);font-size:15px}
+.updated{font-size:12.5px;color:var(--ink-3);white-space:nowrap}
+/* Section switcher shared by all client-care pages */
+.care-nav{border-bottom:1px solid var(--line);background:var(--page);position:sticky;top:72px;z-index:20}
+.care-nav .wrap{display:flex;gap:28px;overflow-x:auto;scrollbar-width:none}
+.care-nav a{flex:none;padding:16px 0 14px;font-size:13px;color:var(--ink-2);border-bottom:1.5px solid transparent}
+.care-nav a:hover{color:var(--ink)}
+.care-nav a[aria-current]{color:var(--ink);font-weight:600;border-color:var(--ink)}
+
+.page{display:none}
+.page.on{display:block}
+
+/* ───── Policy template ───── */
+.doc{display:grid;grid-template-columns:240px minmax(0,1fr);gap:clamp(32px,5vw,88px);padding-block:clamp(36px,5vw,64px) 80px}
+.toc{position:sticky;top:150px;align-self:start;display:grid;gap:22px}
+.toc h2{margin:0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.toc ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--line);display:grid}
+.toc a{display:block;padding:7px 0 7px 16px;margin-left:-1px;border-left:1.5px solid transparent;font-size:13.5px;color:var(--ink-2)}
+.toc a:hover{color:var(--ink)}
+.toc a.on{color:var(--ink);font-weight:500;border-color:var(--ink)}
+.toc .help{background:var(--mist);padding:16px 18px;font-size:13px;color:var(--ink-2);display:grid;gap:6px}
+.toc .help b{font-family:var(--display);font-weight:500;font-size:19px;color:var(--ink)}
+.toc .help a{border:0;padding:0;margin:0;color:var(--teal);font-weight:500;font-size:13px}
+.toc-select{display:none}
+
+.prose{max-width:68ch;font-size:15.5px;line-height:1.75;color:#2B2E33}
+.prose section{padding-top:8px}
+.prose section + section{margin-top:44px;padding-top:40px;border-top:1px solid var(--line)}
+.prose h2{margin:0 0 14px;font-family:var(--display);font-weight:500;font-size:30px;line-height:1.1;color:var(--ink)}
+.prose h3{margin:26px 0 8px;font-size:15.5px;font-weight:600;color:var(--ink)}
+.prose p{margin:0 0 14px}
+.prose ul,.prose ol{margin:0 0 14px;padding-left:20px}
+.prose li{margin-bottom:6px}
+.prose li::marker{color:var(--teal)}
+.prose a{color:var(--teal);text-decoration:underline;text-underline-offset:3px}
+.prose strong{font-weight:600;color:var(--ink)}
+.callout{display:flex;gap:14px;background:var(--mist);padding:16px 18px;margin:18px 0;font-size:14.5px}
+.callout .icon{color:var(--navy);margin-top:3px}
+.steps{list-style:none;padding:0 !important;counter-reset:s;display:grid;gap:14px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:36px 1fr;gap:14px;align-items:start;margin:0}
+.steps li::before{content:counter(s);width:32px;height:32px;border-radius:50%;border:1px solid var(--navy);color:var(--navy);display:grid;place-items:center;font-size:13px;font-weight:600}
+.steps b{display:block;color:var(--ink);font-weight:600}
+table.plain{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:14px}
+table.plain th,table.plain td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+table.plain th{font-weight:600;color:var(--ink);background:var(--soft);font-size:12.5px;letter-spacing:.04em}
+
+/* Key facts strip (shipping) */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:-1px;padding-top:clamp(28px,4vw,44px)}
+.fact{border:1px solid var(--line);padding:20px;display:grid;gap:8px}
+.fact .icon{width:24px;height:24px;color:var(--navy)}
+.fact b{font-family:var(--display);font-weight:500;font-size:22px;line-height:1.1}
+.fact span{font-size:13px;color:var(--ink-2)}
+
+/* ───── FAQs ───── */
+.faq{display:grid;grid-template-columns:240px minmax(0,1fr);gap:clamp(32px,5vw,88px);padding-block:clamp(36px,5vw,56px) 80px}
+.faq-search{display:flex;align-items:center;gap:12px;height:54px;border:1px solid var(--line-2);padding:0 16px;margin-bottom:28px;max-width:680px}
+.faq-search input{flex:1;border:0;outline:none;font-size:15px;background:transparent}
+.faq-cats{position:sticky;top:150px;align-self:start;list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.faq-cats button{width:100%;text-align:left;padding:10px 14px;font-size:14px;color:var(--ink-2);display:flex;justify-content:space-between}
+.faq-cats button span{color:var(--ink-3);font-size:12.5px}
+.faq-cats button[aria-pressed="true"]{background:var(--soft);color:var(--ink);font-weight:500}
+.faq-group{max-width:760px}
+.faq-group + .faq-group{margin-top:40px}
+.faq-group h2{margin:0 0 8px;font-family:var(--display);font-weight:500;font-size:28px}
+.faq-group details{border-bottom:1px solid var(--line)}
+.faq-group details:first-of-type{border-top:1px solid var(--line)}
+.faq-group summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;cursor:pointer;font-size:15.5px;font-weight:500}
+.faq-group summary::-webkit-details-marker{display:none}
+.faq-group summary::after{content:"+";font-weight:300;font-size:22px;color:var(--ink-2);flex:none}
+.faq-group details[open] summary::after{content:"–"}
+.faq-group .a{padding:0 40px 22px 0;color:#2B2E33;font-size:15px;line-height:1.7}
+.faq-group .a a{color:var(--teal);text-decoration:underline;text-underline-offset:3px}
+.no-hits{display:none;color:var(--ink-2);padding:24px 0}
+
+/* ───── Contact ───── */
+.ways{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding-block:clamp(32px,4vw,48px) 0}
+.way{border:1px solid var(--line);padding:22px;display:grid;gap:8px;align-content:start;transition:border-color .2s}
+.way:hover{border-color:var(--ink)}
+.way .icon{width:26px;height:26px;color:var(--navy)}
+.way b{font-family:var(--display);font-weight:500;font-size:22px;line-height:1.1;margin-top:6px}
+.way span{font-size:13.5px;color:var(--ink-2)}
+.way em{font-style:normal;font-size:12.5px;font-weight:600;color:var(--teal);margin-top:4px}
+.way.feature{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.way.feature .icon{color:#B9CCD6}
+.way.feature span{color:rgba(245,239,235,.8)}
+.way.feature em{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.contact{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:clamp(32px,5vw,88px);padding-block:clamp(40px,5vw,64px) 80px}
+.contact h2{margin:0 0 6px;font-family:var(--display);font-weight:500;font-size:32px}
+.contact .lede{margin:0 0 24px;color:var(--ink-2)}
+.form{display:grid;gap:14px;max-width:640px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.phone{display:grid;grid-template-columns:110px 1fr;gap:12px}
+.f{position:relative;display:grid}
+.f input,.f select,.f textarea{border:1px solid var(--line-2);background:var(--page);padding:22px 14px 8px;font-size:14px;border-radius:0;appearance:none;width:100%}
+.f input,.f select{height:56px}
+.f textarea{min-height:150px;resize:vertical}
+.f select{background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.3'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/16px}
+.f :is(input,select,textarea):focus{outline:none;border-color:var(--ink);box-shadow:inset 0 0 0 .5px var(--ink)}
+.f label{position:absolute;left:14px;top:8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);pointer-events:none}
+.f .err{display:none;color:var(--danger);font-size:12px;margin-top:6px}
+.f.bad :is(input,select,textarea){border-color:var(--danger)}
+.f.bad .err{display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:56px;padding:0 40px;background:var(--ink);color:#fff;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;justify-self:start}
+.btn:hover{background:#2A2A2A}
+.fine{font-size:12.5px;color:var(--ink-3);margin:0}
+.sent{display:none;background:var(--mist);padding:22px;gap:6px}
+.sent b{font-family:var(--display);font-weight:500;font-size:24px}
+.sent.show{display:grid}
+.side{display:grid;gap:18px;align-content:start}
+.side figure{margin:0;aspect-ratio:4/3;overflow:hidden;background:var(--tile)}
+.side figure img{width:100%;height:100%;object-fit:cover}
+.hours{border:1px solid var(--line);padding:20px 22px;display:grid;gap:10px;font-size:14px}
+.hours h3{margin:0;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.hours div{display:flex;justify-content:space-between;gap:12px}
+.hours span{color:var(--ink-2)}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink)}
+.status i{width:8px;height:8px;border-radius:50%;background:#4E8A5E;box-shadow:0 0 0 4px rgba(78,138,94,.15)}
+
+/* Help band (shared footer of each page) */
+.helpband{background:var(--navy);color:var(--on-navy)}
+.helpband .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-block:36px}
+.helpband b{display:block;font-family:var(--display);font-weight:500;font-size:28px;color:#fff}
+.helpband span{opacity:.85}
+.helpband .ctas{display:flex;gap:10px;flex-wrap:wrap}
+.helpband a{height:50px;padding:0 24px;display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--on-navy)}
+.helpband a:first-child{background:var(--on-navy);color:var(--navy)}
+.helpband .icon{width:16px;height:16px}
+
+/* Footer */
+.foot{background:#22303F;color:rgba(245,239,235,.8);font-size:13px}
+.foot .wrap{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:32px;padding-block:48px 28px}
+.foot h4{margin:0 0 14px;font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#fff}
+.foot ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.foot a:hover{color:#fff}
+.foot .mark{color:#fff;font-size:22px}
+.foot form{display:flex;margin-top:16px;max-width:360px}
+.foot input{flex:1;height:46px;border:1px solid rgba(245,239,235,.35);border-right:0;background:transparent;padding:0 14px;color:#fff}
+.foot input::placeholder{color:rgba(245,239,235,.6)}
+.foot form button{height:46px;padding:0 18px;background:var(--on-navy);color:var(--navy);font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.foot .legal{grid-column:1/-1;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid rgba(245,239,235,.15);padding-top:20px;font-size:12px}
+
+
+/* ───── Contact v2: concierge ───── */
+.chero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:560px;background:var(--soft);border-bottom:1px solid var(--line)}
+.chero figure{position:relative;margin:0;overflow:hidden;background:var(--navy)}
+.chero figure img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.chero figure blockquote{position:absolute;left:clamp(20px,3vw,40px);right:clamp(20px,3vw,40px);bottom:clamp(20px,3vw,36px);margin:0;color:#fff;font-family:var(--display);font-style:italic;font-size:clamp(20px,1.8vw,26px);line-height:1.3;text-shadow:0 1px 20px rgba(0,0,0,.4)}
+.chero figure blockquote span{display:block;margin-top:8px;font-family:var(--ui);font-style:normal;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.chero figure::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(17,20,26,.6),rgba(17,20,26,0) 55%)}
+.chero figure blockquote{z-index:1}
+.chero .panel{padding:clamp(32px,5vw,72px) clamp(24px,5vw,80px);display:grid;align-content:center;gap:14px}
+.chero h1{font-size:clamp(42px,4.6vw,64px)}
+.chero .lede{margin:0;max-width:44ch;color:var(--ink-2);font-size:15.5px;line-height:1.7}
+.methods{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--line-2);max-width:520px}
+.methods a{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:center;padding:18px 4px;border-bottom:1px solid var(--line-2);transition:padding .3s var(--ease),background .2s}
+.methods a:hover{padding-left:12px;background:var(--page)}
+.methods .ic{width:40px;height:40px;border-radius:50%;background:var(--page);border:1px solid var(--line);display:grid;place-items:center;color:var(--navy)}
+.methods .ic .icon{width:18px;height:18px}
+.methods b{display:block;font-weight:500;font-size:15px}
+.methods small{font-size:13px;color:var(--ink-2)}
+.methods .arr{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);white-space:nowrap}
+.methods li:first-child a{background:var(--navy);color:var(--on-navy);border-color:var(--navy);padding-inline:16px}
+.methods li:first-child a:hover{padding-left:22px}
+.methods li:first-child .ic{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:var(--sky,#B9CCD6)}
+.methods li:first-child small{color:rgba(245,239,235,.8)}
+.methods li:first-child .arr{color:#fff}
+
+.helpme{display:grid;grid-template-columns:minmax(260px,.75fr) minmax(0,1.25fr);gap:clamp(32px,5vw,88px);padding-block:clamp(48px,6vw,88px)}
+.helpme h2{margin:0 0 6px;font-family:var(--display);font-weight:500;font-size:34px;line-height:1.05}
+.helpme > div > p{margin:0 0 22px;color:var(--ink-2)}
+.intents{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.intents button{width:100%;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;text-align:left;padding:14px 16px;border:1px solid var(--line);transition:border-color .2s,background .2s}
+.intents button:hover{border-color:var(--line-2)}
+.intents button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 .5px var(--ink);background:var(--soft)}
+.intents .icon{width:20px;height:20px;color:var(--navy)}
+.intents b{display:block;font-weight:500;font-size:14.5px}
+.intents small{font-size:12.5px;color:var(--ink-2)}
+.tip{display:flex;gap:14px;align-items:flex-start;background:var(--mist);padding:16px 18px;margin-bottom:22px;font-size:14px}
+.tip .icon{color:var(--navy);margin-top:2px}
+.tip a{color:var(--teal);font-weight:500;text-decoration:underline;text-underline-offset:3px}
+.f[hidden]{display:none}
+.quick{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:clamp(32px,5vw,88px);padding-block:0 clamp(56px,6vw,88px)}
+.quick h2{margin:0 0 12px;font-family:var(--display);font-weight:500;font-size:30px}
+.quick details{border-bottom:1px solid var(--line)}
+.quick details:first-of-type{border-top:1px solid var(--line)}
+.quick summary{list-style:none;display:flex;justify-content:space-between;gap:16px;padding:16px 0;cursor:pointer;font-weight:500;font-size:15px}
+.quick summary::-webkit-details-marker{display:none}
+.quick summary::after{content:"+";font-weight:300;font-size:20px;color:var(--ink-2)}
+.quick details[open] summary::after{content:"–"}
+.quick .a{padding:0 0 16px;color:var(--ink-2);font-size:14.5px}
+.quick .all{display:inline-block;margin-top:16px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid currentColor}
+@media (max-width:1024px){
+  .chero,.helpme,.quick{grid-template-columns:1fr}
+  .chero figure{min-height:280px}
+}
+
+
+/* ───── Contact v3: form above the fold ───── */
+.ctop{background:var(--soft);border-bottom:1px solid var(--line)}
+.ctop .wrap{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-areas:'intro form' 'ways form';grid-template-rows:auto 1fr;column-gap:clamp(32px,5vw,80px);row-gap:14px;padding-block:clamp(28px,3.5vw,48px) clamp(36px,4vw,56px);align-items:start}
+.ctop .intro{grid-area:intro;display:grid;gap:12px;align-content:start;padding-top:4px}
+.ctop .ways2{grid-area:ways;display:grid;gap:12px;align-content:start}
+.ctop .formcard{grid-area:form}
+.ctop h1{font-size:clamp(40px,4.2vw,58px)}
+.ctop .lede{margin:0;max-width:40ch;color:var(--ink-2);font-size:15px;line-height:1.7}
+.ctop .methods{margin-top:10px;max-width:none}
+.ctop .mini-hours{display:grid;grid-template-columns:auto 1fr;gap:4px 18px;font-size:13px;color:var(--ink-2);margin-top:6px}
+.ctop .mini-hours b{color:var(--ink);font-weight:500}
+.formcard{background:var(--page);border:1px solid var(--line);padding:clamp(22px,2.6vw,36px);display:grid;gap:16px;box-shadow:0 24px 60px -40px rgba(17,20,26,.35)}
+.formcard h2{margin:0;font-family:var(--display);font-weight:500;font-size:30px;line-height:1}
+.formcard .sub{margin:-8px 0 0;font-size:13.5px;color:var(--ink-2)}
+.topics{display:flex;flex-wrap:wrap;gap:8px}
+.topics button{height:36px;padding:0 14px;border:1px solid var(--line-2);font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
+.topics button .icon{width:15px;height:15px;color:var(--navy)}
+.topics button:hover{border-color:var(--ink)}
+.topics button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.topics button[aria-pressed="true"] .icon{color:#fff}
+.formcard .tip{margin:0}
+.formcard .form{max-width:none}
+.formcard textarea{min-height:120px}
+.formcard .send{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.formcard .send .fine{max-width:34ch}
+.below{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:clamp(32px,5vw,88px);padding-block:clamp(48px,6vw,80px)}
+.below figure{margin:0;aspect-ratio:4/3;overflow:hidden;background:var(--tile)}
+.below figure img{width:100%;height:100%;object-fit:cover}
+.below .side2{display:grid;gap:16px;align-content:start}
+@media (max-width:1024px){ .ctop .wrap{grid-template-columns:1fr;grid-template-areas:'intro' 'form' 'ways';row-gap:24px} .below{grid-template-columns:1fr} }
+@media (max-width:769px){ .topics{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(clamp(22px,2.6vw,36px) * -1);padding-inline:clamp(22px,2.6vw,36px)} .topics button{flex:none} .formcard{margin-inline:calc(var(--gutter) * -1);border-inline:0} }
+
+@media (max-width:1280px){ .search span{display:none} .search{min-width:0} }
+@media (max-width:1024px){
+  .nav{display:none}
+  .doc,.faq,.contact{grid-template-columns:minmax(0,1fr)}
+  .toc{position:static}
+  .toc ol,.toc h2{display:none}
+  .toc-select{display:block;height:50px;border:1px solid var(--line-2);padding:0 14px;width:100%;appearance:none;background:var(--page) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='1.3'%3E%3Cpath d='m6 9.5 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/16px;font-size:14px}
+  .toc .help{display:none}
+  .faq-cats{position:static;display:flex;overflow-x:auto;gap:6px;scrollbar-width:none}
+  .faq-cats button{white-space:nowrap;border:1px solid var(--line);gap:8px}
+  .facts,.ways{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .foot .wrap{grid-template-columns:1fr 1fr}
+}
+@media (max-width:769px){
+  .hdr .wrap{height:60px}
+  .care-nav{top:60px}
+  .search{border:0;padding:0;width:40px;justify-content:center;margin:0}
+  .band .wrap{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+  .ways{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr 1fr;gap:8px}
+  .fact{padding:14px}
+  .fact b{font-size:18px}
+  .fact span{font-size:12px}
+  .foot .wrap{grid-template-columns:1fr}
+  .mark{font-size:20px}
+  .prose{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav class="review" aria-label="Mockup pages" id="review">
+  <b>Mockup</b>
+  <a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#shipping">Shipping &amp; returns</a><a href="#faqs">FAQs</a><a href="#contact">Contact</a>
+</nav>
+
+<div class="announce">Free insured shipping on every order · Book a virtual appointment</div>
+<header class="hdr">
+  <div class="wrap">
+    <a class="mark" href="#">PENDYORA</a>
+    <nav class="nav" aria-label="Main"><a href="#">Engagement</a><a href="#">Wedding</a><a href="#">Jewelry</a><a href="#">Gifts</a><a href="#">Education</a></nav>
+    <div class="tools">
+      <a class="search" href="#"><svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>Search</span></a>
+      <a class="tool" href="#" aria-label="Account"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg></a>
+      <a class="tool" href="#" aria-label="Wishlist"><svg class="icon" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/></svg><span class="count">2</span></a>
+      <a class="tool" href="#" aria-label="Bag"><svg class="icon" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="count">1</span></a>
+    </div>
+  </div>
+</header>
+
+<section class="band">
+  <div class="wrap">
+    <div>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span aria-hidden="true">/</span><a href="#contact">Client care</a><span aria-hidden="true">/</span><span id="crumb">Terms</span></nav>
+      <h1 id="title">Terms &amp; conditions</h1>
+      <p id="intro"></p>
+    </div>
+    <span class="updated" id="updated"></span>
+  </div>
+</section>
+<nav class="care-nav" aria-label="Client care">
+  <div class="wrap" id="careNav">
+    <a href="#shipping">Shipping &amp; returns</a><a href="#faqs">FAQs</a><a href="#contact">Contact us</a><a href="#terms">Terms &amp; conditions</a><a href="#privacy">Privacy policy</a><a href="#">Jewelry care</a>
+  </div>
+</nav>
+
+<main>
+<!-- ═══════════ TERMS ═══════════ -->
+<div class="page wrap" data-page="terms" data-title="Terms &amp; conditions" data-crumb="Terms" data-updated="Last updated 1 October 2026"
+     data-intro="The terms that apply when you use pendyora.com and buy from us. Plain English where we can; the legal detail where we must.">
+  <div class="doc">
+    <aside class="toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <select class="toc-select" aria-label="Jump to section"></select>
+      <ol></ol>
+      <div class="help"><b>Have a question?</b>Our client care team is happy to help.<a href="#contact">Contact us →</a></div>
+    </aside>
+    <article class="prose">
+      <section id="t-using"><h2>Using this site</h2>
+        <p>By using pendyora.com you agree to these terms. We may update them from time to time; the date at the top of this page shows when they last changed, and the version on the site when you place an order is the one that applies to it.</p>
+      </section>
+      <section id="t-pricing"><h2>Prices &amp; pricing errors</h2>
+        <p>We work hard to show accurate prices. If we find a pricing error, we'll correct it as soon as we can. We may cancel an order that contains a pricing error, even after you've received an order confirmation, and we'll refund anything you've paid in full.</p>
+        <div class="callout"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg><span>Prices are shown in the currency you choose in the header. Your card is charged in that currency.</span></div>
+      </section>
+      <section id="t-duties"><h2>Imports, duties &amp; taxes</h2>
+        <p>For international orders, goods are imported on behalf of the buyer. You authorise Pendyora, or a customs broker we appoint, to import them for you. Duties and taxes are paid by the buyer in addition to the purchase price unless your order summary shows them as prepaid.</p>
+      </section>
+      <section id="t-custom"><h2>Custom orders</h2>
+        <p>Custom-made and customised pieces can't be returned. This includes upgraded stones, modifications to an existing design and new designs made to your brief.</p>
+      </section>
+      <section id="t-layaway"><h2>Layaway</h2>
+        <p>Our interest-free layaway plan lets you reserve a piece and pay for it over <strong>3 to 24 months</strong>. Your price is locked when you pay the deposit, even if our price later goes up. We ship as soon as the balance is paid.</p>
+        <h3>How layaway works</h3>
+        <ol class="steps">
+          <li><span><b>Choose your piece</b>Layaway is available on pieces of $200 or more.</span></li>
+          <li><span><b>Pick a plan</b>Choose between 3 and 24 months; the balance is split into equal monthly payments.</span></li>
+          <li><span><b>We ship when it's paid</b>Your piece is set aside, then shipped insured once the final payment clears.</span></li>
+        </ol>
+        <h3>Good to know</h3>
+        <ul><li>Layaway orders can be cancelled before the final payment; the deposit is refundable less a processing fee.</li><li>Missed payments may cancel the plan after we've contacted you.</li></ul>
+      </section>
+      <section id="t-changes"><h2>Changes to these terms</h2>
+        <p>We may change these terms at any time. Using the site after a change means you accept the updated terms, so please check this page now and then.</p>
+      </section>
+      <section id="t-contact"><h2>Contact</h2>
+        <p>Questions about these terms? <a href="#contact">Contact our client care team</a> and we'll get back to you within one business day.</p>
+      </section>
+    </article>
+  </div>
+</div>
+
+<!-- ═══════════ PRIVACY ═══════════ -->
+<div class="page wrap" data-page="privacy" data-title="Privacy policy" data-crumb="Privacy" data-updated="Last updated 1 October 2026"
+     data-intro="What we collect, why we collect it, and the choices you have. We never sell your personal information.">
+  <div class="doc">
+    <aside class="toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <select class="toc-select" aria-label="Jump to section"></select>
+      <ol></ol>
+      <div class="help"><b>Privacy questions?</b>Email our team and we'll reply within 30 days.<a href="#contact">Contact us →</a></div>
+    </aside>
+    <article class="prose">
+      <section id="p-intro"><h2>Introduction</h2><p>This policy explains how Pendyora handles personal information when you visit our site, contact us or buy from us.</p></section>
+      <section id="p-use"><h2>What we do with your information</h2>
+        <p>When you buy from us we collect the details needed to complete your order: your name, address, email, phone number and payment details.</p>
+        <table class="plain"><thead><tr><th>We collect</th><th>We use it to</th></tr></thead><tbody>
+          <tr><td>Contact details</td><td>Process orders, send updates and answer questions</td></tr>
+          <tr><td>Device and browsing data</td><td>Keep the site secure and understand what works</td></tr>
+          <tr><td>Marketing choices</td><td>Send news and offers, only if you opted in</td></tr>
+        </tbody></table>
+      </section>
+      <section id="p-consent"><h2>Consent</h2><p>By placing an order you consent to us using your information to fulfil it. For marketing, we'll always ask first, and you can unsubscribe from any email.</p></section>
+      <section id="p-disclosure"><h2>Disclosure</h2><p>We may disclose your information if required by law or to enforce our terms.</p></section>
+      <section id="p-third"><h2>Third-party services</h2><p>Payment providers, couriers and analytics tools receive only the information they need to provide their service, under their own privacy policies.</p></section>
+      <section id="p-security"><h2>Security</h2><p>Card details are encrypted and handled by our payment partners; we never store full card numbers.</p></section>
+      <section id="p-cookies"><h2>Cookies</h2><p>We use cookies to keep your bag and preferences, and to measure how the site is used. You can control cookies in your browser.</p></section>
+      <section id="p-age"><h2>Age of consent</h2><p>By using this site you confirm you are at least the age of majority where you live.</p></section>
+      <section id="p-changes"><h2>Changes to this policy</h2><p>We'll update this page if our practices change, and note the date at the top.</p></section>
+      <section id="p-contact"><h2>Questions &amp; contact</h2><p>To access, correct or delete your information, <a href="#contact">contact us</a>.</p></section>
+    </article>
+  </div>
+</div>
+
+<!-- ═══════════ SHIPPING & RETURNS ═══════════ -->
+<div class="page wrap" data-page="shipping" data-title="Shipping &amp; returns" data-crumb="Shipping &amp; returns" data-updated="Last updated 1 October 2026"
+     data-intro="Every order is insured and needs a signature. If it isn't right, you have 30 days to send it back.">
+  <div class="facts" aria-label="At a glance">
+    <div class="fact"><svg class="icon" viewBox="0 0 24 24"><path d="M2.5 6.5h11v10h-11zM13.5 10h4l3 3.2v3.3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><b>Free insured US shipping</b><span>Signature required on every order.</span></div>
+    <div class="fact"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5l3 2"/></svg><b>Ships in 2–5 days</b><span>Made-to-order pieces show their own date.</span></div>
+    <div class="fact"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/></svg><b>30-day returns</b><span>Free and insured, from your door.</span></div>
+    <div class="fact"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg><b>Worldwide delivery</b><span>Duties shown before you pay.</span></div>
+  </div>
+  <div class="doc">
+    <aside class="toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <select class="toc-select" aria-label="Jump to section"></select>
+      <ol></ol>
+      <div class="help"><b>Need it by a date?</b>Tell us and we'll check before you order.<a href="#contact">Contact us →</a></div>
+    </aside>
+    <article class="prose">
+      <section id="s-us"><h2>US shipping</h2>
+        <table class="plain"><thead><tr><th>Method</th><th>Delivery</th><th>Cost</th></tr></thead><tbody>
+          <tr><td>Standard insured</td><td>3–5 business days after dispatch</td><td>Free</td></tr>
+          <tr><td>Express insured</td><td>1–2 business days after dispatch</td><td>$35</td></tr>
+        </tbody></table>
+        <p>Orders ship in our presentation box, discreetly labelled. You'll get tracking by email as soon as your order leaves us.</p>
+      </section>
+      <section id="s-holiday"><h2>Holiday shipping</h2><p>Order by <strong>15 December</strong> for standard delivery before 25 December, or by <strong>19 December</strong> with express. Made-to-order pieces need longer; their date is shown on the product page.</p></section>
+      <section id="s-returns"><h2>US returns</h2>
+        <p>You can return unworn pieces in their original packaging within <strong>30 days</strong> of delivery for a full refund to your original payment method.</p>
+        <div class="callout"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg><span>Engraved, resized and custom pieces are final sale.</span></div>
+      </section>
+      <section id="s-intl"><h2>International shipping &amp; returns</h2><p>We deliver worldwide. Duties and taxes are calculated at checkout and shown before you pay. International returns are accepted within 30 days; return shipping is free, but duties paid on import may not be refundable.</p></section>
+      <section id="s-how"><h2>How to return an order</h2>
+        <ol class="steps">
+          <li><span><b>Start your return</b>Go to your account, choose the order and select "Return", or contact us.</span></li>
+          <li><span><b>Pack it securely</b>Use the original box and include all certificates.</span></li>
+          <li><span><b>Ship it insured</b>Use the prepaid, insured label we email you.</span></li>
+          <li><span><b>Get your refund</b>We inspect and refund within 5–7 business days of receiving it.</span></li>
+        </ol>
+      </section>
+    </article>
+  </div>
+</div>
+
+<!-- ═══════════ FAQS ═══════════ -->
+<div class="page wrap" data-page="faqs" data-title="Frequently asked questions" data-crumb="FAQs" data-updated=""
+     data-intro="Quick answers about orders, sizing, diamonds and care. Can't find what you need? Our team is a message away.">
+  <div class="faq">
+    <ul class="faq-cats" id="faqCats" aria-label="Topics"></ul>
+    <div>
+      <label class="faq-search"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span class="sr">Search questions</span><input id="faqSearch" placeholder="Search questions, e.g. resizing"></label>
+      <div id="faqGroups"></div>
+      <p class="no-hits" id="noHits">No questions match that search. <a href="#contact" style="color:var(--teal);text-decoration:underline">Ask us directly</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CONTACT (concierge) ═══════════ -->
+<div class="page" data-page="contact" data-own-hero data-title="Talk to a jeweler" data-crumb="Contact us" data-updated="" data-intro="">
+  <section class="ctop" aria-labelledby="c-title">
+    <div class="wrap">
+      <div class="intro">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Home</a><span aria-hidden="true">/</span><span>Contact us</span></nav>
+        <span class="eyebrow">Client care</span>
+        <h1 id="c-title">Talk to a jeweler</h1>
+        <p class="lede">Real people, not a call centre. Send a message, or choose another way to talk. We reply within one business day.</p>
+        <span class="status"><i></i>We're online now</span>
+      </div>
+      <div class="ways2">
+        <ul class="methods">
+          <li><a href="#"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11"/><path d="m16 10.5 5-3v9l-5-3z"/></svg></span><span><b>Video appointment</b><small>See pieces live and get sized, 20 minutes</small></span><span class="arr">Book →</span></a></li>
+          <li><a href="#"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13"/><path d="m3.5 6 8.5 7 8.5-7"/></svg></span><span><b>care@pendyora.com</b><small>Reply within one business day</small></span><span class="arr">Email →</span></a></li>
+          <li><a href="#"><span class="ic"><svg class="icon" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg></span><span><b>+1 (800) 000-0000</b><small>Mon–Fri, 9am–6pm ET</small></span><span class="arr">Call →</span></a></li>
+        </ul>
+        <div class="mini-hours"><b>Mon – Fri</b><span>9am – 6pm ET</span><b>Saturday</b><span>10am – 4pm ET</span><b>Sunday</b><span>Closed</span></div>
+      </div>
+
+      <div class="formcard">
+        <h2>Send us a message</h2>
+        <p class="sub">Pick a topic and we'll ask only what we need.</p>
+        <div class="topics" id="intents" role="toolbar" aria-label="Topic"></div>
+        <div class="tip" id="tip"></div>
+        <form class="form" id="contactForm" novalidate>
+          <div class="grid2">
+            <div class="f"><input id="c-name" required autocomplete="name" placeholder=" "><label for="c-name">Full name</label><span class="err">Enter your name</span></div>
+            <div class="f"><input id="c-email" type="email" required autocomplete="email" placeholder=" "><label for="c-email">Email</label><span class="err">Enter a valid email address</span></div>
+          </div>
+          <div class="phone">
+            <div class="f"><select id="c-code" aria-label="Country code"><option>+1</option><option>+44</option><option>+61</option><option>+91</option></select><label for="c-code">Code</label></div>
+            <div class="f"><input id="c-phone" type="tel" autocomplete="tel-national" placeholder=" "><label for="c-phone">Phone (optional)</label></div>
+          </div>
+          <div class="f" id="orderField" hidden><input id="c-order" placeholder=" "><label for="c-order">Order number, e.g. PD-10482</label><span class="err">Enter your order number</span></div>
+          <div class="f"><textarea id="c-msg" required placeholder=" "></textarea><label for="c-msg" id="msgLabel">Your message</label><span class="err">Write a short message</span></div>
+          <div class="send">
+            <button class="btn" type="submit">Send message</button>
+            <p class="fine">We'll only use your details to reply. See our <a href="#privacy" style="text-decoration:underline">privacy policy</a>.</p>
+          </div>
+          <div class="sent" id="sent" role="status"><b>Thank you, we've got it.</b><span>A jeweler will reply to your email within one business day.</span></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="quick below" aria-labelledby="h-quick">
+      <div>
+        <h2 id="h-quick">Quick answers</h2>
+        <details><summary>Where is my order?</summary><div class="a">Your tracking link is in your shipping email. You can also see every order in your account.</div></details>
+        <details><summary>How do I find my ring size?</summary><div class="a">Use our printable sizer, or book a video call and we'll measure with you.</div></details>
+        <details><summary>Can I return or exchange a piece?</summary><div class="a">Yes, unworn pieces within 30 days. Engraved and custom pieces are final sale.</div></details>
+        <details><summary>Do you make custom pieces?</summary><div class="a">Yes. Share an idea or a photo and we'll come back with a sketch and a price range.</div></details>
+        <a class="all" href="#faqs">All FAQs</a>
+      </div>
+      <div class="side2">
+        <figure><img src="img/m-hand-thin.jpg" alt="A ring being shown during an appointment" loading="lazy"></figure>
+        <p class="fine" style="font-size:13px">Prefer to see it in person? <a href="#" style="color:var(--teal);text-decoration:underline">Book a video appointment</a> and we'll show you pieces live.</p>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+
+<section class="helpband" aria-label="Help">
+  <div class="wrap">
+    <div><b>Still have a question?</b><span>Talk to a jeweler. No pressure, no obligation.</span></div>
+    <div class="ctas">
+      <a href="#"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6.5" width="13" height="11"/><path d="m16 10.5 5-3v9l-5-3z"/></svg>Book a video call</a>
+      <a href="#contact">Contact us</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <div><span class="mark">PENDYORA</span><p style="margin:14px 0 0;max-width:36ch">Fine jewelry, made by hand. New collections and private previews, straight to your inbox.</p>
+      <form onsubmit="event.preventDefault()"><label class="sr" for="nl">Email</label><input id="nl" placeholder="Your email"><button>Join</button></form></div>
+    <div><h4>Shop</h4><ul><li><a href="#">Engagement</a></li><li><a href="#">Wedding</a></li><li><a href="#">Jewelry</a></li><li><a href="#">Collections</a></li><li><a href="#">Gifts</a></li></ul></div>
+    <div><h4>Client care</h4><ul><li><a href="#contact">Contact us</a></li><li><a href="#shipping">Shipping &amp; returns</a></li><li><a href="#faqs">FAQs</a></li><li><a href="#">Jewelry care</a></li><li><a href="#">Virtual appointment</a></li></ul></div>
+    <div><h4>About</h4><ul><li><a href="#">Our story</a></li><li><a href="#">Journal</a></li><li><a href="#">Education</a></li><li><a href="#terms">Terms</a></li><li><a href="#privacy">Privacy</a></li></ul></div>
+    <div class="legal"><span>© 2026 Pendyora</span><span>Mockup: design-mockups/info-pages · Atlantic palette</span></div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // FAQ content (live site: /cms/type/2)
+  const FAQ = [
+    ['Orders & delivery', [
+      ['When will my order arrive?', 'Ready-to-ship pieces leave us in 2–5 business days and arrive 3–5 days later with free insured shipping. Made-to-order pieces show their own date on the product page and at checkout.'],
+      ['Can I change or cancel my order?', 'Contact us within 24 hours and we will do our best. Once a piece is being made or engraved we can no longer change it.'],
+      ['Do you ship internationally?', 'Yes, worldwide. Duties and taxes are calculated at checkout so nothing is due on delivery.']]],
+    ['Sizing & resizing', [
+      ['How do I find my ring size?', 'Use our printable ring sizer, or book a free video appointment and a jeweler will help you measure.'],
+      ['Can I resize my ring?', 'Most rings can be resized once for free within 60 days. Eternity bands and some settings can’t be resized; the product page will say so.']]],
+    ['Diamonds & materials', [
+      ['Are your diamonds certified?', 'Centre diamonds over 0.30 ct come with a grading report from an independent lab. Smaller accent stones are graded by our gemologists.'],
+      ['What is the difference between lab-grown and natural diamonds?', 'They are chemically and visually identical. Lab-grown diamonds are created above ground and cost less; natural diamonds formed over billions of years. <a href="#">Read our guide</a>.']]],
+    ['Returns & warranty', [
+      ['What is your return policy?', 'Unworn pieces can be returned within 30 days for a full refund. Engraved, resized and custom pieces are final sale. <a href="#shipping">See shipping &amp; returns</a>.'],
+      ['What does the warranty cover?', 'Manufacturing defects are covered. Normal wear, loss and accidental damage are not, but we offer extended protection at checkout.']]],
+  ];
+  const slug = s => s.toLowerCase().replace(/[^a-z]+/g, '-');
+  $('#faqGroups').innerHTML = FAQ.map(([cat, qs]) => `<section class="faq-group" id="faq-${slug(cat)}"><h2>${cat}</h2>${qs.map(([q, a]) => `<details><summary>${q}</summary><div class="a">${a}</div></details>`).join('')}</section>`).join('');
+  $('#faqCats').innerHTML = `<li><button type="button" aria-pressed="true" data-cat="">All topics<span>${FAQ.reduce((n, [, q]) => n + q.length, 0)}</span></button></li>` +
+    FAQ.map(([cat, qs]) => `<li><button type="button" aria-pressed="false" data-cat="${slug(cat)}">${cat}<span>${qs.length}</span></button></li>`).join('');
+  $('#faqCats').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    $$('#faqCats button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    $$('.faq-group').forEach(g => g.style.display = !b.dataset.cat || g.id === 'faq-' + b.dataset.cat ? '' : 'none');
+  });
+  $('#faqSearch').addEventListener('input', e => {
+    const q = e.target.value.trim().toLowerCase(); let hits = 0;
+    $$('.faq-group').forEach(g => {
+      let any = false;
+      $$('details', g).forEach(d => { const m = !q || d.textContent.toLowerCase().includes(q); d.style.display = m ? '' : 'none'; d.open = !!q && m; any ||= m; hits += m; });
+      g.style.display = any ? '' : 'none';
+    });
+    $('#noHits').style.display = hits ? 'none' : 'block';
+  });
+
+  // On-this-page rails for the policy pages, with scroll-spy
+  $$('.doc').forEach(doc => {
+    const secs = $$('.prose section', doc);
+    $('.toc ol', doc).innerHTML = secs.map(s => `<li><a href="#${s.id}">${$('h2', s).textContent}</a></li>`).join('');
+    $('.toc-select', doc).innerHTML = secs.map(s => `<option value="${s.id}">${$('h2', s).textContent}</option>`).join('');
+    $('.toc-select', doc).onchange = e => document.getElementById(e.target.value).scrollIntoView();
+  });
+  const spy = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    const doc = en.target.closest('.doc');
+    $$('.toc a', doc).forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id));
+  }), { rootMargin: '-30% 0px -60% 0px' });
+  $$('.prose section').forEach(s => spy.observe(s));
+
+  // Page switching (#terms, #privacy, #shipping, #faqs, #contact)
+  function show() {
+    const key = (location.hash || '#terms').slice(1);
+    const page = $(`.page[data-page="${key}"]`);
+    if (!page) return; // in-page anchor (section link): keep current page
+    $$('.page').forEach(p => p.classList.toggle('on', p === page));
+    document.querySelector('.band').style.display = page.hasAttribute('data-own-hero') ? 'none' : '';
+    $('#title').innerHTML = page.dataset.title; $('#crumb').innerHTML = page.dataset.crumb;
+    $('#intro').textContent = page.dataset.intro; $('#updated').textContent = page.dataset.updated;
+    $$('#review a, #careNav a').forEach(a => a.toggleAttribute('aria-current', a.hash === '#' + key));
+    window.scrollTo(0, 0);
+  }
+  addEventListener('hashchange', show); show();
+
+
+  // Contact: topic picker adapts the form (subject sent with the message)
+  const ICON = {
+    piece: '<path d="M6.5 4h11l3.5 5-9 11L3 9zM3 9h18"/>',
+    size: '<circle cx="12" cy="14" r="6.5"/><path d="M9.5 5.5 12 3l2.5 2.5L12 8z"/>',
+    order: '<path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',
+    custom: '<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>',
+    ret: '<path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4"/>',
+    other: '<path d="M4 5h16v11H9l-5 4z"/>',
+  };
+  const TIP_I = '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.1M12 11v5"/></svg>';
+  const INTENTS = [
+    ['piece', 'A piece I\'m considering', 'Photos, videos, stone details', 'Tell us which piece. We can send close-up photos and a short video in natural light. <a href="#">Or see it live on video</a>.', 'Which piece, and what would you like to know?'],
+    ['size', 'Sizing & resizing', 'Find your size or resize a ring', 'Sizing is quickest on a 10-minute video call: we measure with you. <a href="#">Book a sizing call</a>.', 'Your current size (if known) and the piece'],
+    ['order', 'An existing order', 'Delivery, changes, tracking', 'Your order number starts with PD- and is in your confirmation email. Tracking is also in <a href="#">your account</a>.', 'What do you need help with?'],
+    ['custom', 'A custom design', 'Your idea, sketched by us', 'Describe your idea, budget and timing. We reply with a first sketch and a price range.', 'Your idea, budget and when you need it'],
+    ['ret', 'Returns & repairs', 'Start a return, warranty, care', 'Most returns can be started from <a href="#">your account</a> in a minute. For repairs, tell us what happened.', 'Order number and what happened'],
+    ['other', 'Something else', 'Press, partnerships, anything', 'Tell us a little about it and we\'ll pass it to the right person.', 'Your message'],
+  ];
+  $('#intents').innerHTML = INTENTS.map(([k, t], i) => `<button type="button" data-k="${k}" aria-pressed="${i === 0}"><svg class="icon" viewBox="0 0 24 24">${ICON[k]}</svg>${t}</button>`).join('');
+  function setIntent(k) {
+    const it = INTENTS.find(x => x[0] === k);
+    $$('#intents button').forEach(b => b.setAttribute('aria-pressed', b.dataset.k === k));
+    $('#tip').innerHTML = TIP_I + `<span>${it[3]}</span>`;
+    $('#msgLabel').textContent = it[4];
+    const order = k === 'order';
+    $('#orderField').hidden = !order;
+    $('#c-order').required = order;
+  }
+  $('#intents').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setIntent(b.dataset.k); });
+  setIntent('piece');
+
+  // Contact form validation (mockup)
+  $('#contactForm').addEventListener('submit', e => {
+    e.preventDefault(); let first = null;
+    $$('.f', e.currentTarget).forEach(f => {
+      const el = $('[required]', f); if (!el) return;
+      let bad = !el.value.trim();
+      if (!bad && el.type === 'email') bad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value);
+      f.classList.toggle('bad', bad); if (bad && !first) first = el;
+    });
+    if (first) { first.focus(); return; }
+    $('#sent').classList.add('show'); e.currentTarget.querySelector('.btn').style.display = 'none';
+  });
+  $('#contactForm').addEventListener('input', e => e.target.closest('.f')?.classList.remove('bad'));
+})();
+</script>
+</body>
+</html>

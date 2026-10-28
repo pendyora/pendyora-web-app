@@ -1,0 +1,38 @@
+{
+ "duration": 11,
+ "noOverlay": false,
+ "captions": [],
+ "scroll": [
+  {
+   "at": 5.0,
+   "sel": ".so-head",
+   "off": -90,
+   "ms": 900
+  },
+  {
+   "at": 6.3,
+   "sel": ".stage3d",
+   "off": -150,
+   "ms": 900
+  },
+  {
+   "at": 7.6,
+   "sel": ".dm-art",
+   "off": -110,
+   "ms": 900
+  },
+  {
+   "at": 8.9,
+   "sel": ".mt-visual",
+   "off": -110,
+   "ms": 900
+  },
+  {
+   "at": 10.1,
+   "sel": "#notify .mono",
+   "off": -140,
+   "ms": 800
+  }
+ ],
+ "js": "document.querySelectorAll('.rv,.clip').forEach(e=>e.classList.add('in'))"
+}

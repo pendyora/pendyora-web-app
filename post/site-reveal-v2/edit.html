@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=405, initial-scale=1">
+<title>DazzBliss Reel v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Libre+Franklin:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 405x720 stage → recorded at 1080x1920. Text stays between y≈90 and y≈560 (Instagram safe area). */
+:root{--navy:#2F4156;--deep:#1B2633;--night:#121A24;--teal:#4E7486;--pale:#B9CFDA;--cream:#F5EFEB;
+  --io:cubic-bezier(.83,0,.17,1);--out:cubic-bezier(.2,.7,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:405px;height:720px;overflow:hidden;background:var(--night)}
+.scene{position:absolute;inset:0;overflow:hidden;visibility:hidden}
+.scene.on{visibility:visible}
+.cap{position:absolute;left:50%;top:118px;transform:translate(-50%,16px);opacity:0;white-space:nowrap;z-index:5;
+  padding:12px 22px;background:var(--cream);color:var(--deep);font:500 25px/1.15 'Cormorant Garamond',serif;
+  box-shadow:0 16px 40px -14px rgba(0,0,0,.6);transition:opacity .6s,transform .7s var(--out)}
+.cap em{font-style:italic;color:var(--teal)}
+.cap small{display:block;text-align:center;font:500 9px/1.5 'Libre Franklin',sans-serif;letter-spacing:.32em;text-transform:uppercase;color:var(--teal);margin-bottom:2px}
+.cap.on{opacity:1;transform:translate(-50%,0)}
+
+/* scene 1: site intro footage */
+#s1 video{width:100%;height:100%;object-fit:cover}
+
+/* scene 2: slit-reveal photo cuts */
+.slide{position:absolute;inset:0;clip-path:inset(0 50% 0 50%);transition:clip-path .55s var(--io)}
+.slide.on{clip-path:inset(0 0 0 0)}
+.slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.2);transition:transform 1.6s var(--out)}
+.slide.on img{transform:scale(1.03)}
+.slide::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,26,36,.9) 0%,rgba(18,26,36,.35) 38%,rgba(18,26,36,0) 60%)}
+.slide .txt{position:absolute;left:28px;right:28px;bottom:176px;z-index:2;color:var(--cream)}
+.slide .lbl{display:flex;align-items:center;gap:10px;font:500 9px 'Libre Franklin',sans-serif;letter-spacing:.34em;color:var(--pale);
+  opacity:0;transform:translateY(10px);transition:all .5s var(--out) .12s}
+.slide .lbl::before{content:"";width:22px;height:1px;background:var(--pale)}
+.slide .word{font:400 54px/1 'Cormorant Garamond',serif;margin-top:10px;text-shadow:0 2px 26px rgba(0,0,0,.45);
+  opacity:0;transform:translateY(26px);transition:all .6s var(--out) .18s}
+.slide .word.sm{font-size:42px}
+.slide .word em{font-style:italic;color:var(--pale)}
+.slide.on .lbl,.slide.on .word{opacity:1;transform:none}
+.seam{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:var(--cream);z-index:10;opacity:0;transform:scaleY(0)}
+.seam.flash{animation:seam .55s var(--io)}
+@keyframes seam{0%{opacity:1;transform:scaleY(0)}45%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
+
+/* scene 3: phone with the live site */
+#s3{background:radial-gradient(120% 80% at 50% 30%,#2E4157 0%,var(--deep) 50%,var(--night) 100%);clip-path:inset(0 50% 0 50%);transition:clip-path .6s var(--io)}
+#s3.on{clip-path:inset(0 0 0 0)}
+#s3::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(118deg,rgba(185,207,218,.05) 0 1px,transparent 1px 24px)}
+.phone{position:absolute;left:50%;top:178px;width:232px;height:492px;margin-left:-116px;border-radius:38px;background:#0B1118;padding:8px;
+  box-shadow:0 0 0 1.5px rgba(185,207,218,.35),0 40px 80px -20px rgba(0,0,0,.8);transform:translateY(560px) rotate(-8deg);transition:transform 1.1s var(--out)}
+#s3.go .phone{transform:none}
+.phone .scr{width:100%;height:100%;border-radius:30px;overflow:hidden;background:#000;position:relative}
+.phone video{width:100%;height:100%;object-fit:cover}
+.phone .notch{position:absolute;top:8px;left:50%;width:74px;height:20px;margin-left:-37px;border-radius:12px;background:#0B1118;z-index:2}
+.glow{position:absolute;left:50%;top:300px;width:420px;height:420px;margin-left:-210px;border-radius:50%;background:radial-gradient(circle,rgba(78,116,134,.55),transparent 65%)}
+.sp{position:absolute;color:var(--cream);opacity:0}
+#s3.go .sp{animation:tw 2.2s ease-in-out infinite}
+.sp.a{left:40px;top:250px;width:22px;height:22px;animation-delay:.4s!important}
+.sp.b{right:38px;top:330px;width:14px;height:14px;animation-delay:1s!important}
+.sp.c{right:62px;top:200px;width:18px;height:18px;animation-delay:.1s!important}
+.sp.d{left:58px;top:430px;width:12px;height:12px;animation-delay:1.4s!important}
+@keyframes tw{0%,100%{opacity:0;transform:scale(.4) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
+
+/* scene 4: curtains close, end card */
+#s4{z-index:20}
+.cp{position:absolute;top:0;bottom:0;width:50.5%;transition:transform 1s var(--io)}
+.cp.l{left:0;transform:translateX(-101%);background:radial-gradient(130% 90% at 100% 50%,#3B526B,#24344A 45%,#151F2B);box-shadow:inset -1px 0 0 rgba(185,207,218,.45)}
+.cp.r{right:0;transform:translateX(101%);background:radial-gradient(130% 90% at 0% 50%,#3B526B,#24344A 45%,#151F2B);box-shadow:inset 1px 0 0 rgba(185,207,218,.45)}
+.cp::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(118deg,rgba(185,207,218,.05) 0 1px,transparent 1px 24px)}
+#s4.close .cp{transform:none}
+.end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:150px;text-align:center;color:var(--cream)}
+.end > *{opacity:0;transform:translateY(16px);filter:blur(8px);transition:opacity .9s var(--out),transform 1s var(--out),filter .9s var(--out)}
+.end .show{opacity:1;transform:none;filter:none}
+.end .mono{width:84px}
+.end .word{width:206px;margin-top:22px}
+.end .rule{width:120px;height:1px;background:rgba(185,207,218,.5);margin:26px 0 24px}
+.end h2{font:400 34px/1.1 'Cormorant Garamond',serif}
+.end h2 em{font-style:italic;color:var(--pale)}
+.end .pill{margin-top:22px;background:var(--cream);color:var(--deep);font:500 10px 'Libre Franklin',sans-serif;letter-spacing:.3em;padding:14px 22px}
+.end .tag{margin-top:22px;font:italic 400 22px 'Cormorant Garamond',serif;color:var(--pale)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><symbol id="spark" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 7.2 4.8 11.4 12 12-7.2.6-11.4 4.8-12 12-.6-7.2-4.8-11.4-12-12 7.2-.6 11.4-4.8 12-12z"/></symbol></svg>
+
+<section class="scene" id="s1">
+  <video id="v1" src="site-clean.mp4" muted playsinline preload="auto"></video>
+  <div class="cap" id="c1">Meet <em>DazzBliss.</em></div>
+</section>
+
+<section class="scene" id="s2">
+  <div class="slide"><img src="../../design-mockups/coming-soon/img/dia-natural.jpg" alt=""><div class="txt"><div class="lbl">01 · DIAMONDS</div><div class="word">Natural.</div></div></div>
+  <div class="slide"><img src="../../design-mockups/coming-soon/img/dia-lab.jpg" alt=""><div class="txt"><div class="lbl">02 · DIAMONDS</div><div class="word"><em>Lab-grown.</em></div></div></div>
+  <div class="slide"><img src="../../design-mockups/coming-soon/img/c04.jpg" alt=""><div class="txt"><div class="lbl">03 · CERTIFIED</div><div class="word sm">Graded by <em>IGI or GIA.</em></div></div></div>
+  <div class="slide"><img src="../../design-mockups/coming-soon/img/metal-14k.jpg" alt=""><div class="txt"><div class="lbl">04 · METALS</div><div class="word sm">10K · 14K · 18K <em>gold.</em></div></div></div>
+  <div class="slide"><img src="../../design-mockups/coming-soon/img/metal-ag.jpg" alt=""><div class="txt"><div class="lbl">05 · METALS</div><div class="word"><em>&amp;</em> silver.</div></div></div>
+  <div class="slide"><img src="../../design-mockups/coming-soon/img/m-every.jpg" alt=""><div class="txt"><div class="lbl">06 · MADE FOR</div><div class="word">For <em>every day.</em></div></div></div>
+  <div class="seam" id="seam"></div>
+</section>
+
+<section class="scene" id="s3">
+  <div class="glow"></div>
+  <div class="cap" id="c3" style="top:86px"><small>Now live</small>dazzbliss<em>.com</em></div>
+  <div class="phone"><div class="scr"><span class="notch"></span><video id="v3" src="site-clean.mp4" muted playsinline preload="auto"></video></div></div>
+  <svg class="sp a"><use href="#spark"/></svg><svg class="sp b"><use href="#spark"/></svg>
+  <svg class="sp c"><use href="#spark"/></svg><svg class="sp d"><use href="#spark"/></svg>
+</section>
+
+<section class="scene" id="s4">
+  <div class="cp l"></div><div class="cp r"></div>
+  <div class="end">
+    <img class="mono" src="../../design-mockups/coming-soon/img/monogram-white.png" alt="">
+    <img class="word" src="../../design-mockups/coming-soon/img/wordmark-white.png" alt="">
+    <div class="rule"></div>
+    <h2>Early access<br>is <em>open.</em></h2>
+    <div class="pill">LINK IN BIO · DAZZBLISS.COM</div>
+    <div class="tag">Wear your bliss.</div>
+  </div>
+</section>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const at = (sec, fn) => setTimeout(fn, sec * 1000);
+
+async function ready(){
+  await document.fonts.ready;
+  await Promise.all($$('img').map(i => i.decode().catch(()=>{})));
+  await Promise.all($$('video').map(v => v.readyState >= 3 ? 0 : new Promise(r => v.addEventListener('canplaythrough', r, {once:true}))));
+}
+
+ready().then(() => {
+  window.__reelStart = Date.now() / 1000;        // recorder trims everything before this
+  const v1 = $('#v1'), v3 = $('#v3');
+
+  // 1 · hook: the site's own curtain intro
+  $('#s1').classList.add('on'); v1.currentTime = 0; v1.play();
+  at(0.5, () => $('#c1').classList.add('on'));
+  at(3.3, () => $('#c1').classList.remove('on'));
+
+  // 2 · slit-reveal cuts, one word each
+  const slides = $$('.slide'), T2 = 4.4, step = 0.95;
+  at(T2, () => $('#s2').classList.add('on'));
+  slides.forEach((s, i) => at(T2 + i * step, () => {
+    s.style.zIndex = i + 1; s.classList.add('on');
+    const seam = $('#seam'); seam.classList.remove('flash'); void seam.offsetWidth; seam.classList.add('flash');
+    if (i === 0) at(0.6, () => { $('#s1').classList.remove('on'); v1.pause(); });
+  }));
+
+  // 3 · phone with the live site
+  const T3 = T2 + slides.length * step;            // 10.1s
+  at(T3, () => { $('#s3').style.zIndex = 10; $('#s3').classList.add('on'); v3.currentTime = 3.9; v3.play(); });
+  at(T3 + 0.25, () => $('#s3').classList.add('go'));
+  at(T3 + 0.7, () => $('#c3').classList.add('on'));
+  at(T3 + 0.7, () => $('#s2').classList.remove('on'));
+  at(T3 + 5.0, () => $('#c3').classList.remove('on'));
+
+  // 4 · curtains close, end card
+  const T4 = T3 + 5.3;                              // 15.4s
+  at(T4, () => { $('#s4').classList.add('on'); requestAnimationFrame(() => $('#s4').classList.add('close')); });
+  [...$$('.end > *')].forEach((el, i) => at(T4 + 0.9 + i * 0.28, () => el.classList.add('show')));
+  at(T4 + 1.2, () => { $('#s3').classList.remove('on'); v3.pause(); });
+});
+</script>
+</body>
+</html>

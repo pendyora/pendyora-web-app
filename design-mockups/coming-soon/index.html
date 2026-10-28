@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="en" class="intro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DazzBliss Coming Soon</title>
+<link rel="icon" href="img/monogram-navy.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ Atlantic palette ============ */
+:root{
+  --page:#FFFFFF; --tile:#F3F3F2; --ink:#111111; --ink-soft:#5F6368; --line:#E6E6E6;
+  --navy:#2F4156; --navy-deep:#1B2633; --navy-night:#121A24;
+  --teal:#4E7486; --teal-soft:#9DB7C4; --teal-pale:#B9CFDA; --mist:#EEF3F7; --on-navy:#F5EFEB;
+  --display:'Cormorant Garamond', Georgia, serif;
+  --sans:'Libre Franklin', system-ui, sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --ease-io:cubic-bezier(.83,0,.17,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html.intro body{overflow:hidden}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px}
+.eyebrow{display:inline-flex;align-items:center;gap:14px;font-size:11px;letter-spacing:.32em;text-transform:uppercase;font-weight:500;color:var(--teal)}
+.eyebrow::before{content:"";width:28px;height:1px;background:currentColor;opacity:.7}
+.h2{font-family:var(--display);font-weight:300;font-size:clamp(38px,5vw,68px);line-height:1.04;letter-spacing:-.01em}
+.h2 em{font-style:italic;color:var(--teal)}
+.lead{font-size:16px;line-height:1.8;color:var(--ink-soft);max-width:540px}
+.spark{display:inline-block;width:14px;height:14px;flex:none}
+
+/* buttons */
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  background:var(--navy);color:#fff;font:500 11px/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;
+  padding:19px 30px;text-decoration:none;transition:background .4s,color .4s,transform .4s var(--ease)}
+.btn::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:sheen 4.5s 4s infinite}
+@keyframes sheen{0%{left:-60%}22%,100%{left:130%}}
+.btn:hover{background:var(--teal)}
+.btn svg{width:14px;height:14px;transition:transform .4s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+.btn.light{background:#fff;color:var(--navy)}
+.btn.light:hover{background:var(--teal-pale)}
+
+/* ============ intro curtain ============ */
+.curtain{position:fixed;inset:0;z-index:200}
+.done .curtain{pointer-events:none}
+.gone .curtain{display:none}
+.cp{position:absolute;top:0;bottom:0;width:50.2%;overflow:hidden;will-change:transform;
+  transition:transform 1.7s var(--ease-io)}
+.cp.l{left:0;background:radial-gradient(130% 90% at 100% 50%,#3B526B 0%,#24344A 45%,#151F2B 100%);box-shadow:inset -1px 0 0 rgba(185,207,218,.4)}
+.cp.r{right:0;background:radial-gradient(130% 90% at 0% 50%,#3B526B 0%,#24344A 45%,#151F2B 100%);box-shadow:inset 1px 0 0 rgba(185,207,218,.4)}
+.cp::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(118deg,rgba(185,207,218,.045) 0 1px,transparent 1px 26px)}
+.cp::after,.grain::after{content:"";position:absolute;inset:0;opacity:.28;mix-blend-mode:overlay;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.s2 .cp{transition-duration:.7s}
+.s2 .cp.l{transform:translateX(-16px)}
+.s2 .cp.r{transform:translateX(16px)}
+.s3 .cp{transition-duration:1.7s}
+.s3 .cp.l{transform:translateX(-101%)}
+.s3 .cp.r{transform:translateX(101%)}
+.c-logo{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;z-index:2;
+  opacity:0;transform:scale(.94);filter:blur(12px);transition:opacity 1.1s var(--ease),transform 1.4s var(--ease),filter 1.1s var(--ease)}
+.s1 .c-logo{opacity:1;transform:none;filter:none}
+.s2 .c-logo{opacity:0;transform:translateY(-14px) scale(1.02);filter:blur(6px);transition-duration:.6s}
+.c-logo .mono{width:clamp(92px,10vw,132px)}
+.c-logo .word{width:clamp(220px,26vw,360px);opacity:0;letter-spacing:0;transform:translateY(10px);transition:all 1s var(--ease) .5s}
+.s1 .c-logo .word{opacity:1;transform:none}
+.c-bar{width:160px;height:1px;background:rgba(185,207,218,.2);position:relative;overflow:hidden}
+.c-bar::after{content:"";position:absolute;inset:0;background:var(--teal-pale);transform:scaleX(0);transform-origin:left;transition:transform 1.4s var(--ease) .6s}
+.s1 .c-bar::after{transform:scaleX(1)}
+.c-tag{font-family:var(--display);font-style:italic;color:var(--teal-pale);font-size:18px;opacity:0;transition:opacity 1s .9s}
+.s1 .c-tag{opacity:1}
+.skip{position:absolute;right:28px;bottom:24px;z-index:3;color:rgba(245,239,235,.6);font-size:10px;letter-spacing:.3em;text-transform:uppercase;transition:color .3s,opacity .4s}
+.skip:hover{color:#fff}
+.s2 .skip{opacity:0}
+
+/* ============ header ============ */
+.hdr{position:fixed;inset:0 0 auto 0;z-index:100;transform:translateY(-100%);transition:transform 1s var(--ease) .2s}
+.done .hdr{transform:none}
+.topbar{height:38px;background:var(--navy-night);color:#D5E1E8;display:flex;align-items:center;justify-content:space-between;padding:0 40px;font-size:11px;letter-spacing:.08em;
+  transition:height .5s var(--ease),opacity .4s}
+.topbar a{text-decoration:none;display:inline-flex;align-items:center;gap:8px;opacity:.85;transition:opacity .3s}
+.topbar a:hover{opacity:1}
+.topbar .mailmini{width:15px;height:15px}
+.ticker-msg{position:relative;height:16px;flex:1;max-width:520px;margin:0 24px;overflow:hidden;text-align:center}
+.ticker-msg span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.24em;text-transform:uppercase;font-size:10px;
+  opacity:0;transform:translateY(100%);transition:all .7s var(--ease)}
+.ticker-msg span.on{opacity:1;transform:none}
+.ticker-msg span.out{opacity:0;transform:translateY(-100%)}
+.mini-social{display:flex;gap:8px}
+.mini-social a{opacity:1}
+.mini-social svg{width:20px;height:20px;border-radius:50%;transition:transform .35s var(--ease)}
+.mini-social a:hover svg{transform:translateY(-2px) scale(1.08)}
+.nav{height:88px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;color:#fff;position:relative;
+  transition:height .5s var(--ease),background .5s,color .5s,box-shadow .5s}
+.nav::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,26,36,.55),rgba(18,26,36,0));pointer-events:none;transition:opacity .5s}
+.brand{display:flex;align-items:center;gap:16px;text-decoration:none;position:relative}
+.brand .mono{height:44px;transition:height .5s var(--ease)}
+.brand .word{height:17px;transition:height .5s var(--ease)}
+.brand .rule{width:1px;height:30px;background:currentColor;opacity:.35}
+.brand .navy{display:none}
+.links{display:flex;gap:38px;list-style:none;position:relative}
+.links a{text-decoration:none;font-size:11px;letter-spacing:.24em;text-transform:uppercase;font-weight:500;position:relative;padding:8px 0}
+.links a::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
+.links a:hover::after{transform:scaleX(1);transform-origin:left}
+.nav-cta{display:flex;align-items:center;gap:18px;position:relative}
+.nav .btn{padding:15px 22px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px)}
+.nav .btn:hover{background:#fff;color:var(--navy)}
+.burger{display:none;width:40px;height:40px;position:relative}
+.burger i{position:absolute;left:9px;right:9px;height:1px;background:currentColor;transition:transform .4s var(--ease),top .4s}
+.burger i:nth-child(1){top:16px}.burger i:nth-child(2){top:24px}
+.progress{position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,var(--teal),var(--teal-pale));transform-origin:left;transform:scaleX(0)}
+/* scrolled state */
+.hdr.solid .topbar{height:0;opacity:0;overflow:hidden}
+.hdr.solid .nav{height:72px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px) saturate(1.4);color:var(--navy);box-shadow:0 1px 0 var(--line),0 18px 40px -30px rgba(27,38,51,.4)}
+.hdr.solid .nav::before{opacity:0}
+.hdr.solid .brand .white{display:none}
+.hdr.solid .brand .navy{display:block}
+.hdr.solid .brand .mono{height:38px}
+.hdr.solid .nav .btn{background:var(--navy);color:#fff;border-color:var(--navy);backdrop-filter:none}
+.hdr.solid .nav .btn:hover{background:var(--teal);border-color:var(--teal)}
+/* mobile menu */
+.menu{position:fixed;inset:0;z-index:150;background:var(--navy-deep);color:var(--on-navy);display:flex;flex-direction:column;justify-content:center;padding:40px 28px;
+  clip-path:circle(0% at calc(100% - 40px) 40px);transition:clip-path .8s var(--ease-io)}
+.menu-open .menu{clip-path:circle(150% at calc(100% - 40px) 40px)}
+.menu a.big{display:block;font-family:var(--display);font-size:42px;font-weight:300;text-decoration:none;padding:8px 0;border-bottom:1px solid rgba(245,239,235,.12)}
+.menu .close{position:absolute;top:22px;right:20px;width:40px;height:40px;font-size:28px;font-weight:200}
+.menu .mini-social{margin-top:36px}
+.menu .mini-social svg{width:36px;height:36px}
+
+/* ============ hero ============ */
+.hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;background:var(--navy-deep);color:#fff}
+.hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:62% 22%;transform:scale(1.18);transition:transform 2.8s var(--ease)}
+.s3 .hero-img{transform:scale(1)}
+.hero{background:radial-gradient(90% 120% at 0% 50%,#2A3B50 0%,var(--navy-deep) 55%,var(--navy-night) 100%)}
+/* photo mirrored so the model faces the headline */
+.hero-img{scale:-1 1;object-position:0% 35%}
+@media (min-width:901px){.hero-img{left:auto;right:0;width:62%}}
+.hero-shade{position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(27,38,51,1) 38%,rgba(27,38,51,.55) 46%,rgba(27,38,51,0) 60%),
+  linear-gradient(0deg,rgba(18,26,36,.5) 0%,rgba(18,26,36,0) 28%)}
+.hero-shade::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(118deg,rgba(185,207,218,.035) 0 1px,transparent 1px 26px);
+  -webkit-mask-image:linear-gradient(90deg,#000 30%,transparent 55%);mask-image:linear-gradient(90deg,#000 30%,transparent 55%)}
+@media (max-width:900px){.hero-shade{background:linear-gradient(0deg,rgba(18,26,36,.94) 0%,rgba(27,38,51,.6) 55%,rgba(27,38,51,.2) 100%)}.hero-shade::after{display:none}}
+.hero-in{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:170px;padding-bottom:110px}
+@media (max-height:780px){.scroll-ind{display:none}.hero .signup,.hero .trust{margin-top:24px}}
+.hero .eyebrow{color:var(--teal-pale)}
+.hero h1{font-family:var(--display);font-weight:300;font-size:clamp(56px,min(9.4vw,15vh),148px);line-height:.92;letter-spacing:-.02em;margin:clamp(14px,2.6vh,26px) 0 clamp(16px,3vh,30px)}
+.hero h1 em{font-style:italic;color:var(--teal-pale);display:inline-flex;align-items:flex-start;gap:.08em}
+.hero h1 em .spark{width:.22em;height:.22em;margin-top:.12em;animation:twinkle 3s infinite}
+.line{display:block;overflow:hidden;padding-bottom:.06em}
+.line>span{display:block;transform:translateY(105%);transition:transform 1.3s var(--ease)}
+.done .line>span{transform:none}
+.done .line:nth-child(2)>span{transition-delay:.12s}
+.hero p.lead{color:rgba(245,239,235,.82);font-size:17px;max-width:470px}
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease)}
+.done .fade-up{opacity:1;transform:none}
+.done .fu1{transition-delay:.3s}.done .fu2{transition-delay:.45s}.done .fu3{transition-delay:.6s}.done .fu4{transition-delay:.8s}
+.signup{display:flex;max-width:500px;margin-top:38px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(14px);padding:6px}
+.signup input{flex:1;min-width:0;background:none;border:0;outline:none;color:#fff;padding:0 18px;font:400 14px var(--sans)}
+.signup input::placeholder{color:rgba(245,239,235,.65)}
+.signup .btn{padding:17px 24px}
+.signup.dark{background:#fff;border-color:#fff}
+.signup.dark input{color:var(--ink)}
+.signup.dark input::placeholder{color:#8a8f94}
+.ok-msg{display:none;margin-top:38px;font-family:var(--display);font-style:italic;font-size:24px;color:var(--teal-pale)}
+.trust{display:flex;gap:30px;margin-top:40px;flex-wrap:wrap}
+.trust div{display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.06em;color:rgba(245,239,235,.88)}
+.trust .ico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(185,207,218,.14);border:1px solid rgba(185,207,218,.35)}
+.trust .ico svg{width:18px;height:18px}
+.badge{position:absolute;right:6%;bottom:9%;width:150px;height:150px;opacity:0;transform:scale(.8) rotate(-30deg);transition:all 1.4s var(--ease) .7s}
+.done .badge{opacity:1;transform:none}
+.badge svg.ring{width:100%;height:100%;animation:spin 22s linear infinite}
+.badge .mid{position:absolute;inset:34px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center}
+.badge .mid img{width:46px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(.6) rotate(45deg);opacity:.6}}
+.scroll-ind{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:rgba(245,239,235,.7)}
+.scroll-ind i{width:22px;height:36px;border:1px solid rgba(245,239,235,.5);border-radius:12px;position:relative}
+.scroll-ind i::after{content:"";position:absolute;left:50%;top:7px;width:2px;height:7px;margin-left:-1px;border-radius:2px;background:#fff;animation:wheel 2s infinite}
+@keyframes wheel{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
+
+/* ============ standouts marquee ============ */
+.band{background:var(--teal);color:#fff;overflow:hidden;padding:22px 0;position:relative}
+.band-track{display:flex;width:max-content;animation:tick 40s linear infinite}
+.band span{display:flex;align-items:center;gap:40px;padding-right:40px;font-family:var(--display);font-size:clamp(22px,2.4vw,32px);font-style:italic;font-weight:300;white-space:nowrap}
+.band span .spark{width:18px;height:18px}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* ============ reveal helpers ============ */
+.rv{opacity:0;transform:translateY(34px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s!important}.d2{transition-delay:.2s!important}.d3{transition-delay:.3s!important}.d4{transition-delay:.4s!important}
+.clip .ci{clip-path:inset(0 50% 0 50%);transition:clip-path 1.6s var(--ease-io)}
+.clip.in .ci{clip-path:inset(0 0 0 0)}
+.clip .ci img{transform:scale(1.15);transition:transform 2.4s var(--ease)}
+.clip.in .ci img{transform:none}
+
+/* ============ statement ============ */
+.statement{padding:150px 0 140px;position:relative;overflow:hidden}
+.st-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:80px;align-items:center}
+.words{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,48px);line-height:1.22;margin:28px 0 36px}
+.words .w{color:#D5DADF;transition:color .25s}
+.words .w.lit{color:var(--navy)}
+.words .w.acc.lit{color:var(--teal);font-style:italic}
+.st-media{position:relative;height:620px}
+.st-media .a{position:absolute;right:0;top:0;width:72%;height:86%;border-radius:220px 220px 0 0;overflow:hidden}
+.st-media .b{position:absolute;left:0;bottom:0;width:46%;height:46%;overflow:hidden;border:10px solid #fff;box-shadow:0 30px 60px -30px rgba(27,38,51,.45)}
+.st-media img{width:100%;height:100%;object-fit:cover}
+.st-media .sp{position:absolute;left:8%;top:40%;width:60px;color:var(--teal);animation:twinkle 4s infinite}
+.st-media .ring-txt{position:absolute;left:2%;top:4%;width:120px;height:120px;color:var(--navy);animation:spin 26s linear infinite}
+.sig{display:flex;align-items:center;gap:16px;margin-top:10px}
+.sig img{height:46px}
+.sig span{font-family:var(--display);font-style:italic;font-size:22px;color:var(--teal)}
+
+/* ============ standouts ============ */
+.standouts{background:var(--navy);color:var(--on-navy);padding:140px 0 150px;position:relative;overflow:hidden}
+.standouts::before{content:"";position:absolute;width:900px;height:900px;right:-300px;top:-380px;border-radius:50%;
+  background:radial-gradient(circle,rgba(78,116,134,.55),rgba(78,116,134,0) 65%)}
+.standouts::after{content:"";position:absolute;width:700px;height:700px;left:-260px;bottom:-360px;border-radius:50%;
+  background:radial-gradient(circle,rgba(157,183,196,.18),rgba(157,183,196,0) 65%)}
+.standouts .eyebrow{color:var(--teal-pale)}
+.standouts .h2 em{color:var(--teal-pale)}
+.so-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-bottom:70px;position:relative;z-index:1}
+.so-head p{max-width:380px;color:rgba(245,239,235,.72);line-height:1.75;font-size:15px}
+.so-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;position:relative;z-index:1}
+.so-card{--mx:50%;--my:50%;position:relative;padding:38px 30px 40px;border:1px solid rgba(245,239,235,.14);background:rgba(255,255,255,.035);
+  backdrop-filter:blur(6px);overflow:hidden;transition:transform .6s var(--ease),border-color .5s,background .5s;min-height:380px;display:flex;flex-direction:column}
+.so-card::before{content:"";position:absolute;inset:0;background:radial-gradient(360px circle at var(--mx) var(--my),rgba(185,207,218,.16),transparent 60%);opacity:0;transition:opacity .4s}
+.so-card:hover{transform:translateY(-10px);border-color:rgba(185,207,218,.5);background:rgba(255,255,255,.06)}
+.so-card:hover::before{opacity:1}
+.so-card .num{font-family:var(--display);font-size:15px;font-style:italic;color:var(--teal-soft)}
+.so-ico{width:74px;height:74px;margin:30px 0 34px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(145deg,#5D879A,#2F4156);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 18px 30px -14px rgba(0,0,0,.5);transition:transform .8s var(--ease)}
+.so-card:hover .so-ico{transform:rotate(-12deg) scale(1.06)}
+.so-ico svg{width:36px;height:36px}
+.so-card h3{font-family:var(--display);font-weight:400;font-size:32px;line-height:1.05;margin-bottom:14px}
+.so-card h3 em{font-style:italic;color:var(--teal-pale)}
+.so-card p{font-size:14px;line-height:1.7;color:rgba(245,239,235,.72)}
+.so-card .chip{margin-top:auto;padding-top:26px;display:flex;gap:8px;flex-wrap:wrap}
+.so-card .chip span{font-size:10px;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(185,207,218,.35);padding:7px 10px;color:var(--teal-pale)}
+
+/* ============ curved gallery ============ */
+.gallery{background:radial-gradient(120% 70% at 50% 0%,#24344A 0%,var(--navy-night) 60%);color:var(--on-navy);padding:130px 0 110px;overflow:hidden;position:relative}
+.gallery .head{text-align:center;position:relative;z-index:2}
+.gallery .eyebrow{color:var(--teal-pale)}
+.gallery .h2{margin-top:20px}
+.gallery .h2 em{color:var(--teal-pale)}
+.stage3d{position:relative;height:600px;margin-top:40px;perspective:1100px;cursor:grab;touch-action:pan-y;user-select:none}
+.stage3d:active{cursor:grabbing}
+.stage3d::before,.stage3d::after{content:"";position:absolute;top:0;bottom:0;width:12%;z-index:2;pointer-events:none}
+.stage3d::before{left:0;background:linear-gradient(90deg,var(--navy-night),transparent)}
+.stage3d::after{right:0;background:linear-gradient(-90deg,var(--navy-night),transparent)}
+.ring3d{position:absolute;left:50%;top:50%;transform-style:preserve-3d}
+.card3d{position:absolute;left:0;top:0;width:var(--cw);height:calc(var(--cw) * 1.333);margin-left:calc(var(--cw) / -2);margin-top:calc(var(--cw) * -.666);
+  backface-visibility:hidden;overflow:hidden;background:#0c121a;will-change:transform,filter}
+.card3d img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.card3d::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.g-hint{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:20px;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:rgba(245,239,235,.6)}
+.g-hint button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(245,239,235,.3);display:grid;place-items:center;transition:background .3s,border-color .3s}
+.g-hint button:hover{background:#fff;color:var(--navy);border-color:#fff}
+.g-hint svg{width:16px;height:16px}
+
+/* ============ diamonds ============ */
+.diamonds{padding:150px 0}
+.dm-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:90px;align-items:center}
+.dm-art{position:relative;aspect-ratio:4/5;max-width:520px;width:100%}
+.dm-art .arch{position:absolute;inset:0;border-radius:260px 260px 0 0;overflow:hidden;background:var(--mist)}
+.dm-art .arch img{width:100%;height:100%;object-fit:cover}
+.dm-art .ci{position:relative;height:100%}
+.dimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s var(--ease),transform 2.4s var(--ease)!important}
+.dimg.on{opacity:1}
+.dm-cap{position:absolute;left:-36px;bottom:12%;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);box-shadow:0 24px 50px -24px rgba(27,38,51,.45);
+  padding:16px 22px;min-width:230px;animation:bob 6s ease-in-out infinite}
+.dm-cap small{display:block;font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--teal)}
+.dm-cap b{display:block;font-family:var(--display);font-weight:400;font-size:24px;color:var(--navy);margin-top:4px;transition:opacity .4s}
+.dm-cap span{display:block;font-size:12px;color:var(--ink-soft);margin-top:2px;transition:opacity .4s}
+.dm-cap.swap b,.dm-cap.swap span{opacity:0}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.tabs{display:inline-flex;margin:36px 0 26px;background:var(--mist);padding:5px;position:relative}
+.tabs button{position:relative;z-index:1;padding:14px 26px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:500;color:var(--ink-soft);transition:color .4s}
+.tabs button.on{color:#fff}
+.tabs .pill{position:absolute;top:5px;bottom:5px;left:5px;background:var(--navy);transition:transform .5s var(--ease),width .5s var(--ease)}
+.panes{position:relative;min-height:170px}
+.pane{position:absolute;inset:0;opacity:0;transform:translateY(14px);transition:opacity .5s,transform .6s var(--ease);pointer-events:none}
+.pane.on{opacity:1;transform:none;pointer-events:auto}
+.pane h3{font-family:var(--display);font-weight:400;font-size:34px;color:var(--navy)}
+.pane p{margin-top:10px;color:var(--ink-soft);line-height:1.75;max-width:480px}
+.pane ul{list-style:none;display:flex;gap:22px;margin-top:20px;flex-wrap:wrap}
+.pane li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--navy)}
+.pane li svg{width:16px;height:16px;color:var(--teal)}
+.labs{margin-top:26px;padding-top:30px;border-top:1px solid var(--line)}
+.labs-h{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:16px}
+.labs-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lab{display:flex;align-items:center;gap:16px;padding:18px 20px;background:#fff;border:1px solid var(--line);transition:border-color .4s,box-shadow .4s}
+.lab:hover{border-color:var(--teal-soft);box-shadow:0 18px 40px -26px rgba(27,38,51,.5)}
+.lab img{height:40px;width:auto;flex:none}
+.lab b{display:block;font-family:var(--display);font-weight:500;font-size:30px;letter-spacing:.1em;color:var(--navy);line-height:1}
+.lab small{display:block;font-size:11px;line-height:1.45;color:var(--ink-soft);margin-top:4px}
+.lab img + .lab-txt b{display:none}
+.metals{background:var(--mist);padding:140px 0;position:relative;overflow:hidden}
+.mt-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.metals::before{content:"";position:absolute;width:760px;height:760px;left:-260px;top:-200px;border-radius:50%;border:1px solid rgba(47,65,86,.08)}
+.metals::after{content:"";position:absolute;width:520px;height:520px;left:-140px;top:-80px;border-radius:50%;border:1px solid rgba(47,65,86,.06)}
+.mt-visual{position:relative;max-width:480px;width:100%;margin:0 auto;z-index:1}
+.mt-frame{position:relative;aspect-ratio:4/5;border-radius:240px 240px 0 0;overflow:hidden;background:#fff;box-shadow:0 50px 90px -50px rgba(27,38,51,.55)}
+.mimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.1);transition:opacity 1.1s var(--ease),transform 2.6s var(--ease)}
+.mimg.on{opacity:1;transform:scale(1)}
+.mt-chip{position:absolute;left:-34px;bottom:56px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);padding:14px 24px 14px 14px;display:flex;gap:14px;align-items:center;
+  box-shadow:0 24px 50px -24px rgba(27,38,51,.45);animation:bob 6s ease-in-out infinite}
+.mt-chip small{display:block;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft)}
+.mt-chip b{display:block;font-family:var(--display);font-size:24px;font-weight:400;color:var(--navy);line-height:1.1}
+.mt-count{position:absolute;right:-44px;top:60px;writing-mode:vertical-rl;font-size:10px;letter-spacing:.32em;color:var(--teal);display:flex;align-items:center;gap:10px}
+.mt-count b{font-family:var(--display);font-size:22px;font-weight:400;letter-spacing:0;color:var(--navy);writing-mode:horizontal-tb}
+.mt-visual .sp{position:absolute;right:-18px;bottom:24%;width:38px;height:38px;color:var(--teal);animation:twinkle 4s infinite}
+@media (max-width:640px){.mt-chip{left:-6px;bottom:30px}.mt-count{display:none}.mt-visual .sp{right:4px}}
+.mlist{list-style:none;margin-top:40px;border-top:1px solid rgba(47,65,86,.14)}
+.mlist button{width:100%;display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:20px;padding:20px 6px;border-bottom:1px solid rgba(47,65,86,.14);text-align:left;position:relative;transition:padding .5s var(--ease)}
+.mlist button::before{content:"";position:absolute;left:0;top:-1px;height:1px;width:100%;background:var(--navy);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
+.mlist button.on::before{transform:scaleX(1)}
+.mlist.auto button.on::before{transition:none;animation:mfill 3.4s linear forwards}
+@keyframes mfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.mlist button.on{padding-left:16px}
+.sw{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 3px #fff,0 0 0 4px rgba(47,65,86,.16),0 12px 22px -12px rgba(47,65,86,.6);transition:box-shadow .4s,transform .5s var(--ease)}
+.mlist button.on .sw{box-shadow:0 0 0 3px #fff,0 0 0 4.5px var(--teal),0 12px 22px -12px rgba(47,65,86,.6);transform:scale(1.06)}
+.mlist b{display:block;font-family:var(--display);font-weight:400;font-size:28px;color:var(--navy);line-height:1.1}
+.mlist small{display:block;font-size:13px;color:var(--ink-soft);margin-top:4px;max-height:0;opacity:0;overflow:hidden;transition:max-height .6s var(--ease),opacity .5s}
+.mlist button.on small{max-height:40px;opacity:1}
+.mlist .arrow{width:18px;height:18px;color:var(--teal);opacity:0;transform:translateX(-8px);transition:all .4s var(--ease)}
+.mlist button.on .arrow,.mlist button:hover .arrow{opacity:1;transform:none}
+
+/* ============ moments ============ */
+.moments{padding:150px 0 140px}
+.mo-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;margin-bottom:60px}
+.mo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.mo{position:relative;aspect-ratio:3/4.3;overflow:hidden;color:#fff;cursor:pointer}
+.mo:nth-child(2){transform:translateY(60px)}
+.mo .ci{position:absolute;inset:0}
+.mo img{width:100%;height:100%;object-fit:cover;transition:transform 1.4s var(--ease)!important}
+.mo:hover img{transform:scale(1.07)!important}
+.mo .shade{position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,26,36,.88) 0%,rgba(27,38,51,.3) 45%,rgba(27,38,51,0) 70%);transition:background .6s}
+.mo:hover .shade{background:linear-gradient(0deg,rgba(27,38,51,.92) 0%,rgba(47,65,86,.5) 60%,rgba(47,65,86,.15) 100%)}
+.mo .txt{position:absolute;left:30px;right:30px;bottom:30px}
+.mo .tag{display:inline-block;font-size:10px;letter-spacing:.26em;text-transform:uppercase;padding:7px 12px;border:1px solid rgba(255,255,255,.45);backdrop-filter:blur(8px);margin-bottom:16px}
+.mo h3{font-family:var(--display);font-weight:300;font-size:42px;line-height:1}
+.mo p{font-size:14px;line-height:1.65;color:rgba(245,239,235,.85);max-height:0;opacity:0;overflow:hidden;transition:max-height .7s var(--ease),opacity .5s,margin .5s}
+.mo:hover p{max-height:90px;opacity:1;margin-top:12px}
+.mo .plus{position:absolute;top:24px;right:24px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5);display:grid;place-items:center;transition:transform .6s var(--ease),background .4s}
+.mo:hover .plus{transform:rotate(90deg);background:#fff;color:var(--navy)}
+.mo .plus svg{width:16px;height:16px}
+
+/* ============ worldwide ============ */
+.world{background:var(--navy-deep);color:var(--on-navy);padding:140px 0;position:relative;overflow:hidden}
+.wd-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.globe{width:100%;max-width:470px;margin:0 auto;display:block}
+.world .eyebrow{color:var(--teal-pale)}
+.world .h2 em{color:var(--teal-pale)}
+.clist{list-style:none;margin-top:40px}
+.clist li{display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:1px solid rgba(245,239,235,.12);font-family:var(--display);font-size:clamp(28px,3vw,38px);font-weight:300;transition:padding .5s var(--ease),color .4s}
+.clist li:hover{padding-left:14px;color:var(--teal-pale)}
+.clist li small{font-family:var(--sans);font-size:11px;letter-spacing:.2em;color:var(--teal-soft);width:26px}
+.clist li .pin{margin-left:auto;width:20px;height:20px;color:var(--teal-soft)}
+.clist li em{font-style:italic;color:var(--teal-pale)}
+
+/* ============ final ============ */
+.final{position:relative;min-height:100vh;display:grid;place-items:center;text-align:center;color:#fff;overflow:hidden}
+.final>img{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover;will-change:transform}
+.final::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(70% 70% at 50% 50%,rgba(27,38,51,.55),rgba(18,26,36,.9))}
+.final .inner{position:relative;z-index:2;padding:120px 24px;display:flex;flex-direction:column;align-items:center}
+.final .mono{width:84px;margin-bottom:30px}
+.final .eyebrow{color:var(--teal-pale)}
+.final h2{font-family:var(--display);font-weight:300;font-size:clamp(50px,7.6vw,118px);line-height:.98;margin:24px 0 16px}
+.final h2 em{font-style:italic;color:var(--teal-pale)}
+.final .tag{font-family:var(--display);font-style:italic;font-size:clamp(22px,2.4vw,30px);opacity:.92}
+.final .signup{margin-left:auto;margin-right:auto;width:100%}
+.final .fine{font-size:11px;letter-spacing:.06em;opacity:.7;margin-top:14px}
+.ask{margin-top:36px;display:inline-flex;align-items:center;gap:12px;font-size:14px;color:rgba(245,239,235,.9)}
+.ask svg{width:34px;height:34px}
+.ask a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.5);padding-bottom:2px;transition:border-color .3s,color .3s}
+.ask a:hover{color:var(--teal-pale);border-color:var(--teal-pale)}
+
+/* ============ footer ============ */
+footer{background:var(--navy-night);color:rgba(245,239,235,.7);padding:100px 0 0;font-size:14px;position:relative}
+.ft-grid{display:grid;grid-template-columns:1.4fr 1fr 1.2fr 1.3fr;gap:50px;padding-bottom:70px}
+.ft-brand .mono{width:64px;margin-bottom:22px}
+.ft-brand .word{width:200px}
+.ft-brand p{font-family:var(--display);font-style:italic;font-size:22px;color:var(--teal-pale);margin-top:18px}
+.ft-h{font-size:11px;letter-spacing:.28em;text-transform:uppercase;font-weight:500;color:#fff;margin-bottom:22px}
+.ft-links{list-style:none;display:grid;gap:12px}
+.ft-links a{text-decoration:none;transition:color .3s}
+.ft-links a:hover{color:#fff}
+.mail{display:inline-flex;align-items:center;gap:14px;text-decoration:none;color:#fff;font-family:var(--display);font-size:22px;transition:color .3s}
+.mail svg{width:42px;height:42px;flex:none;transition:transform .4s var(--ease)}
+.mail:hover{color:var(--teal-pale)}
+.mail:hover svg{transform:rotate(-8deg) scale(1.06)}
+.ft-note{margin-top:14px;font-size:12px;line-height:1.6}
+.socials{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.socials a{display:flex;align-items:center;gap:12px;text-decoration:none;padding:10px 12px 10px 10px;border:1px solid rgba(245,239,235,.1);font-size:13px;color:#fff;transition:background .35s,border-color .35s,transform .35s var(--ease)}
+.socials a:hover{background:rgba(255,255,255,.06);border-color:rgba(185,207,218,.45);transform:translateY(-3px)}
+.socials a:last-child{grid-column:span 2}
+.socials svg{width:30px;height:30px;border-radius:50%;flex:none}
+.ft-base{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:26px 0 30px;border-top:1px solid rgba(245,239,235,.1);font-size:11px;letter-spacing:.08em}
+footer .ft-base{padding-top:24px;padding-bottom:30px}
+.ft-big{overflow:hidden;padding-top:10px;margin-bottom:22px;opacity:.07}
+.ft-big img{width:100%;max-width:1280px;margin:0 auto}
+
+/* ============ responsive ============ */
+@media (max-width:1100px){
+  .links{display:none}
+  .burger{display:block}
+  .so-grid{grid-template-columns:1fr 1fr}
+  .ft-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:900px){
+  .wrap{padding:0 24px}
+  .st-grid,.dm-grid,.mt-grid,.wd-grid{grid-template-columns:1fr;gap:60px}
+  .st-media{height:520px}
+  .mo-grid{grid-template-columns:1fr 1fr}
+  .mo:nth-child(2){transform:none}
+  .dm-art{margin:0 auto}
+  .badge{display:none}
+}
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .topbar{padding:0 16px}
+  .topbar .mail-top,.topbar .mini-social{display:none}
+  .ticker-msg{margin:0}
+  .nav{padding:0 16px;height:72px}
+  .brand .word{height:13px}
+  .brand{gap:12px}
+  .brand .rule{height:24px}
+  .hero .eyebrow{letter-spacing:.2em;font-size:10px}
+  .hero .eyebrow::before{display:none}
+  .brand .mono{height:40px}
+  .nav .btn{display:none}
+  .hero-img{object-position:0% 35%}
+  .hero-shade{background:linear-gradient(0deg,rgba(18,26,36,.92) 0%,rgba(27,38,51,.55) 55%,rgba(27,38,51,.15) 100%)}
+  .hero-in{justify-content:flex-end;padding-top:140px;padding-bottom:90px}
+  .signup{flex-direction:column;padding:6px}
+  .signup input{padding:16px 14px}
+  .trust{gap:16px}
+  .trust div{font-size:11px}
+  .scroll-ind{display:none}
+  /* section spacing on phones */
+  .statement,.diamonds,.moments,.standouts,.metals,.gallery,.world{padding:50px 0}
+  .final{min-height:0}
+  .final .inner{padding:50px 16px}
+  .mo-grid{grid-template-columns:1fr}
+  /* standouts: compact 2x2 on phones */
+  .so-head{margin-bottom:34px}
+  .so-head p{display:none}
+  .so-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .so-card{min-height:0;padding:20px 16px 22px}
+  .so-card:hover{transform:none}
+  .so-card p,.so-card .chip{display:none}
+  .so-ico{width:44px;height:44px;margin:14px 0 16px}
+  .so-ico svg{width:22px;height:22px}
+  .so-card h3{font-size:22px;margin:0}
+  /* footer */
+  footer{padding-top:50px}
+  .ft-grid{gap:36px;padding-bottom:44px}
+  .ft-brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .ft-brand .mono{width:42px;margin:0}
+  .ft-brand .word{width:150px}
+  .ft-brand p{width:100%;margin-top:6px;font-size:18px}
+  .ft-h{margin-bottom:16px}
+  .ft-links{grid-template-columns:1fr 1fr;gap:12px 20px}
+  .mail{font-size:20px;gap:12px}
+  .mail svg{width:36px;height:36px}
+  .ft-big{display:none}
+  .ft-base{flex-direction:column;align-items:center;text-align:center;gap:8px}
+  .st-media{height:440px}
+  .stage3d{height:440px;perspective:900px}
+  .dm-cap{left:-6px;min-width:0}
+  .labs-row{grid-template-columns:1fr}
+  .tabs button{padding:13px 16px}
+  .panes{min-height:230px}
+  .ft-grid{grid-template-columns:1fr}
+  .socials{grid-template-columns:1fr 1fr}
+}
+html.shot *,html.shot *::before,html.shot *::after{transition:none!important}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SVG sprite: brand-coloured social icons + vectors ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="igg" cx="30%" cy="107%" r="150%">
+      <stop offset="0" stop-color="#FDF497"/><stop offset=".05" stop-color="#FDF497"/>
+      <stop offset=".45" stop-color="#FD5949"/><stop offset=".6" stop-color="#D6249F"/><stop offset=".9" stop-color="#285AEB"/>
+    </radialGradient>
+    <linearGradient id="tealg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6E97A9"/><stop offset="1" stop-color="#2F4156"/></linearGradient>
+    <linearGradient id="icog" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B9CFDA"/></linearGradient>
+  </defs>
+  <symbol id="i-ig" viewBox="0 0 24 24"><rect width="24" height="24" rx="12" fill="url(#igg)"/><rect x="6" y="6" width="12" height="12" rx="3.6" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="2.9" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="15.6" cy="8.4" r=".9" fill="#fff"/></symbol>
+  <symbol id="i-th" viewBox="0 0 24 24"><rect width="24" height="24" rx="12" fill="#000"/><path d="M15.9 9.6c-.8-2-2.5-2.9-4.3-2.9-2.6 0-4.1 2-4.1 5.3s1.5 5.3 4.1 5.3c2.3 0 3.8-1.3 3.8-3.2 0-1.9-1.6-2.8-3.4-2.8-1.4 0-2.3.7-2.3 1.7s.8 1.6 1.9 1.6c1.7 0 2.4-1.4 2.4-3.5" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><rect width="24" height="24" rx="12" fill="#000"/><path transform="translate(6.2 6.2) scale(.48)" fill="#fff" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#E60023"/><path fill="#fff" d="M12.6 5.4c-3.8 0-5.8 2.7-5.8 5 0 1.4.5 2.6 1.6 3 .2.1.3 0 .4-.2l.2-.7c0-.2 0-.3-.1-.4-.3-.4-.6-1-.6-1.7 0-2.2 1.6-4.1 4.2-4.1 2.3 0 3.6 1.4 3.6 3.3 0 2.5-1.1 4.6-2.7 4.6-.9 0-1.6-.7-1.3-1.6.3-1.1.8-2.2.8-3 0-.7-.4-1.3-1.1-1.3-.9 0-1.6.9-1.6 2.2 0 .8.3 1.3.3 1.3l-1.1 4.5c-.3 1.3 0 2.9 0 3.1 0 .1.1.1.2 0s1.1-1.3 1.4-2.5l.6-2.2c.3.5 1.1 1 1.9 1 2.6 0 4.4-2.4 4.4-5.6 0-2.5-2.1-4.7-5.3-4.7z"/></symbol>
+  <symbol id="i-fb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path fill="#fff" d="M13.4 24v-8.6h2.9l.4-3.4h-3.3V9.9c0-1 .3-1.6 1.7-1.6h1.8V5.2c-.3 0-1.4-.1-2.6-.1-2.6 0-4.3 1.6-4.3 4.4V12H7.1v3.4H10V24z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="url(#tealg)"/><rect x="6" y="8" width="12" height="8.5" rx="1.2" fill="none" stroke="#fff" stroke-width="1.3"/><path d="M6.5 8.7l5.5 4.2 5.5-4.2" fill="none" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 7.2 4.8 11.4 12 12-7.2.6-11.4 4.8-12 12-.6-7.2-4.8-11.4-12-12 7.2-.6 11.4-4.8 12-12z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-dia" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M6 4h12l4 5-10 12L2 9z"/><path d="M2 9h20M9 4l-2 5 5 12 5-12-2-5"/></g></symbol>
+  <symbol id="i-cert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><circle cx="12" cy="10" r="6.5"/><path d="M8.5 15.5L7 22l5-2.5 5 2.5-1.5-6.5"/><path d="M9.3 10l1.9 1.9 3.6-3.7"/></g></symbol>
+  <symbol id="i-rings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="9" cy="14" r="6"/><circle cx="15" cy="14" r="6"/><path d="M7 5.5L9 3l2 2.5M7 5.5h4" stroke-linejoin="round"/></g></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9.5"/><ellipse cx="12" cy="12" rx="4" ry="9.5"/><path d="M2.5 12h19M4 7h16M4 17h16"/></g></symbol>
+  <symbol id="i-pinloc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></g></symbol>
+  <symbol id="seal" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="#2F4156"/><circle cx="40" cy="40" r="32" fill="none" stroke="#B9CFDA" stroke-width=".8" stroke-dasharray="2 3"/><circle cx="40" cy="40" r="27" fill="none" stroke="#B9CFDA" stroke-width=".6"/></symbol>
+</svg>
+
+<!-- ===== Intro curtain: opens automatically on visit ===== -->
+<div class="curtain" id="curtain" aria-hidden="true">
+  <div class="cp l"></div>
+  <div class="cp r"></div>
+  <div class="c-logo">
+    <img class="mono" src="img/monogram-white.png" alt="">
+    <img class="word" src="img/wordmark-white.png" alt="">
+    <div class="c-bar"></div>
+    <div class="c-tag">Wear your bliss.</div>
+  </div>
+  <button class="skip" id="skip" type="button">Skip intro</button>
+</div>
+
+<!-- ===== Mobile menu ===== -->
+<nav class="menu" id="menu" aria-label="Menu">
+  <button class="close" id="menuClose" aria-label="Close menu">×</button>
+  <a class="big" href="#standouts">Our standouts</a>
+  <a class="big" href="#diamonds">Diamonds</a>
+  <a class="big" href="#metals">Metals</a>
+  <a class="big" href="#moments">Moments</a>
+  <a class="big" href="#contact">Contact</a>
+  <div class="mini-social">
+    <a href="https://www.instagram.com/dazzbliss/" target="_blank" rel="noopener" aria-label="Instagram"><svg><use href="#i-ig"/></svg></a>
+    <a href="https://www.threads.com/@dazzbliss" target="_blank" rel="noopener" aria-label="Threads"><svg><use href="#i-th"/></svg></a>
+    <a href="https://x.com/Dazzbliss" target="_blank" rel="noopener" aria-label="X"><svg><use href="#i-x"/></svg></a>
+    <a href="https://in.pinterest.com/dazzbliss/" target="_blank" rel="noopener" aria-label="Pinterest"><svg><use href="#i-pin"/></svg></a>
+    <a href="https://www.facebook.com/profile.php?id=61595880082192" target="_blank" rel="noopener" aria-label="Facebook"><svg><use href="#i-fb"/></svg></a>
+  </div>
+</nav>
+
+<!-- ===== Header ===== -->
+<header class="hdr" id="hdr">
+  <div class="topbar">
+    <a class="mail-top" href="mailto:support@dazzbliss.com"><svg class="mailmini"><use href="#i-mail"/></svg>support@dazzbliss.com</a>
+    <div class="ticker-msg" id="tmsg">
+      <span class="on"><svg class="spark" style="width:9px;height:9px;color:#9DB7C4"><use href="#i-spark"/></svg>Natural &amp; lab-grown diamonds</span>
+      <span><svg class="spark" style="width:9px;height:9px;color:#9DB7C4"><use href="#i-spark"/></svg>Graded by IGI or GIA</span>
+      <span><svg class="spark" style="width:9px;height:9px;color:#9DB7C4"><use href="#i-spark"/></svg>10K · 14K · 18K gold &amp; silver</span>
+      <span><svg class="spark" style="width:9px;height:9px;color:#9DB7C4"><use href="#i-spark"/></svg>Shipped worldwide</span>
+    </div>
+    <div class="mini-social">
+      <a href="https://www.instagram.com/dazzbliss/" target="_blank" rel="noopener" aria-label="Instagram"><svg><use href="#i-ig"/></svg></a>
+      <a href="https://www.threads.com/@dazzbliss" target="_blank" rel="noopener" aria-label="Threads"><svg><use href="#i-th"/></svg></a>
+      <a href="https://x.com/Dazzbliss" target="_blank" rel="noopener" aria-label="X"><svg><use href="#i-x"/></svg></a>
+      <a href="https://in.pinterest.com/dazzbliss/" target="_blank" rel="noopener" aria-label="Pinterest"><svg><use href="#i-pin"/></svg></a>
+      <a href="https://www.facebook.com/profile.php?id=61595880082192" target="_blank" rel="noopener" aria-label="Facebook"><svg><use href="#i-fb"/></svg></a>
+    </div>
+  </div>
+  <div class="nav">
+    <a class="brand" href="#" aria-label="DazzBliss home">
+      <img class="mono white" src="img/monogram-white.png" alt="">
+      <img class="mono navy" src="img/monogram-navy.png" alt="">
+      <span class="rule"></span>
+      <img class="word white" src="img/wordmark-white.png" alt="DazzBliss">
+      <img class="word navy" src="img/wordmark-navy.png" alt="DazzBliss">
+    </a>
+    <ul class="links">
+      <li><a href="#standouts">Standouts</a></li>
+      <li><a href="#diamonds">Diamonds</a></li>
+      <li><a href="#metals">Metals</a></li>
+      <li><a href="#moments">Moments</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn" href="#notify">Early access <svg><use href="#i-arrow"/></svg></a>
+      <button class="burger" id="burger" aria-label="Open menu"><i></i><i></i></button>
+    </div>
+    <div class="progress" id="progress"></div>
+  </div>
+</header>
+
+<!-- ===== Hero (banner: swap img/hero.jpg) ===== -->
+<section class="hero" id="hero">
+  <img class="hero-img" src="img/hero.jpg" alt="Model wearing diamond and pearl drop earrings">
+  <div class="hero-shade"></div>
+  <div class="wrap hero-in">
+    <div class="eyebrow fade-up">Launching soon · Fine diamond jewelry</div>
+    <h1>
+      <span class="line"><span>Wear your</span></span>
+      <span class="line"><span><em>bliss.<svg class="spark"><use href="#i-spark"/></svg></em></span></span>
+    </h1>
+    <p class="lead fade-up fu1">Minimal fine jewelry in natural and lab-grown diamonds, graded by IGI or GIA — made for gifting, anniversaries and every day.</p>
+    <div class="fade-up fu2">
+      <form class="signup js-signup">
+        <input type="email" required placeholder="Enter your email for early access" aria-label="Email address">
+        <button class="btn light" type="submit">Notify me <svg><use href="#i-arrow"/></svg></button>
+      </form>
+      <div class="ok-msg">You're on the list — thank you.</div>
+    </div>
+    <div class="trust fade-up fu3">
+      <div><span class="ico"><svg style="color:#fff"><use href="#i-cert"/></svg></span>IGI &amp; GIA graded</div>
+      <div><span class="ico"><svg style="color:#fff"><use href="#i-rings"/></svg></span>Gold &amp; silver</div>
+      <div><span class="ico"><svg style="color:#fff"><use href="#i-globe"/></svg></span>Shipped worldwide</div>
+    </div>
+  </div>
+  <div class="badge">
+    <svg class="ring" viewBox="0 0 150 150"><defs><path id="circ" d="M75,75 m-60,0 a60,60 0 1,1 120,0 a60,60 0 1,1 -120,0"/></defs>
+      <text fill="#fff" font-family="Libre Franklin" font-size="10.5" letter-spacing="4.2"><textPath href="#circ">COMING SOON · WEAR YOUR BLISS · </textPath></text></svg>
+    <div class="mid"><img src="img/monogram-white.png" alt=""></div>
+  </div>
+  <a class="scroll-ind fade-up fu4" href="#standouts"><i></i>Scroll</a>
+</section>
+
+<!-- ===== Standouts marquee ===== -->
+<div class="band" aria-hidden="true">
+  <div class="band-track">
+    <span>Natural diamonds <svg class="spark"><use href="#i-spark"/></svg> Lab-grown diamonds <svg class="spark"><use href="#i-spark"/></svg> IGI &amp; GIA graded <svg class="spark"><use href="#i-spark"/></svg> 10K · 14K · 18K gold <svg class="spark"><use href="#i-spark"/></svg> Silver <svg class="spark"><use href="#i-spark"/></svg> Shipped worldwide <svg class="spark"><use href="#i-spark"/></svg></span>
+    <span>Natural diamonds <svg class="spark"><use href="#i-spark"/></svg> Lab-grown diamonds <svg class="spark"><use href="#i-spark"/></svg> IGI &amp; GIA graded <svg class="spark"><use href="#i-spark"/></svg> 10K · 14K · 18K gold <svg class="spark"><use href="#i-spark"/></svg> Silver <svg class="spark"><use href="#i-spark"/></svg> Shipped worldwide <svg class="spark"><use href="#i-spark"/></svg></span>
+  </div>
+</div>
+
+<!-- ===== Statement ===== -->
+<section class="statement">
+  <div class="wrap st-grid">
+    <div>
+      <div class="eyebrow rv">DazzBliss is coming soon</div>
+      <p class="words" id="words">Minimal fine jewelry, made to be *worn every day.* Real diamonds, honest grading and precious metals — designed for the moments you *want to remember.*</p>
+      <div class="sig rv">
+        <img src="img/monogram-navy.png" alt="">
+        <span>Wear your bliss.</span>
+      </div>
+    </div>
+    <div class="st-media">
+      <div class="a clip"><div class="ci" style="height:100%"><img src="img/s-neck.jpg" alt="Model wearing a fine diamond necklace" data-par=".06" style="height:116%;margin-top:-8%"></div></div>
+      <div class="b clip"><div class="ci" style="height:100%"><img src="img/s-ear.jpg" alt="Close-up of a diamond stud earring"></div></div>
+      <svg class="sp"><use href="#i-spark"/></svg>
+      <svg class="ring-txt" viewBox="0 0 120 120"><defs><path id="circ2" d="M60,60 m-48,0 a48,48 0 1,1 96,0 a48,48 0 1,1 -96,0"/></defs>
+        <text fill="currentColor" font-family="Libre Franklin" font-size="9" letter-spacing="3.4"><textPath href="#circ2">FINE JEWELRY · DAZZBLISS · 2026 · </textPath></text></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Standouts ===== -->
+<section class="standouts" id="standouts">
+  <div class="wrap">
+    <div class="so-head">
+      <div>
+        <div class="eyebrow rv">Our standouts</div>
+        <h2 class="h2 rv d1" style="margin-top:22px">Four promises behind<br><em>every piece.</em></h2>
+      </div>
+      <p class="rv d2">No fuss and no compromise. Just jewelry you can trust, in the metal you love, delivered wherever you are.</p>
+    </div>
+    <div class="so-grid">
+      <article class="so-card rv">
+        <span class="num">01</span>
+        <div class="so-ico"><svg><use href="#i-dia" style="color:#fff"/></svg></div>
+        <h3>Natural <em>&amp;</em> lab-grown</h3>
+        <p>Choose an earth-mined diamond or a lab-grown one. Two origins, one standard of cut and sparkle.</p>
+        <div class="chip"><span>Natural</span><span>Lab-grown</span></div>
+      </article>
+      <article class="so-card rv d1">
+        <span class="num">02</span>
+        <div class="so-ico"><svg><use href="#i-cert" style="color:#fff"/></svg></div>
+        <h3>Graded by <em>IGI or GIA</em></h3>
+        <p>Our diamonds are independently graded by IGI or GIA, so you know exactly what you're wearing.</p>
+        <div class="chip"><span>IGI</span><span>GIA</span></div>
+      </article>
+      <article class="so-card rv d2">
+        <span class="num">03</span>
+        <div class="so-ico"><svg><use href="#i-rings" style="color:#fff"/></svg></div>
+        <h3>Gold <em>&amp;</em> silver</h3>
+        <p>10K, 14K and 18K gold, or silver. Pick the finish that suits your style.</p>
+        <div class="chip"><span>10K</span><span>14K</span><span>18K</span><span>Silver</span></div>
+      </article>
+      <article class="so-card rv d3">
+        <span class="num">04</span>
+        <div class="so-ico"><svg><use href="#i-globe" style="color:#fff"/></svg></div>
+        <h3>Shipped <em>worldwide</em></h3>
+        <p>Delivering to the USA, Canada, Australia, Hong Kong and more.</p>
+        <div class="chip"><span>USA</span><span>CA</span><span>AU</span><span>HK</span><span>+ more</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Curved 3D gallery ===== -->
+<section class="gallery" aria-label="DazzBliss mood gallery">
+  <div class="wrap head">
+    <div class="eyebrow rv">The DazzBliss mood</div>
+    <h2 class="h2 rv d1">Quiet sparkle, <em>worn your way.</em></h2>
+  </div>
+  <div class="stage3d" id="stage3d"><div class="ring3d" id="ring3d"></div></div>
+  <div class="g-hint">
+    <button type="button" id="gPrev" aria-label="Previous"><svg style="transform:rotate(180deg)"><use href="#i-arrow"/></svg></button>
+    Drag to explore
+    <button type="button" id="gNext" aria-label="Next"><svg><use href="#i-arrow"/></svg></button>
+  </div>
+</section>
+
+<!-- ===== Diamonds ===== -->
+<section class="diamonds" id="diamonds">
+  <div class="wrap dm-grid">
+    <div class="dm-art rv">
+      <div class="arch clip"><div class="ci">
+        <img class="dimg on" data-pane="nat" src="img/dia-natural.jpg" alt="Natural diamond resting on rough bark">
+        <img class="dimg" data-pane="lab" src="img/dia-lab.jpg" alt="Lab-grown diamond held in tweezers">
+      </div></div>
+      <div class="dm-cap" id="dmCap"><small>Shown</small><b>Natural diamond</b><span>Formed in the earth</span></div>
+    </div>
+    <div>
+      <div class="eyebrow rv">The diamonds</div>
+      <h2 class="h2 rv d1" style="margin-top:22px">Natural or lab-grown.<br><em>Always graded.</em></h2>
+      <div class="tabs rv d2" id="tabs">
+        <span class="pill"></span>
+        <button class="on" data-pane="nat" data-cap="Natural diamond|Formed in the earth" type="button">Natural</button>
+        <button data-pane="lab" data-cap="Lab-grown diamond|Grown above ground" type="button">Lab-grown</button>
+      </div>
+      <div class="panes rv d2">
+        <div class="pane on" id="nat">
+          <h3>Natural diamonds</h3>
+          <p>Formed deep in the earth over millions of years. A timeless choice for anniversaries and heirloom pieces.</p>
+          <ul><li><svg><use href="#i-check"/></svg>Earth-mined</li><li><svg><use href="#i-check"/></svg>IGI or GIA graded</li><li><svg><use href="#i-check"/></svg>Set in your metal</li></ul>
+        </div>
+        <div class="pane" id="lab">
+          <h3>Lab-grown diamonds</h3>
+          <p>Grown above ground, with the same chemical makeup as a mined diamond. The same sparkle, at a gentler price.</p>
+          <ul><li><svg><use href="#i-check"/></svg>Real diamond</li><li><svg><use href="#i-check"/></svg>IGI or GIA graded</li><li><svg><use href="#i-check"/></svg>Set in your metal</li></ul>
+        </div>
+      </div>
+      <div class="labs rv d3">
+        <div class="labs-h">Independently graded by</div>
+        <div class="labs-row">
+          <!-- Drop the official logo files in img/ as igi-logo.png and gia-logo.png; until then the name shows -->
+          <div class="lab"><img src="img/igi-logo.png" alt="IGI" onerror="this.remove()"><span class="lab-txt"><b>IGI</b><small>International Gemological Institute</small></span></div>
+          <div class="lab"><img src="img/gia-logo.png" alt="GIA" onerror="this.remove()"><span class="lab-txt"><b>GIA</b><small>Gemological Institute of America</small></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Metals ===== -->
+<section class="metals" id="metals">
+  <div class="wrap mt-grid">
+    <div class="mt-visual rv">
+      <div class="mt-frame">
+        <img class="mimg" src="img/metal-10k.jpg" alt="Gold rings in a jewelry tray">
+        <img class="mimg on" src="img/metal-14k.jpg" alt="Two gold wedding bands">
+        <img class="mimg" src="img/metal-18k.jpg" alt="Gold pendant with diamonds">
+        <img class="mimg" src="img/metal-ag.jpg" alt="Silver bracelets on a wrist">
+      </div>
+      <div class="mt-chip"><img class="sw" id="chipSw" src="img/metal-14k.jpg" alt=""><div><small>Shown in</small><b id="chipName">14K Gold</b></div></div>
+      <div class="mt-count"><b id="mNum">02</b>of 04 metals</div>
+      <svg class="sp"><use href="#i-spark"/></svg>
+    </div>
+    <div>
+      <div class="eyebrow rv">The metals</div>
+      <h2 class="h2 rv d1" style="margin-top:22px">Set in the metal<br><em>you love.</em></h2>
+      <p class="lead rv d2" style="margin-top:18px">Every piece can be made in the metal that suits you best.</p>
+      <ul class="mlist auto rv d2" id="mlist">
+        <li><button type="button" data-c="#F6E7BE,#D9B76A,#A8843A" data-n="10K Gold"><img class="sw" src="img/metal-10k.jpg" alt=""><span><b>10K Gold</b><small>Durable everyday gold with a soft, warm tone.</small></span><svg class="arrow"><use href="#i-arrow"/></svg></button></li>
+        <li><button type="button" class="on" data-c="#FBE7B0,#D6A83F,#9E7524" data-n="14K Gold"><img class="sw" src="img/metal-14k.jpg" alt=""><span><b>14K Gold</b><small>The classic balance of rich colour and strength.</small></span><svg class="arrow"><use href="#i-arrow"/></svg></button></li>
+        <li><button type="button" data-c="#FDE29C,#D29A22,#93660F" data-n="18K Gold"><img class="sw" src="img/metal-18k.jpg" alt=""><span><b>18K Gold</b><small>Deeper, richer gold for pieces that feel like heirlooms.</small></span><svg class="arrow"><use href="#i-arrow"/></svg></button></li>
+        <li><button type="button" data-c="#FAFAFA,#C9CBCE,#8A8E94" data-n="Silver"><img class="sw" src="img/metal-ag.jpg" alt=""><span><b>Silver</b><small>Bright, cool and easy to wear every day.</small></span><svg class="arrow"><use href="#i-arrow"/></svg></button></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Moments ===== -->
+<section class="moments" id="moments">
+  <div class="wrap">
+    <div class="mo-head">
+      <div>
+        <div class="eyebrow rv">Made for moments</div>
+        <h2 class="h2 rv d1" style="margin-top:22px">For the gift, the date,<br><em>the everyday.</em></h2>
+      </div>
+      <p class="lead rv d2" style="max-width:360px">Clean lines and quiet sparkle, designed to be worn — not saved for later.</p>
+    </div>
+    <div class="mo-grid">
+      <article class="mo clip rv">
+        <div class="ci"><img src="img/m-gift.jpg" alt="Solitaire ring in a gift box"></div>
+        <div class="shade"></div>
+        <span class="plus"><svg><use href="#i-arrow"/></svg></span>
+        <div class="txt"><span class="tag">01 · Gifting</span><h3>Gifting</h3><p>Little boxes, big meaning. Pieces they'll reach for every morning.</p></div>
+      </article>
+      <article class="mo clip rv d1">
+        <div class="ci"><img src="img/m-anniv.jpg" alt="Couple holding hands, diamond ring"></div>
+        <div class="shade"></div>
+        <span class="plus"><svg><use href="#i-arrow"/></svg></span>
+        <div class="txt"><span class="tag">02 · Anniversaries</span><h3>Anniversaries</h3><p>Mark the years with a diamond made to last as long as you do.</p></div>
+      </article>
+      <article class="mo clip rv d2">
+        <div class="ci"><img src="img/m-every.jpg" alt="Hand wearing a delicate ring and bracelet"></div>
+        <div class="shade"></div>
+        <span class="plus"><svg><use href="#i-arrow"/></svg></span>
+        <div class="txt"><span class="tag">03 · Everyday</span><h3>Everyday wear</h3><p>Minimal pieces that go from desk to dinner without a second thought.</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Worldwide ===== -->
+<section class="world" id="world">
+  <div class="wrap wd-grid">
+    <svg class="globe rv" viewBox="0 0 400 400" aria-hidden="true">
+      <defs>
+        <radialGradient id="gl" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#4E7486"/><stop offset=".6" stop-color="#2F4156"/><stop offset="1" stop-color="#1B2633"/></radialGradient>
+      </defs>
+      <circle cx="200" cy="200" r="190" fill="none" stroke="rgba(185,207,218,.12)"/>
+      <circle cx="200" cy="200" r="150" fill="url(#gl)"/>
+      <g fill="none" stroke="rgba(185,207,218,.35)" stroke-width="1">
+        <ellipse cx="200" cy="200" rx="150" ry="40"/><ellipse cx="200" cy="200" rx="150" ry="95"/>
+        <path d="M50 200h300"/>
+        <ellipse cx="200" cy="200" ry="150" rx="150"><animate attributeName="rx" values="150;0;150" dur="9s" repeatCount="indefinite"/></ellipse>
+        <ellipse cx="200" cy="200" ry="150" rx="100"><animate attributeName="rx" values="100;0;150;100" keyTimes="0;.22;.67;1" dur="9s" repeatCount="indefinite"/></ellipse>
+        <ellipse cx="200" cy="200" ry="150" rx="50"><animate attributeName="rx" values="50;0;150;50" keyTimes="0;.11;.6;1" dur="9s" repeatCount="indefinite"/></ellipse>
+      </g>
+      <g fill="#B9CFDA">
+        <circle cx="120" cy="150" r="4"/><circle cx="120" cy="150" r="4" fill="none" stroke="#B9CFDA"><animate attributeName="r" values="4;16" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="2.4s" repeatCount="indefinite"/></circle>
+        <circle cx="132" cy="118" r="3.5"/>
+        <circle cx="300" cy="275" r="4"/><circle cx="300" cy="275" r="4" fill="none" stroke="#B9CFDA"><animate attributeName="r" values="4;16" dur="2.4s" begin=".8s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="2.4s" begin=".8s" repeatCount="indefinite"/></circle>
+        <circle cx="280" cy="172" r="3.5"/><circle cx="280" cy="172" r="3.5" fill="none" stroke="#B9CFDA"><animate attributeName="r" values="3.5;14" dur="2.4s" begin="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="2.4s" begin="1.6s" repeatCount="indefinite"/></circle>
+      </g>
+      <g fill="none" stroke="rgba(185,207,218,.6)" stroke-dasharray="3 5">
+        <path d="M132 118 Q 200 60 280 172"/><path d="M120 150 Q 220 250 300 275"/>
+      </g>
+      <g transform="rotate(-18 200 200)">
+        <ellipse cx="200" cy="200" rx="185" ry="52" fill="none" stroke="rgba(185,207,218,.3)"/>
+        <circle r="5" fill="#fff"><animateMotion dur="7s" repeatCount="indefinite" path="M15 200a185 52 0 1 0 370 0a185 52 0 1 0 -370 0"/></circle>
+      </g>
+    </svg>
+    <div>
+      <div class="eyebrow rv">Shipped worldwide</div>
+      <h2 class="h2 rv d1" style="margin-top:22px">Wherever you are,<br><em>we'll find you.</em></h2>
+      <ul class="clist">
+        <li class="rv"><small>01</small>USA<svg class="pin"><use href="#i-pinloc"/></svg></li>
+        <li class="rv d1"><small>02</small>Canada<svg class="pin"><use href="#i-pinloc"/></svg></li>
+        <li class="rv d2"><small>03</small>Australia<svg class="pin"><use href="#i-pinloc"/></svg></li>
+        <li class="rv d3"><small>04</small>Hong Kong<svg class="pin"><use href="#i-pinloc"/></svg></li>
+        <li class="rv d4"><small>05</small><em>&amp; many more</em><svg class="pin"><use href="#i-globe"/></svg></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Final CTA ===== -->
+<section class="final" id="notify">
+  <img src="img/cta.jpg" alt="" data-par=".12">
+  <div class="inner">
+    <img class="mono rv" src="img/monogram-white.png" alt="">
+    <div class="eyebrow rv d1">Launching soon</div>
+    <h2 class="rv d2">DazzBliss is<br><em>coming soon.</em></h2>
+    <div class="tag rv d3">Wear your bliss.</div>
+    <div class="rv d4" style="width:100%;max-width:520px">
+      <form class="signup dark js-signup">
+        <input type="email" required placeholder="Your email address" aria-label="Email address">
+        <button class="btn" type="submit">Notify me <svg><use href="#i-arrow"/></svg></button>
+      </form>
+      <div class="ok-msg">You're on the list — thank you.</div>
+      <div class="fine">Be the first to see the collection. No spam, ever.</div>
+    </div>
+    <div class="ask rv d4"><svg><use href="#i-mail"/></svg>Questions? Write to us at&nbsp;<a href="mailto:support@dazzbliss.com">support@dazzbliss.com</a></div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer id="contact">
+  <div class="wrap ft-grid">
+    <div class="ft-brand">
+      <img class="mono" src="img/monogram-white.png" alt="">
+      <img class="word" src="img/wordmark-white.png" alt="DazzBliss">
+      <p>Wear your bliss.</p>
+    </div>
+    <div>
+      <div class="ft-h">Explore</div>
+      <ul class="ft-links">
+        <li><a href="#standouts">Our standouts</a></li>
+        <li><a href="#diamonds">Diamonds</a></li>
+        <li><a href="#metals">Metals</a></li>
+        <li><a href="#moments">Moments</a></li>
+        <li><a href="#notify">Early access</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="ft-h">Contact us</div>
+      <a class="mail" href="mailto:support@dazzbliss.com"><svg><use href="#i-mail"/></svg>support@dazzbliss.com</a>
+      <p class="ft-note">Questions about diamonds, metals or gifting? Just ask.</p>
+    </div>
+    <div>
+      <div class="ft-h">Follow us</div>
+      <nav class="socials" aria-label="DazzBliss on social media">
+        <a href="https://www.instagram.com/dazzbliss/" target="_blank" rel="noopener"><svg><use href="#i-ig"/></svg>Instagram</a>
+        <a href="https://www.threads.com/@dazzbliss" target="_blank" rel="noopener"><svg><use href="#i-th"/></svg>Threads</a>
+        <a href="https://x.com/Dazzbliss" target="_blank" rel="noopener"><svg><use href="#i-x"/></svg>X</a>
+        <a href="https://in.pinterest.com/dazzbliss/" target="_blank" rel="noopener"><svg><use href="#i-pin"/></svg>Pinterest</a>
+        <a href="https://www.facebook.com/profile.php?id=61595880082192" target="_blank" rel="noopener"><svg><use href="#i-fb"/></svg>Facebook</a>
+      </nav>
+    </div>
+  </div>
+  <div class="wrap ft-big" aria-hidden="true"><img src="img/wordmark-white.png" alt=""></div>
+  <div class="wrap ft-base">
+    <span>© 2026 DazzBliss. Fine jewelry, shipped worldwide.</span>
+    <span>USA · Canada · Australia · Hong Kong · &amp; more</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const H = document.documentElement;
+  const shot = location.search.includes('shot');
+  if (shot){ H.classList.add('shot'); const y=+(new URLSearchParams(location.search).get('y')||0); addEventListener('load',()=>{scrollTo({top:y,behavior:'instant'}); dispatchEvent(new Event('scroll'));}); }
+  const reduce = shot || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const clamp = (v,a,b)=>Math.min(b,Math.max(a,v));
+
+  /* ---------- 1. Intro: logo → slit → curtains open (no scroll needed) ---------- */
+  const timers = [];
+  function finish(){
+    timers.forEach(clearTimeout);
+    H.classList.add('s1','s2','s3','done'); H.classList.remove('intro');
+    setTimeout(()=>H.classList.add('gone'), 1800);
+  }
+  if (reduce){ finish(); }
+  else {
+    timers.push(setTimeout(()=>H.classList.add('s1'), 150));
+    timers.push(setTimeout(()=>H.classList.add('s2'), 2300));
+    timers.push(setTimeout(()=>H.classList.add('s3'), 2900));
+    timers.push(setTimeout(finish, 3700));
+  }
+  $('#skip').addEventListener('click', finish);
+
+  /* ---------- 2. Header state + progress ---------- */
+  const hdr = $('#hdr'), prog = $('#progress');
+  function onScroll(){
+    hdr.classList.toggle('solid', scrollY > 60);
+    const max = document.body.scrollHeight - innerHeight;
+    prog.style.transform = `scaleX(${clamp(scrollY/max,0,1)})`;
+    parallax(); words();
+  }
+
+  /* top-bar rotating messages */
+  const msgs = $$('#tmsg span'); let mi = 0;
+  setInterval(()=>{
+    const cur = msgs[mi]; cur.classList.remove('on'); cur.classList.add('out');
+    setTimeout(()=>cur.classList.remove('out'), 700);
+    mi = (mi+1) % msgs.length; msgs[mi].classList.add('on');
+  }, 3200);
+
+  /* mobile menu */
+  $('#burger').onclick = ()=>H.classList.add('menu-open');
+  $('#menuClose').onclick = ()=>H.classList.remove('menu-open');
+  $$('#menu a.big').forEach(a=>a.addEventListener('click',()=>H.classList.remove('menu-open')));
+
+  /* ---------- 3. Reveals ---------- */
+  const io = new IntersectionObserver(es => es.forEach(e=>{
+    if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  }), {threshold:0, rootMargin:'0px 0px -12% 0px'});
+  $$('.rv,.clip').forEach(el=> shot ? el.classList.add('in') : io.observe(el));
+
+  /* ---------- 4. Parallax ---------- */
+  const pars = $$('[data-par]');
+  function parallax(){
+    if (reduce) return;
+    pars.forEach(el=>{
+      const r = el.parentElement.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      const off = (r.top + r.height/2 - innerHeight/2) * parseFloat(el.dataset.par);
+      el.style.translate = `0 ${off}px`;
+    });
+  }
+
+  /* ---------- 5. Statement words light up on scroll ---------- */
+  const wEl = $('#words');
+  wEl.innerHTML = wEl.textContent.split(/(\*[^*]+\*)/).map(chunk=>{
+    const acc = chunk.startsWith('*');
+    return chunk.replace(/\*/g,'').split(' ').filter(Boolean)
+      .map(w=>`<span class="w${acc?' acc':''}">${w}</span>`).join(' ');
+  }).join(' ');
+  const ws = $$('#words .w');
+  function words(){
+    const r = wEl.getBoundingClientRect();
+    const p = clamp((innerHeight*.85 - r.top) / (r.height + innerHeight*.35), 0, 1);
+    const n = Math.round(p * ws.length * 1.15);
+    ws.forEach((w,i)=>w.classList.toggle('lit', i < n));
+  }
+
+  addEventListener('scroll', onScroll, {passive:true});
+  addEventListener('resize', onScroll);
+  onScroll();
+
+  /* ---------- 6. Spotlight on standout cards ---------- */
+  $$('.so-card').forEach(c=>c.addEventListener('pointermove', e=>{
+    const r = c.getBoundingClientRect();
+    c.style.setProperty('--mx', (e.clientX-r.left)+'px');
+    c.style.setProperty('--my', (e.clientY-r.top)+'px');
+  }));
+
+  /* ---------- 7. Curved 3D gallery ---------- */
+  const imgs = Array.from({length:12},(_,i)=>`img/c${String(i+1).padStart(2,'0')}.jpg`);
+  const ring = $('#ring3d'), stage = $('#stage3d');
+  const N = 24, STEP = 360/N;
+  const cards = [];
+  for (let i=0;i<N;i++){
+    const d = document.createElement('div'); d.className='card3d';
+    d.innerHTML = `<img src="${imgs[i%imgs.length]}" alt="" loading="lazy" draggable="false">`;
+    ring.appendChild(d); cards.push(d);
+  }
+  let R, rot = 0, vel = 0, target = null, dragging = false, hover = false, lastX = 0, lastT = 0, visible = false;
+  function sizeRing(){
+    const cw = innerWidth < 640 ? 170 : innerWidth < 1100 ? 230 : 280;
+    const gap = innerWidth < 640 ? 12 : 22;
+    stage.style.setProperty('--cw', cw+'px');
+    R = (cw + gap) / (2 * Math.sin(STEP/2 * Math.PI/180));
+  }
+  sizeRing(); addEventListener('resize', sizeRing);
+  function render(){
+    cards.forEach((c,i)=>{
+      let a = ((i*STEP + rot) % 360 + 540) % 360 - 180;
+      if (Math.abs(a) > 66){ c.style.visibility='hidden'; return; }
+      c.style.visibility='visible';
+      c.style.transform = `translateZ(${R}px) rotateY(${a}deg) translateZ(${-R}px)`;
+      c.style.filter = `brightness(${(1 - Math.abs(a)/95).toFixed(3)})`;
+    });
+  }
+  let prev = performance.now();
+  function loop(now){
+    const dt = Math.min(50, now - prev); prev = now;
+    if (!dragging){
+      if (target !== null){
+        const diff = target - rot; rot += diff * .08;
+        if (Math.abs(diff) < .05){ rot = target; target = null; }
+      } else {
+        vel *= .94;
+        rot += vel + (hover || reduce ? 0 : -.006 * dt);
+      }
+    }
+    if (visible) render();
+    requestAnimationFrame(loop);
+  }
+  new IntersectionObserver(es=>{visible = es[0].isIntersecting}).observe(stage);
+  render(); requestAnimationFrame(loop);
+  stage.addEventListener('pointerenter', ()=>hover=true);
+  stage.addEventListener('pointerleave', ()=>{hover=false; dragging=false});
+  stage.addEventListener('pointerdown', e=>{dragging=true; target=null; lastX=e.clientX; lastT=performance.now(); vel=0; stage.setPointerCapture(e.pointerId)});
+  stage.addEventListener('pointermove', e=>{
+    if (!dragging) return;
+    const dx = e.clientX - lastX; lastX = e.clientX;
+    const d = dx * (innerWidth < 640 ? .16 : .09);
+    rot += d; vel = d;
+  });
+  const endDrag = ()=>{ if (!dragging) return; dragging=false; target = Math.round((rot + vel*12)/STEP)*STEP; };
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+  $('#gPrev').onclick = ()=>{ target = Math.round(rot/STEP)*STEP + STEP; };
+  $('#gNext').onclick = ()=>{ target = Math.round(rot/STEP)*STEP - STEP; };
+
+  /* ---------- 8. Natural / lab-grown tabs ---------- */
+  const tabs = $('#tabs'), pill = tabs.querySelector('.pill');
+  function placePill(b){ pill.style.width = b.offsetWidth+'px'; pill.style.transform = `translateX(${b.offsetLeft-5}px)`; }
+  tabs.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    tabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
+    $$('.pane').forEach(p=>p.classList.toggle('on', p.id===b.dataset.pane));
+    $$('.dimg').forEach(im=>im.classList.toggle('on', im.dataset.pane===b.dataset.pane));
+    const cap = $('#dmCap'), [t1,t2] = b.dataset.cap.split('|');
+    cap.classList.add('swap');
+    setTimeout(()=>{ cap.querySelector('b').textContent=t1; cap.querySelector('span').textContent=t2; cap.classList.remove('swap'); }, 380);
+    placePill(b);
+  }));
+  const placeOn = ()=>placePill(tabs.querySelector('button.on'));
+  addEventListener('resize', placeOn); document.fonts && document.fonts.ready.then(placeOn); placeOn();
+
+  /* ---------- 9. Metal picker (auto-cycles until clicked) ---------- */
+  const mBtns = $$('#mlist button'), mImgs = $$('.mimg'), mList = $('#mlist');
+  let mIdx = 1, mAuto = !reduce, mTimer;
+  function pickMetal(i){
+    mIdx = i; const b = mBtns[i];
+    mBtns.forEach(x=>x.classList.toggle('on', x===b));
+    mImgs.forEach((im,k)=>im.classList.toggle('on', k===i));
+    $('#chipSw').src = b.querySelector('.sw').src;
+    $('#chipName').textContent = b.dataset.n;
+    $('#mNum').textContent = String(i+1).padStart(2,'0');
+    if (mAuto){ clearTimeout(mTimer); mTimer = setTimeout(()=>pickMetal((mIdx+1)%mBtns.length), 3400); }
+  }
+  const takeOver = i=>{ mAuto=false; clearTimeout(mTimer); mList.classList.remove('auto'); pickMetal(i); };
+  mBtns.forEach((b,i)=>{ b.addEventListener('click',()=>takeOver(i)); b.addEventListener('mouseenter',()=>takeOver(i)); });
+  if (reduce) mList.classList.remove('auto');
+  new IntersectionObserver((es,o)=>{ if (es[0].isIntersecting){ pickMetal(mIdx); o.disconnect(); } }).observe(mList);
+
+  /* ---------- 10. Mock signup ---------- */
+  /* Free "Notify me" with no server: answers go into a Google Form → Google Sheet.
+     Fill these two values in (setup steps: NOTIFY-SETUP.md). Left empty, the form just shows the thank-you. */
+  const NOTIFY = {
+    action: 'https://docs.google.com/forms/d/e/1FAIpQLSfjBYffEr6x8XHpBYRVHsn54N3JSPzFr5IEzBdcQer1dGYong/formResponse',
+    emailField: 'entry.977077407'   // the form's "Email" question
+  };
+  $$('.js-signup').forEach(f=>f.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const email = f.querySelector('input').value.trim(), btn = f.querySelector('button');
+    btn.disabled = true; btn.style.opacity = .6;
+    if (NOTIFY.action && NOTIFY.emailField){
+      try { await fetch(NOTIFY.action, {method:'POST', mode:'no-cors', body:new URLSearchParams({[NOTIFY.emailField]: email})}); } catch(_){}
+    }
+    f.style.display='none';
+    const ok = f.parentElement.querySelector('.ok-msg'); if (ok) ok.style.display='block';
+  }));
+})();
+</script>
+</body>
+</html>

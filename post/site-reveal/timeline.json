@@ -1,0 +1,68 @@
+{
+ "duration": 19,
+ "captionTop": 132,
+ "captions": [
+  {
+   "from": 0.5,
+   "to": 3.4,
+   "html": "This is <em>dazzbliss.com</em>"
+  },
+  {
+   "from": 5.9,
+   "to": 7.6,
+   "html": "Natural <em>&amp;</em> lab-grown diamonds"
+  },
+  {
+   "from": 8.3,
+   "to": 10.0,
+   "html": "Made for <em>every day</em>"
+  },
+  {
+   "from": 10.7,
+   "to": 12.4,
+   "html": "Graded by <em>IGI or GIA</em>"
+  },
+  {
+   "from": 13.1,
+   "to": 14.8,
+   "html": "10K · 14K · 18K gold <em>&amp;</em> silver"
+  },
+  {
+   "from": 15.6,
+   "to": 19.0,
+   "html": "Early access is open.<small>Link in bio · dazzbliss.com</small>"
+  }
+ ],
+ "scroll": [
+  {
+   "at": 5.4,
+   "sel": ".so-head",
+   "off": -210,
+   "ms": 1000
+  },
+  {
+   "at": 7.8,
+   "sel": ".gallery .head",
+   "off": -205,
+   "ms": 1000
+  },
+  {
+   "at": 10.2,
+   "sel": ".dm-art",
+   "off": -205,
+   "ms": 1000
+  },
+  {
+   "at": 12.6,
+   "sel": ".mt-visual",
+   "off": -205,
+   "ms": 1000
+  },
+  {
+   "at": 15.0,
+   "sel": "#notify .mono",
+   "off": -250,
+   "ms": 1100
+  }
+ ]
+}
